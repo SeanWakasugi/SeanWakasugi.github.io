@@ -1,5 +1,5 @@
 # 公開するページのURL
-baseURL = "https://kat0h.github.io/hugo-blog-template"
+baseURL = "https://SeanWakasugi.github.io"
 
 languageCode = "ja"
 DefaultContentLanguage = "ja"
@@ -7,16 +7,16 @@ HasCJKLanguage = true
 enableRobotsTXT = true
 
 # ブログのタイトル
-title = "hugo-blog-template"
+title = "SeanWakasugiBlog"
 
 theme = "mainroad"
 paginate = 20
 
 # 自己紹介
 [Author]
-    name = "Author"
-    bio = "ここに自己紹介を入れることができます"
-    avatar = "img/avatar.png"
+    name = "Sean Wakasugi"
+    bio = "Swiftを学習中"
+    avatar = "img/avatar.jpg"
 
 [Params]
     customCSS = ["css/custom.css"]
@@ -28,12 +28,11 @@ paginate = 20
 
 # ページのテーマカラー
 [Params.style.vars]
-  highlightColor = "#e22d30"
+  highlightColor = "#00ff00"
 
 # SNS等のユーザー名
 [Params.widgets.social]
-  twitter = "uvrub"
-  github = "kato-k"
+  github = "SeanWakasugi"
 
 [Params.sidebar]
     home = "right"
