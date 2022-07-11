@@ -7,15 +7,12 @@ HasCJKLanguage = true
 enableRobotsTXT = true
 
 # ブログのタイトル
-title = "SeanWakasugiBlog"
-
+title = "しょ〜んの技術メモ😗"
 theme = "mainroad"
 paginate = 20
 
 # 自己紹介
 [Author]
-    name = "Sean Wakasugi"
-    bio = "Swiftを学習中"
     avatar = "img/avatar.jpg"
 
 [Params]
@@ -28,11 +25,11 @@ paginate = 20
 
 # ページのテーマカラー
 [Params.style.vars]
-  highlightColor = "#00ff00"
+  highlightColor = "#00bfff"
 
 # SNS等のユーザー名
 [Params.widgets.social]
-  github = "SeanWakasugi"
+
 
 [Params.sidebar]
     home = "right"
