@@ -1,21 +1,21 @@
 ---
-title: "Storyboardで作成できるUIButtonと同じものをコードで作る"
+title: "Storyboardで作成できるUIButtonと同じものをコードで実装する"
 date: 2022-07-11
 categories: ["UIKit"]
 tags: ["Storyboard"]
 ---
 
-Storyboard上でボタンを設置しようとすると、以下のような選択肢がある。
+Storyboard上でボタンを設置しようとすると、以下のような選択肢があります。
 
 ![StoryboardのButton選択肢](./ButtonsInStoryboard.png)
 
-これらと同じものをコードで実装しようとすると少しずつ違うものができがちである。
+これらと同じものをコードで実装しました。
 
-StroyboardのデフォルトはAppleの推奨であると(私は)考えているので、Storyboardのデフォルトボタンをコードで実装しながら、Appleの推奨のボタンの実装方法とは何か考えたい。
+StroyboardのデフォルトはAppleの推奨であると(私は)考えているので、Storyboardのデフォルトボタンをコードで実装しながら、Appleの推奨のボタンの実装方法について考えていきます。
 
-### UIButtonのstyleについて
+### UIButtonのStyle
 
-選択肢のうち、次の4つは`Style`の違いによるものである.
+選択肢のうち、次の4つは`Style`の違いによるものです。
 
 * Button
 * Gray Button
@@ -25,7 +25,7 @@ StroyboardのデフォルトはAppleの推奨であると(私は)考えている
 ![ボタンの見た目](./buttonAppearance.png)
 
 
-Storyboard上はButtonのStyle部分が変化しているだけである。
+Storyboardで設置してみると、ButtonのStyle部分が変化しているだけなのがわかります。
 
 * Button - `plain`
 * Gray Button - `gray`
@@ -35,7 +35,7 @@ Storyboard上はButtonのStyle部分が変化しているだけである。
 ![StoryboardのButtonstyle](./buttonstyle.png)
 
 
-コードでは、`configuration`を書き換えることで同じ設定が行える。
+コードでは、`configuration`を書き換えることで同じ設定が行えます。
 ```
 let button = UIButton(type: .system)
 let grayButton = UIButton(type: .system)
@@ -48,7 +48,7 @@ tintedButton.configuration = UIButton.Configuration.tinted()
 filledButton.configuration = UIButton.Configuration.filled()
 ```
 
-これらの使い分けについて、Appleの公式ガイドラインでは、
+これらの使い分けについて、Appleの公式ガイドラインでは、以下のように書かれています。
 
 >Use a filled button for the most likely action in a view.
 
@@ -60,10 +60,10 @@ filledButton.configuration = UIButton.Configuration.filled()
 
 https://developer.apple.com/design/human-interface-guidelines/components/menus-and-actions/buttons
 
-とのことである。
 
-なお、使用できないようにグレーアウトしたボタン等を実装するときは、`Style`や色などをいじらなくても、ボタン自体を`isEnabled`で使用できなくするだけでそのStyleの使用できないボタンが表示される。
-(なお、定義時に`let button = UIButton(type: .system)`のように`type`を`system`にする必要がある。)
+
+なお、使用できないようにグレーアウトしたボタン等を実装したいときは、`Style`や色などをいじらなくても、ボタン自体を`isEnabled`で使用できなくするだけでそのStyleの使用できないボタンが表示されます。
+(なお、定義時に`let button = UIButton(type: .system)`のように`type`を`system`にする必要があります。)
 ```
 button.configuration = UIButton.Configuration.plain()
 button.isEnabled = false
@@ -78,30 +78,29 @@ filledButton.isEnabled = false
 
 
 
-### アイコンのついたボタン
+### メニューのついたボタン
 
-Storyboardで選択できるボタンのうち残り2つはiOS14から使用できるようになったボタンを押すと選択肢が出てくるボタンである。
+Storyboardで選択できるボタンのうち残り2つはiOS14から使用できるようになったボタンを押すと選択肢が出てくるボタンです。
 * Pull Down Button
 * Pop Up Button
 
 ![プルダウンボタン](pulldownbutton.png)
 
-Pull Down Buttonは、ボタンの名前は固定だが、
+Pull Down Buttonは、ボタンの名前は固定ですが、
 
-Pop Up Buttonは、選択するとボタンの名前が選択した要素の名前になる。
+Pop Up Buttonは、選択するとボタンの名前が選択した要素の名前になります。
 
 ![ポップアップボタン](popupbutton.png)
 
 ![ポップアップボタン](onlinemode.png)
 
-このように、ポップアップボタンは選んだ`Online Mode`という名前のボタンに変化する。
+このように、Pop Up Buttonは選んだ`Online Mode`という名前のボタンに変化します。
 
 
-別の言い方をすると、プルダウンボタンは選択したら終わりだが、
+別の言い方をすると、プルダウンボタンは選択したら終わりですが、  
+ポップアップボタンは何度も状態を変えたりするようにできています。
 
-ポップアップボタンは何度も状態を変えたりするようにできている。
-
-Apple公式ガイドラインでは、Pop-upとPull-downの使いわけについて
+Apple公式ガイドラインでは、Pop-upとPull-downの使いわけについて、以下のように書かれています。
 
 >Use a pop-up button to present a flat list of mutually exclusive options or states. A pop-up button helps people make a choice that affects their content or the surrounding view. Use a pull-down button instead if you need to:
 > * Offer a list of actions
@@ -117,19 +116,18 @@ Pull-downは、以下のような時に使う。
 
 https://developer.apple.com/design/human-interface-guidelines/components/menus-and-actions/pop-up-buttons
 
-と示されている。
 
-明確な使い分けがあるが、実装の上ではたった1つのパラメータを変えるだけである。
+このように明確な使い分けが決められていますが、実装の上ではたった1つのパラメータを変えるだけです。
 ![selectionasprimaryaction](./selectionasprimaryaction.png)
 
-`Selection as Primary Action`にチェックが入っていれば`Pop-up`、入っていなければ`Pull-down`として機能する。
+`Selection as Primary Action`にチェックが入っていれば`Pop-up`、入っていなければ`Pull-down`として機能します。
 
-コードでも、以下のように書き分ける。
+コードでも、以下のように書き分けます。
 ```
 popUpButton.changesSelectionAsPrimaryAction = true
 ```
 
-実際の実装は以下である。
+実際の実装は以下です。
 
 ```
 let pullDownButton = UIButton(type: .system)
@@ -165,4 +163,100 @@ popUpButton.showsMenuAsPrimaryAction = true
 popUpButton.changesSelectionAsPrimaryAction = true
 ```
 
-これは、`.menu`が入っているだけのただのボタンなので、前述の`Style`をいじって見た目を変えたりもできる。
+これは、`.menu`が入っているだけのただのボタンなので、前述の`Style`をいじって見た目を変えたりもできます。
+
+### 全体コード
+
+Storyboardで作った下の6つのボタンと同じものをコードで実装しました。
+
+![完成したスクショ](./completescreenshot.png)
+
+```
+import UIKit
+
+class ViewController: UIViewController {
+    
+    let label = UILabel()
+    let plainButton = UIButton(type: .system)
+    let grayButton = UIButton(type: .system)
+    let tintedButton = UIButton(type: .system)
+    let filledButton = UIButton(type: .system)
+    let pullDownButton = UIButton(type: .system)
+    let popUpButton = UIButton(type: .system)
+
+    let stackView = UIStackView()
+    
+    @IBOutlet weak var sbPullDownButton: UIButton!
+    @IBOutlet weak var sbPopUpButton: UIButton!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.alignment = .center
+        stackView.spacing = 10
+        stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50).isActive = true
+        stackView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
+
+        label.text = "コードで実装したボタン"
+        stackView.addArrangedSubview(label)
+        
+        plainButton.configuration = UIButton.Configuration.plain()
+        grayButton.configuration = UIButton.Configuration.gray()
+        tintedButton.configuration = UIButton.Configuration.tinted()
+        filledButton.configuration = UIButton.Configuration.filled()
+        
+        addButton(uiButton: plainButton)
+        addButton(uiButton: grayButton)
+        addButton(uiButton: tintedButton)
+        addButton(uiButton: filledButton)
+
+        addPullDownButton(pullDownButton: pullDownButton)
+        addPopUpButton(popUpButton: popUpButton)
+
+        // StoryboardのPullDown/PopUpボタンにもメニュー設定
+        setPullDownMenu(pullDownButton: sbPullDownButton)
+        setPopUpMenu(popUpButton: sbPopUpButton)
+        
+    }
+    
+    func addButton(uiButton: UIButton) {
+        stackView.addArrangedSubview(uiButton)
+        uiButton.setTitle("Button", for: .normal)
+    }
+    
+    
+    func addPullDownButton(pullDownButton: UIButton) {
+        setPullDownMenu(pullDownButton: pullDownButton)
+        pullDownButton.showsMenuAsPrimaryAction = true
+        pullDownButton.setTitle("Button", for: .normal)
+        stackView.addArrangedSubview(pullDownButton)
+    }
+    
+    func setPullDownMenu(pullDownButton: UIButton) {
+        let items = UIMenu(children: [
+            UIAction(title: "Edit", image: UIImage(systemName: "pencil"), handler: { _ in print("Edit is tapped")}),
+            UIAction(title: "Disabled", attributes: .disabled, handler: { _ in print("Disabled is tapped")}),
+            UIAction(title: "Hidden", attributes: .hidden, handler: { _ in print("Hidden is tapped")}),
+            UIAction(title: "Delete", image: UIImage(systemName: "trash"), attributes: .destructive, handler: { _ in print("Delete is tapped")})
+        ])
+        pullDownButton.menu = items
+    }
+    
+    func addPopUpButton(popUpButton: UIButton) {
+        setPopUpMenu(popUpButton: popUpButton)
+        popUpButton.showsMenuAsPrimaryAction = true
+        popUpButton.changesSelectionAsPrimaryAction = true
+        stackView.addArrangedSubview(popUpButton)
+    }
+    
+    func setPopUpMenu(popUpButton: UIButton) {
+        let items = UIMenu(children: [
+            UIAction(title: "Online Mode", handler: { _ in print("Online mode")}),
+            UIAction(title: "Offline Mode", handler: { _ in print("Offline mode")})
+        ])
+        popUpButton.menu = items
+    }
+}
+```
