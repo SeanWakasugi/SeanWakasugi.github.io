@@ -22,7 +22,7 @@ StroyboardのデフォルトはAppleの推奨であると(私は)考えている
 * Tinted Button
 * Filled Button
 
-![ボタンの見た目](./buttonAppearance.png)
+{{<figure src="./buttonAppearance.png" alt="ボタンの見た目" width="15%">}}
 
 
 Storyboardで設置してみると、ButtonのStyle部分が変化しているだけなのがわかります。
@@ -32,7 +32,8 @@ Storyboardで設置してみると、ButtonのStyle部分が変化している�
 * Tinted Button - `tinted`
 * Filled Button - `filled`
 
-![StoryboardのButtonstyle](./buttonstyle.png)
+{{<figure src="./buttonstyle.png" alt="StoryboardのButtonstyle" width="50%">}}
+
 
 
 コードでは、`configuration`を書き換えることで同じ設定が行えます。
@@ -74,7 +75,8 @@ tintedButton.isEnabled = false
 filledButton.configuration = UIButton.Configuration.filled()
 filledButton.isEnabled = false
 ```
-![使用できないボタン](./disabledButton.png)
+
+{{<figure src="./disabledButton.png" alt="使用できないボタン" width="15%">}}
 
 
 
@@ -84,15 +86,17 @@ Storyboardで選択できるボタンのうち残り2つはiOS14から使用で�
 * Pull Down Button
 * Pop Up Button
 
-![プルダウンボタン](pulldownbutton.png)
+{{<figure src="./pulldownbutton.png" alt="プルダウンボタン" width="50%">}}
 
 Pull Down Buttonは、ボタンの名前は固定ですが、
 
 Pop Up Buttonは、選択するとボタンの名前が選択した要素の名前になります。
 
-![ポップアップボタン](popupbutton.png)
 
-![ポップアップボタン](onlinemode.png)
+{{<figure src="./popupbutton.png" alt="ポップアップボタン" width="50%">}}
+
+
+{{<figure src="./onlinemode.png" alt="オンラインモード" width="20%">}}
 
 このように、Pop Up Buttonは選んだ`Online Mode`という名前のボタンに変化します。
 
@@ -118,7 +122,8 @@ https://developer.apple.com/design/human-interface-guidelines/components/menus-a
 
 
 このように明確な使い分けが決められていますが、実装の上ではたった1つのパラメータを変えるだけです。
-![selectionasprimaryaction](./selectionasprimaryaction.png)
+
+{{<figure src="./selectionasprimaryaction.png" alt="selectionasprimaryaction" width="50%">}}
 
 `Selection as Primary Action`にチェックが入っていれば`Pop-up`、入っていなければ`Pull-down`として機能します。
 
@@ -169,7 +174,8 @@ popUpButton.changesSelectionAsPrimaryAction = true
 
 Storyboardで作った下の6つのボタンと同じものをコードで実装しました。
 
-![完成したスクショ](./completescreenshot.png)
+
+{{<figure src="./completescreenshot.png" alt="完成したスクショ" width="50%">}}
 
 ```
 import UIKit
