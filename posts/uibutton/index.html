@@ -55,7 +55,8 @@
 <li>Tinted Button</li>
 <li>Filled Button</li>
 </ul>
-<p><img src=./buttonAppearance.png alt=ボタンの見た目></p>
+<figure><img src=./buttonAppearance.png alt=ボタンの見た目 width=15%>
+</figure>
 <p>Storyboardで設置してみると、ButtonのStyle部分が変化しているだけなのがわかります。</p>
 <ul>
 <li>Button - <code>plain</code></li>
@@ -63,7 +64,8 @@
 <li>Tinted Button - <code>tinted</code></li>
 <li>Filled Button - <code>filled</code></li>
 </ul>
-<p><img src=./buttonstyle.png alt=StoryboardのButtonstyle></p>
+<figure><img src=./buttonstyle.png alt=StoryboardのButtonstyle width=50%>
+</figure>
 <p>コードでは、<code>configuration</code>を書き換えることで同じ設定が行えます。</p>
 <pre><code>let button = UIButton(type: .system)
 let grayButton = UIButton(type: .system)
@@ -94,18 +96,22 @@ tintedButton.configuration = UIButton.Configuration.tinted()
 tintedButton.isEnabled = false
 filledButton.configuration = UIButton.Configuration.filled()
 filledButton.isEnabled = false
-</code></pre><p><img src=./disabledButton.png alt=使用できないボタン></p>
+</code></pre><figure><img src=./disabledButton.png alt=使用できないボタン width=15%>
+</figure>
 <h3 id=メニューのついたボタン>メニューのついたボタン</h3>
 <p>Storyboardで選択できるボタンのうち残り2つはiOS14から使用できるようになったボタンを押すと選択肢が出てくるボタンです。</p>
 <ul>
 <li>Pull Down Button</li>
 <li>Pop Up Button</li>
 </ul>
-<p><img src=pulldownbutton.png alt=プルダウンボタン></p>
+<figure><img src=./pulldownbutton.png alt=プルダウンボタン width=50%>
+</figure>
 <p>Pull Down Buttonは、ボタンの名前は固定ですが、</p>
 <p>Pop Up Buttonは、選択するとボタンの名前が選択した要素の名前になります。</p>
-<p><img src=popupbutton.png alt=ポップアップボタン></p>
-<p><img src=onlinemode.png alt=ポップアップボタン></p>
+<figure><img src=./popupbutton.png alt=ポップアップボタン width=50%>
+</figure>
+<figure><img src=./onlinemode.png alt=オンラインモード width=20%>
+</figure>
 <p>このように、Pop Up Buttonは選んだ<code>Online Mode</code>という名前のボタンに変化します。</p>
 <p>別の言い方をすると、プルダウンボタンは選択したら終わりですが、<br>
 ポップアップボタンは何度も状態を変えたりするようにできています。</p>
@@ -126,8 +132,9 @@ filledButton.isEnabled = false
 <li>サブメニューがあるとき</li>
 </ul>
 <p><a href=https://developer.apple.com/design/human-interface-guidelines/components/menus-and-actions/pop-up-buttons>https://developer.apple.com/design/human-interface-guidelines/components/menus-and-actions/pop-up-buttons</a></p>
-<p>このように明確な使い分けが決められていますが、実装の上ではたった1つのパラメータを変えるだけです。
-<img src=./selectionasprimaryaction.png alt=selectionasprimaryaction></p>
+<p>このように明確な使い分けが決められていますが、実装の上ではたった1つのパラメータを変えるだけです。</p>
+<figure><img src=./selectionasprimaryaction.png alt=selectionasprimaryaction width=50%>
+</figure>
 <p><code>Selection as Primary Action</code>にチェックが入っていれば<code>Pop-up</code>、入っていなければ<code>Pull-down</code>として機能します。</p>
 <p>コードでも、以下のように書き分けます。</p>
 <pre><code>popUpButton.changesSelectionAsPrimaryAction = true
@@ -163,7 +170,8 @@ popUpButton.changesSelectionAsPrimaryAction = true
 </code></pre><p>これは、<code>.menu</code>が入っているだけのただのボタンなので、前述の<code>Style</code>をいじって見た目を変えたりもできます。</p>
 <h3 id=全体コード>全体コード</h3>
 <p>Storyboardで作った下の6つのボタンと同じものをコードで実装しました。</p>
-<p><img src=./completescreenshot.png alt=完成したスクショ></p>
+<figure><img src=./completescreenshot.png alt=完成したスクショ width=50%>
+</figure>
 <pre><code>import UIKit
 
 class ViewController: UIViewController {
@@ -283,6 +291,7 @@ class ViewController: UIViewController {
 <h4 class=widget__title>最近の投稿</h4>
 <div class=widget__content>
 <ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/usernotification/>UserNotificationを使ってローカル通知をするシンプルなアプリを作成する</a></li>
 <li class=widget__item><a class=widget__link href=/posts/uibutton/>Storyboardで作成できるUIButtonと同じものをコードで実装する</a></li>
 <li class=widget__item><a class=widget__link href=/posts/readablecodeep1-2/>リーダブルコード1章、2章まとめ</a></li>
 </ul>
