@@ -37,3 +37,7 @@ paginate = 20
     single = "right"
     widgets = ["search", "recent", "categories", "taglist", "social"]
 
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
