@@ -3,12 +3,12 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>Storyboardで作成できるUIButtonと同じものをコードで作る - しょ〜んの技術メモ😗</title>
+<title>Storyboardで作成できるUIButtonと同じものをコードで実装する - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="Storyboardで作成できるUIButtonと同じものをコードで作る">
-<meta name=twitter:description content="Storyboard上でボタンを設置しようとすると、以下のような選択肢がある。 これらと同じものをコードで実装しようとすると少しずつ違うものが">
+<meta name=twitter:title content="Storyboardで作成できるUIButtonと同じものをコードで実装する">
+<meta name=twitter:description content="Storyboard上でボタンを設置しようとすると、以下のような選択肢があります。 これらと同じものをコードで実装しました。 Stroyboar">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
@@ -36,19 +36,19 @@
 <main class=main role=main>
 <article class=post>
 <header class=post__header>
-<h1 class=post__title>Storyboardで作成できるUIButtonと同じものをコードで作る</h1>
+<h1 class=post__title>Storyboardで作成できるUIButtonと同じものをコードで実装する</h1>
 <div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
 <svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-11T00:00:00Z>July 11, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/uikit/ rel=category>UIKit</a>
 </span>
 </div></div>
 </header><div class="content post__content clearfix">
-<p>Storyboard上でボタンを設置しようとすると、以下のような選択肢がある。</p>
+<p>Storyboard上でボタンを設置しようとすると、以下のような選択肢があります。</p>
 <p><img src=./ButtonsInStoryboard.png alt=StoryboardのButton選択肢></p>
-<p>これらと同じものをコードで実装しようとすると少しずつ違うものができがちである。</p>
-<p>StroyboardのデフォルトはAppleの推奨であると(私は)考えているので、Storyboardのデフォルトボタンをコードで実装しながら、Appleの推奨のボタンの実装方法とは何か考えたい。</p>
-<h3 id=uibuttonのstyleについて>UIButtonのstyleについて</h3>
-<p>選択肢のうち、次の4つは<code>Style</code>の違いによるものである.</p>
+<p>これらと同じものをコードで実装しました。</p>
+<p>StroyboardのデフォルトはAppleの推奨であると(私は)考えているので、Storyboardのデフォルトボタンをコードで実装しながら、Appleの推奨のボタンの実装方法について考えていきます。</p>
+<h3 id=uibuttonのstyle>UIButtonのStyle</h3>
+<p>選択肢のうち、次の4つは<code>Style</code>の違いによるものです。</p>
 <ul>
 <li>Button</li>
 <li>Gray Button</li>
@@ -56,7 +56,7 @@
 <li>Filled Button</li>
 </ul>
 <p><img src=./buttonAppearance.png alt=ボタンの見た目></p>
-<p>Storyboard上はButtonのStyle部分が変化しているだけである。</p>
+<p>Storyboardで設置してみると、ButtonのStyle部分が変化しているだけなのがわかります。</p>
 <ul>
 <li>Button - <code>plain</code></li>
 <li>Gray Button - <code>gray</code></li>
@@ -64,7 +64,7 @@
 <li>Filled Button - <code>filled</code></li>
 </ul>
 <p><img src=./buttonstyle.png alt=StoryboardのButtonstyle></p>
-<p>コードでは、<code>configuration</code>を書き換えることで同じ設定が行える。</p>
+<p>コードでは、<code>configuration</code>を書き換えることで同じ設定が行えます。</p>
 <pre><code>let button = UIButton(type: .system)
 let grayButton = UIButton(type: .system)
 let tintedButton = UIButton(type: .system)
@@ -74,7 +74,7 @@ button.configuration = UIButton.Configuration.plain()
 grayButton.configuration = UIButton.Configuration.gray()
 tintedButton.configuration = UIButton.Configuration.tinted()
 filledButton.configuration = UIButton.Configuration.filled()
-</code></pre><p>これらの使い分けについて、Appleの公式ガイドラインでは、</p>
+</code></pre><p>これらの使い分けについて、Appleの公式ガイドラインでは、以下のように書かれています。</p>
 <blockquote>
 <p>Use a filled button for the most likely action in a view.</p>
 </blockquote>
@@ -84,9 +84,8 @@ filledButton.configuration = UIButton.Configuration.filled()
 </blockquote>
 <p>好ましい選択肢を強調するにはボタンの大きさではなく、<code>Style</code>を使いましょう。</p>
 <p><a href=https://developer.apple.com/design/human-interface-guidelines/components/menus-and-actions/buttons>https://developer.apple.com/design/human-interface-guidelines/components/menus-and-actions/buttons</a></p>
-<p>とのことである。</p>
-<p>なお、使用できないようにグレーアウトしたボタン等を実装するときは、<code>Style</code>や色などをいじらなくても、ボタン自体を<code>isEnabled</code>で使用できなくするだけでそのStyleの使用できないボタンが表示される。
-(なお、定義時に<code>let button = UIButton(type: .system)</code>のように<code>type</code>を<code>system</code>にする必要がある。)</p>
+<p>なお、使用できないようにグレーアウトしたボタン等を実装したいときは、<code>Style</code>や色などをいじらなくても、ボタン自体を<code>isEnabled</code>で使用できなくするだけでそのStyleの使用できないボタンが表示されます。
+(なお、定義時に<code>let button = UIButton(type: .system)</code>のように<code>type</code>を<code>system</code>にする必要があります。)</p>
 <pre><code>button.configuration = UIButton.Configuration.plain()
 button.isEnabled = false
 grayButton.configuration = UIButton.Configuration.gray()
@@ -96,21 +95,21 @@ tintedButton.isEnabled = false
 filledButton.configuration = UIButton.Configuration.filled()
 filledButton.isEnabled = false
 </code></pre><p><img src=./disabledButton.png alt=使用できないボタン></p>
-<h3 id=アイコンのついたボタン>アイコンのついたボタン</h3>
-<p>Storyboardで選択できるボタンのうち残り2つはiOS14から使用できるようになったボタンを押すと選択肢が出てくるボタンである。</p>
+<h3 id=メニューのついたボタン>メニューのついたボタン</h3>
+<p>Storyboardで選択できるボタンのうち残り2つはiOS14から使用できるようになったボタンを押すと選択肢が出てくるボタンです。</p>
 <ul>
 <li>Pull Down Button</li>
 <li>Pop Up Button</li>
 </ul>
 <p><img src=pulldownbutton.png alt=プルダウンボタン></p>
-<p>Pull Down Buttonは、ボタンの名前は固定だが、</p>
-<p>Pop Up Buttonは、選択するとボタンの名前が選択した要素の名前になる。</p>
+<p>Pull Down Buttonは、ボタンの名前は固定ですが、</p>
+<p>Pop Up Buttonは、選択するとボタンの名前が選択した要素の名前になります。</p>
 <p><img src=popupbutton.png alt=ポップアップボタン></p>
 <p><img src=onlinemode.png alt=ポップアップボタン></p>
-<p>このように、ポップアップボタンは選んだ<code>Online Mode</code>という名前のボタンに変化する。</p>
-<p>別の言い方をすると、プルダウンボタンは選択したら終わりだが、</p>
-<p>ポップアップボタンは何度も状態を変えたりするようにできている。</p>
-<p>Apple公式ガイドラインでは、Pop-upとPull-downの使いわけについて</p>
+<p>このように、Pop Up Buttonは選んだ<code>Online Mode</code>という名前のボタンに変化します。</p>
+<p>別の言い方をすると、プルダウンボタンは選択したら終わりですが、<br>
+ポップアップボタンは何度も状態を変えたりするようにできています。</p>
+<p>Apple公式ガイドラインでは、Pop-upとPull-downの使いわけについて、以下のように書かれています。</p>
 <blockquote>
 <p>Use a pop-up button to present a flat list of mutually exclusive options or states. A pop-up button helps people make a choice that affects their content or the surrounding view. Use a pull-down button instead if you need to:</p>
 <ul>
@@ -127,13 +126,12 @@ filledButton.isEnabled = false
 <li>サブメニューがあるとき</li>
 </ul>
 <p><a href=https://developer.apple.com/design/human-interface-guidelines/components/menus-and-actions/pop-up-buttons>https://developer.apple.com/design/human-interface-guidelines/components/menus-and-actions/pop-up-buttons</a></p>
-<p>と示されている。</p>
-<p>明確な使い分けがあるが、実装の上ではたった1つのパラメータを変えるだけである。
+<p>このように明確な使い分けが決められていますが、実装の上ではたった1つのパラメータを変えるだけです。
 <img src=./selectionasprimaryaction.png alt=selectionasprimaryaction></p>
-<p><code>Selection as Primary Action</code>にチェックが入っていれば<code>Pop-up</code>、入っていなければ<code>Pull-down</code>として機能する。</p>
-<p>コードでも、以下のように書き分ける。</p>
+<p><code>Selection as Primary Action</code>にチェックが入っていれば<code>Pop-up</code>、入っていなければ<code>Pull-down</code>として機能します。</p>
+<p>コードでも、以下のように書き分けます。</p>
 <pre><code>popUpButton.changesSelectionAsPrimaryAction = true
-</code></pre><p>実際の実装は以下である。</p>
+</code></pre><p>実際の実装は以下です。</p>
 <pre><code>let pullDownButton = UIButton(type: .system)
 
 let items = UIMenu(children: [
@@ -162,7 +160,98 @@ popUpButton.menu = items
 popUpButton.showsMenuAsPrimaryAction = true
 // defaultはfalseで、Pull-down。trueだとPop-up。
 popUpButton.changesSelectionAsPrimaryAction = true
-</code></pre><p>これは、<code>.menu</code>が入っているだけのただのボタンなので、前述の<code>Style</code>をいじって見た目を変えたりもできる。</p>
+</code></pre><p>これは、<code>.menu</code>が入っているだけのただのボタンなので、前述の<code>Style</code>をいじって見た目を変えたりもできます。</p>
+<h3 id=全体コード>全体コード</h3>
+<p>Storyboardで作った下の6つのボタンと同じものをコードで実装しました。</p>
+<p><img src=./completescreenshot.png alt=完成したスクショ></p>
+<pre><code>import UIKit
+
+class ViewController: UIViewController {
+    
+    let label = UILabel()
+    let plainButton = UIButton(type: .system)
+    let grayButton = UIButton(type: .system)
+    let tintedButton = UIButton(type: .system)
+    let filledButton = UIButton(type: .system)
+    let pullDownButton = UIButton(type: .system)
+    let popUpButton = UIButton(type: .system)
+
+    let stackView = UIStackView()
+    
+    @IBOutlet weak var sbPullDownButton: UIButton!
+    @IBOutlet weak var sbPopUpButton: UIButton!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.alignment = .center
+        stackView.spacing = 10
+        stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50).isActive = true
+        stackView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
+
+        label.text = &quot;コードで実装したボタン&quot;
+        stackView.addArrangedSubview(label)
+        
+        plainButton.configuration = UIButton.Configuration.plain()
+        grayButton.configuration = UIButton.Configuration.gray()
+        tintedButton.configuration = UIButton.Configuration.tinted()
+        filledButton.configuration = UIButton.Configuration.filled()
+        
+        addButton(uiButton: plainButton)
+        addButton(uiButton: grayButton)
+        addButton(uiButton: tintedButton)
+        addButton(uiButton: filledButton)
+
+        addPullDownButton(pullDownButton: pullDownButton)
+        addPopUpButton(popUpButton: popUpButton)
+
+        // StoryboardのPullDown/PopUpボタンにもメニュー設定
+        setPullDownMenu(pullDownButton: sbPullDownButton)
+        setPopUpMenu(popUpButton: sbPopUpButton)
+        
+    }
+    
+    func addButton(uiButton: UIButton) {
+        stackView.addArrangedSubview(uiButton)
+        uiButton.setTitle(&quot;Button&quot;, for: .normal)
+    }
+    
+    
+    func addPullDownButton(pullDownButton: UIButton) {
+        setPullDownMenu(pullDownButton: pullDownButton)
+        pullDownButton.showsMenuAsPrimaryAction = true
+        pullDownButton.setTitle(&quot;Button&quot;, for: .normal)
+        stackView.addArrangedSubview(pullDownButton)
+    }
+    
+    func setPullDownMenu(pullDownButton: UIButton) {
+        let items = UIMenu(children: [
+            UIAction(title: &quot;Edit&quot;, image: UIImage(systemName: &quot;pencil&quot;), handler: { _ in print(&quot;Edit is tapped&quot;)}),
+            UIAction(title: &quot;Disabled&quot;, attributes: .disabled, handler: { _ in print(&quot;Disabled is tapped&quot;)}),
+            UIAction(title: &quot;Hidden&quot;, attributes: .hidden, handler: { _ in print(&quot;Hidden is tapped&quot;)}),
+            UIAction(title: &quot;Delete&quot;, image: UIImage(systemName: &quot;trash&quot;), attributes: .destructive, handler: { _ in print(&quot;Delete is tapped&quot;)})
+        ])
+        pullDownButton.menu = items
+    }
+    
+    func addPopUpButton(popUpButton: UIButton) {
+        setPopUpMenu(popUpButton: popUpButton)
+        popUpButton.showsMenuAsPrimaryAction = true
+        popUpButton.changesSelectionAsPrimaryAction = true
+        stackView.addArrangedSubview(popUpButton)
+    }
+    
+    func setPopUpMenu(popUpButton: UIButton) {
+        let items = UIMenu(children: [
+            UIAction(title: &quot;Online Mode&quot;, handler: { _ in print(&quot;Online mode&quot;)}),
+            UIAction(title: &quot;Offline Mode&quot;, handler: { _ in print(&quot;Offline mode&quot;)})
+        ])
+        popUpButton.menu = items
+    }
+}
+</code></pre>
 </div>
 <footer class=post__footer>
 <div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
@@ -194,7 +283,7 @@ popUpButton.changesSelectionAsPrimaryAction = true
 <h4 class=widget__title>最近の投稿</h4>
 <div class=widget__content>
 <ul class=widget__list>
-<li class=widget__item><a class=widget__link href=/posts/uibutton/>Storyboardで作成できるUIButtonと同じものをコードで作る</a></li>
+<li class=widget__item><a class=widget__link href=/posts/uibutton/>Storyboardで作成できるUIButtonと同じものをコードで実装する</a></li>
 <li class=widget__item><a class=widget__link href=/posts/readablecodeep1-2/>リーダブルコード1章、2章まとめ</a></li>
 </ul>
 </div>
