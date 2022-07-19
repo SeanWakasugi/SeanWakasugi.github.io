@@ -1,8 +1,8 @@
 ---
 title: "UserNotificationを使ってローカル通知をするシンプルなアプリを作成する"
 date: 2022-07-12
-categories: ["UIKit"]
-tags: ["Storyboard"]
+categories: ["iOSアプリ"]
+tags: ["Swift", "UIKit", "UserNotifications"]
 ---
 
 `UserNotification`による簡単なiOSの通知ができるアプリケーションを作成しました。

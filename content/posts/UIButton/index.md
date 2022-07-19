@@ -1,8 +1,8 @@
 ---
 title: "Storyboardで作成できるUIButtonと同じものをコードで実装する"
 date: 2022-07-11
-categories: ["UIKit"]
-tags: ["Storyboard"]
+categories: ["iOSアプリ"]
+tags: ["UIKit", "Storyboard"]
 ---
 
 Storyboard上でボタンを設置しようとすると、以下のような選択肢があります。
