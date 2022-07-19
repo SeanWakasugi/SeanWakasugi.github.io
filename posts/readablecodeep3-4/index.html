@@ -3,12 +3,12 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>リーダブルコード1章、2章まとめ - しょ〜んの技術メモ😗</title>
+<title>リーダブルコード3章、4章まとめ - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="リーダブルコード1章、2章まとめ">
-<meta name=twitter:description content="1章: 理解しやすいコード 読みやすさの基本定理 コードは他の人が最短時間で理解できるように書かなければいけない。 これが全て。 2章: 名前">
+<meta name=twitter:title content="リーダブルコード3章、4章まとめ">
+<meta name=twitter:description content="3章: 誤解されない名前 積極的に「誤解」を探して曖昧な名前を変えると良い。 複数の名前を検討して、何が起きるかを明確に表していてかつ誤解を生む">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
@@ -36,65 +36,55 @@
 <main class=main role=main>
 <article class=post>
 <header class=post__header>
-<h1 class=post__title>リーダブルコード1章、2章まとめ</h1>
+<h1 class=post__title>リーダブルコード3章、4章まとめ</h1>
 <div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-11T00:00:00Z>July 11, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-19T00:00:00Z>July 19, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
 </span>
 </div></div>
 </header><div class="content post__content clearfix">
-<h2 id=1章-理解しやすいコード>1章: 理解しやすいコード</h2>
-<p>読みやすさの基本定理</p>
-<p><strong>コードは他の人が最短時間で理解できるように書かなければいけない。</strong></p>
-<p>これが全て。</p>
-<h2 id=2章-名前に情報を詰め込む>2章: 名前に情報を詰め込む</h2>
-<p>まずは命名の話。</p>
-<h3 id=明確な単語を選ふ>明確な単語を選ぶ</h3>
-<p>getは明確ではない。
-どこからgetするかがわからないから。<br>
-fetchなら、インターネットから手に入れるのだとわかる。</p>
-<p>sizeは何のサイズを指すのか明確ではない。<br>
-HeightとかNumNodesとかMemoryBytesとかに変えれば、何のサイズなのかが明確になる。</p>
-<p>Stopという言葉もどう止まるのかが明確じゃない。<br>
-Kill（取り消しができない重い操作）を使ったり、
-Pause（後からResumeできる操作）を使ったりすると、明確になる。</p>
-<p>捉え方が複数ある単語を使う前に、シソーラスで調べてより合った言葉がないか探すこと。</p>
-<h3 id=汎用的な名前を避けるあるいは使う状況を選ふ>汎用的な名前を避ける(あるいは、使う状況を選ぶ)</h3>
-<p>retvalなど汎用的な命名を避けて、変数の値や目的を示す変数名へ変えた方がいい。</p>
-<p>汎用的な名前も悪いわけではなく、例えば一時的な保管が目的で生存期間が短いならtmpでも良い。</p>
-<p>i, j, kなどもイテレータであることがわかりやすくて良いが、イテレータが複数あるときは説明的な名前を付けると良い。例えば、clubs_i, members_jなど。</p>
-<p>少しでも時間を使っていい名前を考える習慣を。</p>
-<h3 id=抽象的な名前よりも具体的な名前を使う>抽象的な名前よりも具体的な名前を使う</h3>
-<p>名前の強さよりも、許可していないものを明確にする方が大事。<br>
-DISALLOW_EVIL_CONSTRUCTORS → DISALLOW_COPY_AND_ASSIGN</p>
-<p>—-run-locallyがローカルのデータベースを使って、かつデバッグログを出してもらうためのオプションなら、<br>
-—-use-local-databaseと—-extra-loggingで分けてわかりやすくする。</p>
-<h3 id=接尾辞や接頭辞を使って情報を追加する>接尾辞や接頭辞を使って情報を追加する</h3>
-<p>値の単位を入れる</p>
+<h2 id=3章-誤解されない名前>3章: 誤解されない名前</h2>
+<p>積極的に「誤解」を探して曖昧な名前を変えると良い。</p>
+<p>複数の名前を検討して、何が起きるかを明確に表していてかつ誤解を生む可能性が低い言葉を選ぶといい。</p>
+<p>filter()<br>
+選択するのか除外するのか分かりにくい<br>
+選択する→select()<br>
+除外する→exclude()</p>
+<p>限界値を含めるときはminとmaxを使う。<br>
+CART_TOO_BIG_LIMITでは、条件がCART_TOO_BIG_LIMIT未満ならOKなのか以下ならOKなのかわからない。MAX_ITEMS_IN_CARTなら以下であると分かる。</p>
+<p>似た規則</p>
 <ul>
-<li>delay_secs</li>
-<li>max_kbps</li>
+<li>min &lt;= x &lt;= max</li>
+<li>first &lt;= x &lt;= last</li>
+<li>begin &lt;= x &lt; end</li>
 </ul>
-<p>重要な属性を追加する</p>
+<p>ブール値は、is, has, can, shouldを先頭につけるとわかりやすい。<br>
+否定系は混乱しやすいので肯定系に。<br>
+disable→use</p>
+<p>get~は軽量な動作を想起させるので、処理が大きいならcomputeなどにした方がいい。</p>
+<h2 id=4章-美しさ>4章: 美しさ</h2>
+<p>美しい、目に優しい、読みやすいソースコードを作るための3つの原則</p>
 <ul>
-<li>plaintext_password: 暗号化前のパスワード</li>
-<li>unescaped_comment: 表示する前にエスケープする必要があるcomment</li>
+<li>読み手が慣れているパターンと一貫性のあるレイアウトを使う。</li>
+<li>似ているコードは似ているように見せる。</li>
+<li>関連するコードをまとめてブロックにする。</li>
 </ul>
-<h3 id=名前の長さを決める>名前の長さを決める</h3>
-<p>名前は短ければ短いほどいいわけでも、長く情報を詰め込めばいいわけでもない。<br>
-状況ごとに適切な長さを設定して命名する必要がある。</p>
-<p>スコープの大きさ（その名前が使われる範囲の広さ）で長さを決めると良い。<br>
-例えば、スコープが小さければ短い簡潔な名前でも良い。
-なぜなら、その変数を使う場所が近く何の変数かすぐわかるから。</p>
-<p>省略語は構わないがプロジェクト固有の省略後はだめ。
-新しいチームメイトが名前の意味を理解できるかで判断する。<br>
-BackEndManger → BEManger はだめで、
-string → strは良い。</p>
-<p>不要な単語を捨てたほうが良い。<br>
-ConvertToString → ToString</p>
-<h3 id=名前のフォーマットて情報を伝える>名前のフォーマットで情報を伝える</h3>
-<p>クラス名はCamelCaseで変数名はlower_separatedのようなルールを持つことで、一目でそれが何なのかわかる。</p>
-<p>言語ごと、プロジェクトごとに決まりが違うので、プログラム、チーム内で一貫性を持つことが大事。</p>
+<p>似ているコードは、改行を使って同じ「シルエット」にすると似ている処理であることが一目でわかる。</p>
+<p>重複したり複雑な処理はメソッドにして分離することで、コードが簡潔になり、何のための処理であるかなどの大切な部分が見やすくなる。</p>
+<p>列を揃える</p>
+<pre><code>CheckFullName(&quot;Doug Adams&quot;, &quot;Mr. Douglas Adams&quot;, &quot;&quot;); 
+CheckFullName(&quot; Jake Brown &quot;, &quot;Mr. Jacob Brown III&quot;, &quot;&quot;); 
+CheckFullName(&quot;No Such Guy&quot;, &quot;&quot;, &quot;no match found&quot;); 
+CheckFullName(&quot;John&quot;, &quot;&quot;, &quot;more than one result&quot;); 
+</code></pre><p>上を、下のように整形すると読みやすい。</p>
+<pre><code>CheckFullName(&quot;Doug Adams&quot;,     &quot;Mr. Douglas Adams&quot;,    &quot;&quot;);
+CheckFullName(&quot; Jake Brown &quot;,   &quot;Mr. Jake Brown III&quot;,   &quot;&quot;);
+CheckFullName(&quot;No Such Guy&quot; ,   &quot;&quot; ,                    &quot;no match found&quot;);
+CheckFullName(&quot;John&quot; ,          &quot;&quot; ,                    &quot;more than one result&quot;);
+</code></pre><p>（という意図らしいが、できればやりたくないと思った。
+見やすいのは確かだが、保守コストとかが高すぎる気がしている。）</p>
+<p>どんな順番でも処理が変わらないようなものでも、意味のある順番を選んで、常にその順番を守ること。例えば使う順番とか、出力する時の並び順とか。</p>
+<p>大きな処理の塊を空の行やコメントで区切って書くこと。</p>
 </div>
 <footer class=post__footer>
 <div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
