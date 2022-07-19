@@ -1,0 +1,183 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>SwiftのDateとDateComponentsの違いの整理 - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="SwiftのDateとDateComponentsの違いの整理">
+<meta name=twitter:description content="DateとDateComponentsの違い Dateはカレンダーやタイムゾーン情報を含まない絶対的な時間のことです。 DateComponen">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>SwiftのDateとDateComponentsの違いの整理</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-19T00:00:00Z>July 19, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<h3 id=dateとdatecomponentsの違い><code>Date</code>と<code>DateComponents</code>の違い</h3>
+<p><code>Date</code>はカレンダーやタイムゾーン情報を含まない絶対的な時間のことです。</p>
+<p><code>DateComponents</code>は年月日など単位のある構造体で、具体的な数字による時間を表します。</p>
+<p>大まかに言えば、日本で2022/7/19 16:24の<code>Date</code>は、イギリスでは2022/7/19 07:24の<code>Date</code>になります。</p>
+<p>2022/7/19 16:24の<code>DateComponents</code>は<code>year: 2022, month: 7, day: 19, hour: 16, minute: 24</code>というただの値のことです。</p>
+<p><code>DateComponents</code>は以下のようなinitを持っており、さまざまな情報を保つことができる構造体なのがわかると思います。</p>
+<p>カレンダーもタイムゾーンも持つことはできますが、持っていないこともあります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>init</span>(
+    calendar: Calendar? = <span style=color:#66d9ef>nil</span>, 
+    timeZone: TimeZone? = <span style=color:#66d9ef>nil</span>, 
+    era: Int? = <span style=color:#66d9ef>nil</span>, 
+    year: Int? = <span style=color:#66d9ef>nil</span>, 
+    month: Int? = <span style=color:#66d9ef>nil</span>, 
+    day: Int? = <span style=color:#66d9ef>nil</span>, 
+    hour: Int? = <span style=color:#66d9ef>nil</span>, 
+    minute: Int? = <span style=color:#66d9ef>nil</span>, 
+    second: Int? = <span style=color:#66d9ef>nil</span>, 
+    nanosecond: Int? = <span style=color:#66d9ef>nil</span>, 
+    weekday: Int? = <span style=color:#66d9ef>nil</span>, 
+    weekdayOrdinal: Int? = <span style=color:#66d9ef>nil</span>, 
+    quarter: Int? = <span style=color:#66d9ef>nil</span>, 
+    weekOfMonth: Int? = <span style=color:#66d9ef>nil</span>, 
+    weekOfYear: Int? = <span style=color:#66d9ef>nil</span>, 
+    yearForWeekOfYear: Int? = <span style=color:#66d9ef>nil</span>
+)
+</code></pre></div><h3 id=calendarとtimezone><code>Calendar</code>と<code>Timezone</code></h3>
+<p><code>Calendar</code>により、カレンダー、例えば西暦とか和暦とかを指定できます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>let</span> seireki = Calendar(identifier: .gregorian) <span style=color:#75715e>// 西暦カレンダー</span>
+<span style=color:#66d9ef>let</span> wareki = Calendar(identifier: .japanese) <span style=color:#75715e>// 和暦カレンダー</span>
+<span style=color:#66d9ef>let</span> tanmatsu = Calendar.current <span style=color:#75715e>// 端末のカレンダー設定に依存</span>
+</code></pre></div><p><code>Date</code>は<code>Calendar</code>が関係ありません。</p>
+<p>なぜなら、西暦2022年7月19日でも令和4年7月19日でもどちらも同じ時間のことを指していますから、どちらも同じものとして扱えるからです。</p>
+<p><code>TimeZone</code>は、地域による時差を指定できます。</p>
+<p>上で言った日本とかイギリスとかの時間の違いは<code>TimeZone</code>による違いです。</p>
+<p><code>Calendar.timeZone</code>に入れることで特定のカレンダーの特定のタイムゾーンを指定できます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>var</span> japanCalendar = Calendar(identifier: .japanese)
+japanCalendar.timeZone = TimeZone(identifier: <span style=color:#e6db74>&#34;JST&#34;</span>)<span style=color:#f92672>!</span>
+
+<span style=color:#66d9ef>var</span> ukCalendar = Calendar(identifier: .gregorian)
+ukCalendar.timeZone = TimeZone(identifier: <span style=color:#e6db74>&#34;GMT&#34;</span>)<span style=color:#f92672>!</span>
+
+<span style=color:#66d9ef>var</span> currentCalendar = Calendar.current
+currentCalendar.timeZone = TimeZone.current <span style=color:#75715e>// これは指定しなくても端末のタイムゾーン設定に依存する</span>
+</code></pre></div><h3 id=dateとdatecomponentsの変換><code>Date</code>と<code>DateComponents</code>の変換</h3>
+<p><code>Date</code>は<code>Calendar</code>と<code>Timezone</code>を指定することで<code>DateComponents</code>を取り出すことができます。</p>
+<p>絶対的な時間<code>Date</code>にカレンダーとタイムゾーンを指定して、そのカレンダーのその地点の時間を切り出して<code>DateComponents</code>に入れているイメージです。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>let</span> date = Date() <span style=color:#75715e>// Date()で現在の時間が入る</span>
+print(date) <span style=color:#75715e>// 2022-07-19 08:20:30 +0000</span>
+
+<span style=color:#66d9ef>var</span> japanCalendar = Calendar(identifier: .japanese)
+japanCalendar.timeZone = TimeZone(identifier: <span style=color:#e6db74>&#34;JST&#34;</span>)<span style=color:#f92672>!</span>
+<span style=color:#66d9ef>let</span> dateComponents = japanCalendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+print(dateComponents) <span style=color:#75715e>// year: 4 month: 7 day: 19 hour: 17 minute: 20 isLeapMonth: false</span>
+</code></pre></div><p>逆に、<code>DateComponents</code>の値に<code>Calendar</code>と<code>Timezone</code>を指定して<code>Date</code>に変換もできます。</p>
+<p><code>DateComponents</code>の表す時間が、どのカレンダーのどこのタイムゾーンかを教えてあげることで、絶対時間を計算して<code>Date</code>にしてくれるイメージです。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>let</span> dateComponents = DateComponents(year: <span style=color:#ae81ff>4</span>, month: <span style=color:#ae81ff>7</span>, day: <span style=color:#ae81ff>19</span>, hour: <span style=color:#ae81ff>16</span>, minute: <span style=color:#ae81ff>24</span>)
+print(dateComponents) <span style=color:#75715e>// year: 4 month: 7 day: 19 hour: 16 minute: 24 isLeapMonth: false</span>
+
+<span style=color:#66d9ef>var</span> japanCalendar = Calendar(identifier: .japanese)
+japanCalendar.timeZone = TimeZone(identifier: <span style=color:#e6db74>&#34;JST&#34;</span>)<span style=color:#f92672>!</span>
+<span style=color:#66d9ef>let</span> date = japanCalendar.date(from: dateComponents)<span style=color:#f92672>!</span>
+print(date) <span style=color:#75715e>// 2022-07-19 07:24:00 +0000</span>
+</code></pre></div>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/calendardatedatecomponents/>SwiftのDateとDateComponentsの違いの整理</a></li>
+<li class=widget__item><a class=widget__link href=/posts/usernotification/>UserNotificationを使ってローカル通知をするシンプルなアプリを作成する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/uibutton/>Storyboardで作成できるUIButtonと同じものをコードで実装する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecodeep1-2/>リーダブルコード1章、2章まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2022 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
