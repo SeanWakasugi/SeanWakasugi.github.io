@@ -3,12 +3,12 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>リーダブルコード3章、4章まとめ - しょ〜んの技術メモ😗</title>
+<title>リーダブルコード5章まとめ - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="リーダブルコード3章、4章まとめ">
-<meta name=twitter:description content="3章: 誤解されない名前 積極的に「誤解」を探して曖昧な名前を変えると良い。 複数の名前を検討して、何が起きるかを明確に表していてかつ誤解を生む">
+<meta name=twitter:title content="リーダブルコード5章まとめ">
+<meta name=twitter:description content="5章: コメントすべきことを知る コメントの目的は、書き手の意図を読み手に知らせることである。 コメントすべきでは「ない」こと コードからすぐにわか">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
@@ -36,55 +36,58 @@
 <main class=main role=main>
 <article class=post>
 <header class=post__header>
-<h1 class=post__title>リーダブルコード3章、4章まとめ</h1>
+<h1 class=post__title>リーダブルコード5章まとめ</h1>
 <div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-19T00:00:00Z>July 19, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-25T00:00:00Z>July 25, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
 </span>
 </div></div>
 </header><div class="content post__content clearfix">
-<h2 id=3章-誤解されない名前>3章: 誤解されない名前</h2>
-<p>積極的に「誤解」を探して曖昧な名前を変えると良い。</p>
-<p>複数の名前を検討して、何が起きるかを明確に表していてかつ誤解を生む可能性が低い言葉を選ぶといい。</p>
-<p>filter()<br>
-選択するのか除外するのか分かりにくい<br>
-選択する→select()<br>
-除外する→exclude()</p>
-<p>限界値を含めるときはminとmaxを使う。<br>
-CART_TOO_BIG_LIMITでは、条件がCART_TOO_BIG_LIMIT未満ならOKなのか以下ならOKなのかわからない。MAX_ITEMS_IN_CARTなら以下であると分かる。</p>
-<p>似た規則</p>
+<h2 id=5章-コメントすべきことを知る>5章: コメントすべきことを知る</h2>
+<p><strong>コメントの目的は、書き手の意図を読み手に知らせることである。</strong></p>
+<h3 id=コメントすべきではないこと>コメントすべきでは「ない」こと</h3>
+<p><strong>コードからすぐにわかることをコメントに書かない</strong></p>
+<p>関数の名前や引数名でわかることをわざわざコメントに書き直さなくて良い。</p>
+<p>わかりにくい関数名の補足をコメントに書かない。<br>
+関数名をわかりやすくするべきである。</p>
+<h3 id=自分の考えを記録する>自分の考えを記録する</h3>
+<p>映画のコメンタリーのように、何を考えて作ったか書くと良い。</p>
+<p>例えば、コードが汚い理由を書いてもいい。</p>
+<pre><code>// このクラスは汚くなってきている。  
+// サブクラスを作った方がいいかもしれない。  
+</code></pre><p>コードの欠陥にコメントをつけるときの記法の例</p>
 <ul>
-<li>min &lt;= x &lt;= max</li>
-<li>first &lt;= x &lt;= last</li>
-<li>begin &lt;= x &lt; end</li>
+<li>TODO: 後で手を付ける</li>
+<li>FIXME: 既知の不具合がある</li>
+<li>HACK: あまり綺麗ではない解決策</li>
+<li>XXX: 大きな問題があり危険</li>
 </ul>
-<p>ブール値は、is, has, can, shouldを先頭につけるとわかりやすい。<br>
-否定系は混乱しやすいので肯定系に。<br>
-disable→use</p>
-<p>get~は軽量な動作を想起させるので、処理が大きいならcomputeなどにした方がいい。</p>
-<h2 id=4章-美しさ>4章: 美しさ</h2>
-<p>美しい、目に優しい、読みやすいソースコードを作るための3つの原則</p>
-<ul>
-<li>読み手が慣れているパターンと一貫性のあるレイアウトを使う。</li>
-<li>似ているコードは似ているように見せる。</li>
-<li>関連するコードをまとめてブロックにする。</li>
-</ul>
-<p>似ているコードは、改行を使って同じ「シルエット」にすると似ている処理であることが一目でわかる。</p>
-<p>重複したり複雑な処理はメソッドにして分離することで、コードが簡潔になり、何のための処理であるかなどの大切な部分が見やすくなる。</p>
-<p>列を揃える</p>
-<pre><code>CheckFullName(&quot;Doug Adams&quot;, &quot;Mr. Douglas Adams&quot;, &quot;&quot;); 
-CheckFullName(&quot; Jake Brown &quot;, &quot;Mr. Jacob Brown III&quot;, &quot;&quot;); 
-CheckFullName(&quot;No Such Guy&quot;, &quot;&quot;, &quot;no match found&quot;); 
-CheckFullName(&quot;John&quot;, &quot;&quot;, &quot;more than one result&quot;); 
-</code></pre><p>上を、下のように整形すると読みやすい。</p>
-<pre><code>CheckFullName(&quot;Doug Adams&quot;,     &quot;Mr. Douglas Adams&quot;,    &quot;&quot;);
-CheckFullName(&quot; Jake Brown &quot;,   &quot;Mr. Jake Brown III&quot;,   &quot;&quot;);
-CheckFullName(&quot;No Such Guy&quot; ,   &quot;&quot; ,                    &quot;no match found&quot;);
-CheckFullName(&quot;John&quot; ,          &quot;&quot; ,                    &quot;more than one result&quot;);
-</code></pre><p>（という意図らしいが、できればやりたくないと思った。
-見やすいのは確かだが、保守コストとかが高すぎる気がしている。）</p>
-<p>どんな順番でも処理が変わらないようなものでも、意味のある順番を選んで、常にその順番を守ること。例えば使う順番とか、出力する時の並び順とか。</p>
-<p>大きな処理の塊を空の行やコメントで区切って書くこと。</p>
+<p>定数がなぜその値なのかその背景をコメントを書く</p>
+<pre><code>// 合理的な限界値。人間はこんなに読めない。   
+const int MAX_RSS_SUBSCRIPTIONS = 1000;
+</code></pre><h3 id=読み手の立場になって考える>読み手の立場になって考える</h3>
+<p>質問されそうなところ、ハマりそうな罠は前もって予測してコメントを書いておく。</p>
+<p>例えば普通に考える実装とは異なる場合、なぜそのような実装をしているかとか、<br>
+入力によっては処理に時間がかかる関数に、処理時間を書いておいたりとか。</p>
+<p>システムの全体像のコメントを書くことで、新しいチームメンバーがコードを読みやすくなる。</p>
+<p>新しくチームに参加した人に教えるようなイメージで言葉を考えてコメントに書くと良い。</p>
+<h3 id=ライターズブロックを乗り越える>ライターズブロックを乗り越える</h3>
+<p>簡単にコメントを書くためには</p>
+<ol>
+<li>頭のなかにあるコメントをとにかく書き出す。</li>
+<li>コメントを読んで改善が必要なものを見つける。</li>
+<li>改善する。</li>
+</ol>
+<p>まずはとにかく書き出して、</p>
+<p><code>// ヤバい。これはリストに重複があったら面倒なことになる。 </code></p>
+<p>これを改善すればいい。</p>
+<p><code>// 注意:このコードはリストの重複を処理できません(実装が難しいので)。 </code></p>
+<h3 id=5章の感想>5章の感想</h3>
+<p>“正しい”コメントの書き方とは、もっときっちりルール通りに書くものだと思っていた。</p>
+<p>例えば、関数の定義を書き、関数がどこで呼び出され、引数は何をとるのか。などを全ての関数について書いていけば読みやすいのではと今までは考えていた。</p>
+<p>しかし、この章ではもっと人間の考えに沿った、コメントの書き方が紹介されていた。</p>
+<p><strong>コメントの目的は、書き手の意図を読み手に知らせることである。</strong></p>
+<p>コメントを読む人も人間なので、読む人のことを想定して必要な言葉をかけるというのが、一番大事なことなのだと認識した。</p>
 </div>
 <footer class=post__footer>
 <div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
