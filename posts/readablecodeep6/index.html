@@ -3,19 +3,18 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>Tags - しょ〜んの技術メモ😗</title>
+<title>リーダブルコード6章まとめ - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="Tags">
-<meta name=twitter:description content>
+<meta name=twitter:title content="リーダブルコード6章まとめ">
+<meta name=twitter:description content="6章: コメントは正確で簡潔に コメントは領域に対する情報の比率が高くなければいけない 「それ」や「これ」を使わずに、「それ」や「これ」が指してい">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
 <link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
 <link rel=stylesheet href=/css/style.css>
 <link rel=stylesheet href=/css/custom.css>
-<link rel=alternate type=application/rss+xml href=/tags/index.xml title=しょ〜んの技術メモ😗>
 <link rel="shortcut icon" href=/favicon.ico>
 </head>
 <body class=body>
@@ -34,76 +33,46 @@
 </header>
 <div class="wrapper flex">
 <div class=primary>
-<main class="main list" role=main>
-<header class=main__header>
-<h1 class=main__title>Tags</h1>
-</header><article class="list__item post">
-<header class=list__header>
-<h2 class="list__title post__title">
-<a href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ rel=bookmark>
-リーダブルコード
-</a>
-</h2>
-<div class="list__meta meta">
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>リーダブルコード6章まとめ</h1>
+<div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-28T00:00:00Z>July 28, 2022</time></div></div>
-</header>
-<div class="content list__excerpt post__content clearfix">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-28T00:00:00Z>July 28, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<h2 id=6章-コメントは正確で簡潔に>6章: コメントは正確で簡潔に</h2>
+<p><strong>コメントは領域に対する情報の比率が高くなければいけない</strong></p>
+<p>「それ」や「これ」を使わずに、「それ」や「これ」が指している名詞そのものに書き換えたが良い。</p>
+<p>関数の動作を正確に記述した方がいい。<br>
+「行数をカウント」ではなく、改行記号を数えているなら「改行記号をカウント」の方が関数の動作に正確である。</p>
+<p>慎重に選んだ入出力の実例をコメントに書いておくのも良い。<br>
+どういう処理なのか質問されることを考えて、全てに答えられる実例を選ぶと良い。</p>
+<p>コードの動作だけでなく、コードの意図を書く。<br>
+「listを逆順にイテレートする」ではなく、「値段の高い順に表示する」のように、どうしてその動作が必要なのかわかる様に書いた方が良い。</p>
+<p>「キャッシュ」「正規化する」のような処理の名前としてよく使われる情報密度の高い言葉を使う。</p>
+<h3 id=6章の感想>6章の感想</h3>
+<p>コメントの文章であっても言葉ではあるので、わかりやすく人に伝えられるテクニックが必要であるということだと考えている。このテクニックを使えばコードのコメントでなくても、日常生活の会話の中でわかりやすく人に伝えることができる。例えば、こそあど言葉をなるべく使わないことで混乱を防いだり、うまい例を使うことで説明よりも何倍も早く伝えることができる。
+逆に、誰しも日常の中で人にうまく伝えるノウハウは自分の中に溜まっているはずなので、それをコードのコメントにも活かせばいいのだと思っている。</p>
 </div>
-</article><article class="list__item post">
-<header class=list__header>
-<h2 class="list__title post__title">
-<a href=/tags/swift/ rel=bookmark>
-Swift
-</a>
-</h2>
-<div class="list__meta meta">
-<div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-19T00:00:00Z>July 19, 2022</time></div></div>
-</header>
-<div class="content list__excerpt post__content clearfix">
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ rel=tag>リーダブルコード</a>
+</li>
+</ul>
 </div>
-</article><article class="list__item post">
-<header class=list__header>
-<h2 class="list__title post__title">
-<a href=/tags/uikit/ rel=bookmark>
-UIKit
-</a>
-</h2>
-<div class="list__meta meta">
-<div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-12T00:00:00Z>July 12, 2022</time></div></div>
-</header>
-<div class="content list__excerpt post__content clearfix">
-</div>
-</article><article class="list__item post">
-<header class=list__header>
-<h2 class="list__title post__title">
-<a href=/tags/usernotifications/ rel=bookmark>
-UserNotifications
-</a>
-</h2>
-<div class="list__meta meta">
-<div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-12T00:00:00Z>July 12, 2022</time></div></div>
-</header>
-<div class="content list__excerpt post__content clearfix">
-</div>
-</article><article class="list__item post">
-<header class=list__header>
-<h2 class="list__title post__title">
-<a href=/tags/storyboard/ rel=bookmark>
-Storyboard
-</a>
-</h2>
-<div class="list__meta meta">
-<div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-11T00:00:00Z>July 11, 2022</time></div></div>
-</header>
-<div class="content list__excerpt post__content clearfix">
-</div>
+</footer>
 </article>
 </main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
 </div>
 <aside class=sidebar><div class="widget-search widget">
 <form class=widget-search__form role=search method=get action=https://google.com/search>
