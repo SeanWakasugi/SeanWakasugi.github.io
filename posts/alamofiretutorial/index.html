@@ -1,0 +1,268 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>Alamofireで天気APIを取得してUITableViewに表示するiOSアプリを作成する - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Alamofireで天気APIを取得してUITableViewに表示するiOSアプリを作成する">
+<meta name=twitter:description content="Swiftの通信用のライブラリAlamofireを使って、簡単な天気一覧表示アプリを作成します。 北海道のさまざまな地点の明日の天気を一覧で確">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>Alamofireで天気APIを取得してUITableViewに表示するiOSアプリを作成する</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-08-01T00:00:00Z>August 01, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/ rel=category>iOSアプリ</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>Swiftの通信用のライブラリAlamofireを使って、簡単な天気一覧表示アプリを作成します。</p>
+<p>北海道のさまざまな地点の明日の天気を一覧で確認できるようにします。</p>
+<h2 id=alamofireの導入>Alamofireの導入</h2>
+<p>AlamofireをCocoaPodsを仕様してインストールします。</p>
+<p>Xcodeで作成したプロジェクトのディレクトリで<code>pod init</code>を実行すると、<code>Podfile</code>が生成されます。</p>
+<pre><code>cd &lt;プロジェクトのディレクトリ&gt;
+pod init
+</code></pre><p><code>Podfile</code>を開いて、target<code>pod "Alamofire"</code>と追加します。</p>
+<pre><code># Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target '&lt;プロジェクトの名前&gt;' do
+	pod &quot;Alamofire&quot;
+end
+</code></pre><p>追加したライブラリをインストールします。</p>
+<pre><code>pod install
+</code></pre><p><code>pod install</code>終了後は、<code>&lt;プロジェクトの名前>.xcodeproj</code>ではなく、新たに生成されている<code>&lt;プロジェクトの名前>.xcworkspace</code>からXcodeを開く必要があります。</p>
+<h2 id=alamofireの使い方>Alamofireの使い方</h2>
+<p>天気予報 API（livedoor 天気互換）を利用します。
+<a href=https://weather.tsukumijima.net>https://weather.tsukumijima.net</a></p>
+<p>レスポンスをデコードする<code>struct</code>を指定してAPIのURLを入れるだけで、API通信からレスポンスのデコードまで一気にやってくれます。</p>
+<p>例えば、これだけで久留米の今日明日明後日の3日間の天気が取れます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>Alamofire</span>
+
+<span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>ForecastResponse</span>: Decodable {
+    <span style=color:#75715e>// 天気のタイトル(例: &#34;福岡県 久留米 の天気&#34;)</span>
+    <span style=color:#66d9ef>let</span> title: String
+    <span style=color:#75715e>// 今日明日明後日の3日間の天気が配列で入る。</span>
+    <span style=color:#66d9ef>let</span> forecasts: [Forecast]
+    
+    <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Forecast</span>: Decodable {
+        <span style=color:#75715e>// 日付(yyyy-MM-dd)</span>
+        <span style=color:#66d9ef>let</span> date: String
+        <span style=color:#75715e>// 天気(例: &#34;曇のち一時雨&#34;)</span>
+        <span style=color:#66d9ef>let</span> telop: String
+    }
+}
+
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>getForecastAPI</span>() {
+    AF.request(<span style=color:#e6db74>&#34;https://weather.tsukumijima.net/api/forecast/city/400040&#34;</span>).responseDecodable(of: ForecastResponse.<span style=color:#66d9ef>self</span>) { response <span style=color:#66d9ef>in</span>
+        <span style=color:#75715e>// 通信終了後の処理</span>
+        print(response)
+    }
+}
+</code></pre></div><p><code>struct</code>は、API仕様書のレスポンスフィールドやJSONデータサンプルを参考に、階層構造を崩さず欲しい情報の部分だけ切り出して作れば、よしなに取ってきてくれます。</p>
+<p>クロージャの引数になっている<code>response</code>は<code>DataResponse&lt;ForecastResponse, AFError></code>という型になっており、エラーの情報も含まれています。</p>
+<p><code>response.result</code>を調べることで、通信成功と失敗を分岐して成功時にデコードデータを取り出すことができます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift>AF.request(<span style=color:#e6db74>&#34;https://weather.tsukumijima.net/api/forecast/city/400040&#34;</span>).responseDecodable(of: ForecastResponse.<span style=color:#66d9ef>self</span>) { response <span style=color:#66d9ef>in</span>
+    <span style=color:#66d9ef>switch</span> response.result {
+    <span style=color:#66d9ef>case</span> .success(<span style=color:#66d9ef>let</span> forecastResponse):
+        <span style=color:#75715e>// 通信成功時の処理</span>
+        print(forecastResponse)
+    <span style=color:#66d9ef>case</span> .failure(<span style=color:#66d9ef>let</span> error):
+        <span style=color:#75715e>// 通信失敗時の処理</span>
+        print(error)
+    }
+}
+</code></pre></div><p>次は、このデータをiOSアプリでリストを表示することができるTableViewに流し込んで画面に表示してみます。</p>
+<p>今回は、北海道のさまざまな地点の明日の天気を一覧で表示したいので、urlの<code>city/***</code>を変更して何度かAPIを取得します。</p>
+<h2 id=画面の作成>画面の作成</h2>
+<p>画面の作成にはStoryboardを使用します。</p>
+<p>とは言っても、<code>TableView</code>を乗っけるだけです。</p>
+<p><code>Main</code>というStoryboardファイルを開き、右上の+ボタンからTableViewと検索し、<code>Table View</code>を画面の上に乗っけます。</p>
+<p><img src=./tableviewstroyboard.png alt=Storyboardのtableview検索結果></p>
+<p>その後、<code>Table View Cell</code>も同様に<code>Table View</code>の上に1つ乗っけておきます。</p>
+<p>あとはお好みでラベルをつけたりサイズを調整したりしてください。</p>
+<p><img src=./storyboardss.png alt=Storyboard完成></p>
+<h2 id=コード>コード</h2>
+<p><code>ViewController</code>を書いていきます。</p>
+<p>便宜上<code>DispatchQueueViewController</code>にしていますが、Main Storyboardの画面を動かすだけなら<code>ViewController</code>に置き換えてください。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>Foundation</span>
+<span style=color:#66d9ef>import</span> <span style=color:#a6e22e>UIKit</span>
+<span style=color:#66d9ef>import</span> <span style=color:#a6e22e>Alamofire</span>
+
+<span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>ForecastResponse</span>: Decodable {
+    <span style=color:#66d9ef>let</span> title: String
+    <span style=color:#66d9ef>let</span> forecasts: [Forecast]
+    
+    <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Forecast</span>: Decodable {
+        <span style=color:#66d9ef>let</span> date: String
+        <span style=color:#66d9ef>let</span> telop: String
+    }
+}
+
+<span style=color:#66d9ef>class</span> <span style=color:#a6e22e>DispatchQueueViewController</span>: UIViewController {
+    
+    <span style=color:#66d9ef>@IBOutlet</span> <span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>var</span> tableView: UITableView!
+    <span style=color:#66d9ef>var</span> forecastStrings: [String] = []
+    
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewDidLoad</span>() {
+        <span style=color:#66d9ef>super</span>.viewDidLoad()
+        <span style=color:#75715e>// 北海道の各地点の地点ID(https://weather.tsukumijima.net/primary_area.xml)</span>
+        <span style=color:#66d9ef>let</span> cityIDs: [String] = [<span style=color:#e6db74>&#34;011000&#34;</span>, <span style=color:#e6db74>&#34;012010&#34;</span>, <span style=color:#e6db74>&#34;012020&#34;</span>, <span style=color:#e6db74>&#34;013010&#34;</span>, <span style=color:#e6db74>&#34;013020&#34;</span>, <span style=color:#e6db74>&#34;013030&#34;</span>, <span style=color:#e6db74>&#34;014010&#34;</span>, <span style=color:#e6db74>&#34;014020&#34;</span>, <span style=color:#e6db74>&#34;014030&#34;</span>, <span style=color:#e6db74>&#34;015010&#34;</span>, <span style=color:#e6db74>&#34;015020&#34;</span>, <span style=color:#e6db74>&#34;016010&#34;</span>, <span style=color:#e6db74>&#34;016020&#34;</span>, <span style=color:#e6db74>&#34;016030&#34;</span>, <span style=color:#e6db74>&#34;017010&#34;</span>, <span style=color:#e6db74>&#34;017020&#34;</span>]
+        getForecastAPIs(cityIDs: cityIDs)
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>getForecastAPIs</span>(cityIDs: [String]) {
+        cityIDs.forEach ( { cityID <span style=color:#66d9ef>in</span>
+            getForecastAPI(cityID: cityID) { forecastResponse <span style=color:#66d9ef>in</span>
+                <span style=color:#75715e>// forecasts配列は基本的に[今日, 明日, 明後日]と入っているので、[1]を指定することで明日の天気を取得している。</span>
+                <span style=color:#66d9ef>self</span>.forecastStrings.append(forecastResponse.title <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34; は &#34;</span> <span style=color:#f92672>+</span> forecastResponse.forecasts[<span style=color:#ae81ff>1</span>].telop)
+                <span style=color:#66d9ef>self</span>.tableView.dataSource = <span style=color:#66d9ef>self</span>
+                <span style=color:#66d9ef>self</span>.tableView.reloadData()
+            }
+        })
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>getForecastAPI</span>(cityID: String, completion: @escaping ((ForecastResponse) -&gt; Void)) {
+        <span style=color:#66d9ef>let</span> url = <span style=color:#e6db74>&#34;https://weather.tsukumijima.net/api/forecast/city/</span><span style=color:#e6db74>\(</span>cityID<span style=color:#e6db74>)</span><span style=color:#e6db74>&#34;</span>
+        AF.request(url).responseDecodable(of: ForecastResponse.<span style=color:#66d9ef>self</span>) { response <span style=color:#66d9ef>in</span>
+            <span style=color:#66d9ef>switch</span> response.result {
+            <span style=color:#66d9ef>case</span> .success(<span style=color:#66d9ef>let</span> forecastResponse):
+                completion(forecastResponse)
+                print(forecastResponse)
+            <span style=color:#66d9ef>case</span> .failure(<span style=color:#66d9ef>let</span> error):
+                print(error)
+            }
+        }
+    }
+}
+
+<span style=color:#75715e>// UITableViewを表示するために`UITableViewDataSource`プロトコルに定められたメソッド2つ</span>
+<span style=color:#66d9ef>extension</span> <span style=color:#a6e22e>DispatchQueueViewController</span>: UITableViewDataSource {
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>tableView</span>(<span style=color:#66d9ef>_</span> tableView: UITableView, numberOfRowsInSection section: Int) -&gt; Int {
+        <span style=color:#66d9ef>return</span> forecastStrings.count
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>tableView</span>(<span style=color:#66d9ef>_</span> tableView: UITableView, cellForRowAt indexPath: IndexPath) -&gt; UITableViewCell {
+        <span style=color:#66d9ef>let</span> cell = tableView.dequeueReusableCell(withIdentifier: <span style=color:#e6db74>&#34;cell&#34;</span>, <span style=color:#66d9ef>for</span>: indexPath)
+        cell.textLabel!.text =  forecastStrings[indexPath.row]
+        <span style=color:#66d9ef>return</span> cell
+    }
+}
+</code></pre></div><p><code>@IBOutlet weak var tableView: UITableView!</code>をStoryboardの<code>Table View</code>に紐つけることを忘れずに。</p>
+<p>完成すると、北海道の明日の天気が一覧で表示されます。</p>
+<p><img src=./hokkaidotenkiss.png alt=完成したアプリのスクリーンショット></p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/alamofire/ rel=tag>Alamofire</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/uikit/ rel=tag>UIKit</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/alamofiretutorial/>Alamofireで天気APIを取得してUITableViewに表示するiOSアプリを作成する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode6/>リーダブルコード6章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode7/>リーダブルコード7章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode5/>リーダブルコード5章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/calendardatedatecomponents/>SwiftのDateとDateComponentsの違いの整理</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode3-4/>リーダブルコード3章、4章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/usernotification/>UserNotificationを使ってローカル通知をするシンプルなアプリを作成する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/uibutton/>Storyboardで作成できるUIButtonと同じものをコードで実装する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode1-2/>リーダブルコード1章、2章まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2022 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
