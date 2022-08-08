@@ -1,0 +1,239 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>ナビゲーションバーの色を変更するシンプルな方法 - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="ナビゲーションバーの色を変更するシンプルな方法">
+<meta name=twitter:description content="ナビゲーションバーを画面ごとに変更する必要があるアプリを制作したのでやり方のメモです。 UINavigationControllerのexte">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>ナビゲーションバーの色を変更するシンプルな方法</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-08-08T00:00:00Z>August 08, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/ rel=category>iOSアプリ</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>ナビゲーションバーを画面ごとに変更する必要があるアプリを制作したのでやり方のメモです。</p>
+<p><code>UINavigationController</code>のextensionとして<code>UINavigationBarAppearance</code>を編集するメソッドを実装しました。</p>
+<h2 id=使用したメソッド>使用したメソッド</h2>
+<p>ナビゲーションバーの背景と、ナビゲーションバー上のアイテム（タイトルとか戻るボタンとか）の色を設定できるメソッドを実装しました。</p>
+<p>この情報は<code>UINavigationController</code>に書き込まれてしまうので、同じ<code>UINavigationController</code>上の全てに適用されてしまいます。</p>
+<p>そのため、元に戻すためのメソッドも用意しています。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>extension</span> <span style=color:#a6e22e>UINavigationController</span> {
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>customColorBar</span>(item: UIColor, background: UIColor) {
+        <span style=color:#66d9ef>let</span> appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = background
+        appearance.titleTextAttributes = [.foregroundColor: item]
+        appearance.buttonAppearance.normal.titleTextAttributes = [.foregroundColor: item]
+        <span style=color:#66d9ef>self</span>.navigationBar.tintColor = item
+        <span style=color:#66d9ef>self</span>.navigationBar.standardAppearance = appearance
+        <span style=color:#66d9ef>self</span>.navigationBar.scrollEdgeAppearance = appearance
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>defaultBar</span>() {
+        <span style=color:#66d9ef>let</span> appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        <span style=color:#66d9ef>self</span>.navigationBar.tintColor = <span style=color:#66d9ef>nil</span>
+        <span style=color:#66d9ef>self</span>.navigationBar.standardAppearance = appearance
+        <span style=color:#66d9ef>self</span>.navigationBar.scrollEdgeAppearance = appearance
+    }
+}
+</code></pre></div><p>このメソッドは<code>ViewController</code>で以下のように使えます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift>navigationController?.customColorBar(item: .magenta, background: .black)
+</code></pre></div><p>もしくは、AppDelegateなどでUINavigationControllerを生成した際に書き込むことで、起動時に設定することもできます。</p>
+<p>詳しく動作を解説します。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>customColorBar</span>(item: UIColor, background: UIColor) {
+    <span style=color:#75715e>// (iOS13以降のみ使用可能)</span>
+    <span style=color:#66d9ef>let</span> appearance = UINavigationBarAppearance()
+
+    <span style=color:#75715e>// 初期化</span>
+    appearance.configureWithDefaultBackground()
+    <span style=color:#75715e>// 背景色の設定</span>
+    appearance.backgroundColor = background
+    <span style=color:#75715e>// バー中央のタイトルの文字色設定</span>
+    appearance.titleTextAttributes = [.foregroundColor: item]
+    <span style=color:#75715e>// バー上のボタン（戻るボタン、右のボタン）の文字色設定</span>
+    appearance.buttonAppearance.normal.titleTextAttributes = [.foregroundColor: item]
+
+    <span style=color:#75715e>// 戻るボタンの矢印はこれでしか設定できない(古い設定方法)</span>
+    <span style=color:#66d9ef>self</span>.navigationBar.tintColor = item
+
+    <span style=color:#75715e>// 以下でUINavigationBarAppearance()を適用</span>
+    
+    <span style=color:#75715e>// コンテンツをスクロール中のバーの見た目</span>
+    <span style=color:#66d9ef>self</span>.navigationBar.standardAppearance = appearance
+    <span style=color:#75715e>// スクロールが一番上の時とスクロールがない時のバーの見た目</span>
+    <span style=color:#66d9ef>self</span>.navigationBar.scrollEdgeAppearance = appearance
+    <span style=color:#75715e>// 横画面で、コンテンツをスクロール中のバーの見た目（nilなら縦画面と同一）</span>
+    <span style=color:#75715e>// self.navigationBar.compactAppearance = appearance</span>
+    <span style=color:#75715e>// 横画面で、スクロールが一番上の時とスクロールがない時のバーの見た目（nilなら縦画面と同一）</span>
+    <span style=color:#75715e>// self.navigationBar.compactScrollEdgeAppearance = appearance</span>
+}
+</code></pre></div><p><code>UINavigationBarAppearance()</code>から戻るボタンの矢印の色が変更できずいろいろと苦戦しましたが、部分的に以前の方法を使う形で落ち着きました。</p>
+<h2 id=サンプルアプリ>サンプルアプリ</h2>
+<p>画面ごとにナビゲーションバーの色を変える簡単なサンプルアプリです。</p>
+<p>Storyboard上でNavigationControllerと次の画面へ遷移するボタン(今回はナビゲーションバーの右に置いています)を設定しています。</p>
+<p>Storyboard上のナビゲーションバーをクリックして、NavigationItemのtitleを設定しておきます。(今回はRoot, 1, 2, 3にしました。)</p>
+<p><img src=./storyboard.png alt=ストーリーボード上の設定></p>
+<p>ナビゲーションバーの色を変更するメソッドを各ViewControllerに書いていきます。</p>
+<p>StoryboardとのViewControllerの紐付けも忘れずに。</p>
+<p>画面ごとにバーの色が変わる仕様なら、<code>viewWillAppear</code>で色変更メソッドを呼んで、<code>viewWillDisappear</code>でデフォルトに戻す実装が良いと思います。</p>
+<p>このメソッドは同じ<code>UINavigationController</code>に含まれる全ての<code>ViewController</code>に適用されてしまうので、<code>viewWillAppear</code>でナビゲーションバーの色設定をしない<code>ViewController</code>があると前の色のままになってしまいます。(今回は1の画面からRootの画面に戻った場合など）</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>firstViewController</span>: UIViewController {
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewWillAppear</span>(<span style=color:#66d9ef>_</span> animated: Bool) {
+        <span style=color:#66d9ef>super</span>.viewWillAppear(animated)
+        navigationController?.customColorBar(item: .magenta, background: .black)
+    }
+    
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewWillDisappear</span>(<span style=color:#66d9ef>_</span> animated: Bool) {
+        <span style=color:#66d9ef>super</span>.viewWillDisappear(animated)
+        navigationController?.defaultBar()
+    }
+}
+
+<span style=color:#66d9ef>class</span> <span style=color:#a6e22e>secondViewController</span>: UIViewController {
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewWillAppear</span>(<span style=color:#66d9ef>_</span> animated: Bool) {
+        <span style=color:#66d9ef>super</span>.viewWillAppear(animated)
+        navigationController?.customColorBar(item: .yellow, background: .blue)
+    }
+    
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewWillDisappear</span>(<span style=color:#66d9ef>_</span> animated: Bool) {
+        <span style=color:#66d9ef>super</span>.viewWillDisappear(animated)
+        navigationController?.defaultBar()
+    }
+}
+
+<span style=color:#66d9ef>class</span> <span style=color:#a6e22e>thirdViewController</span>: UIViewController {
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewWillAppear</span>(<span style=color:#66d9ef>_</span> animated: Bool) {
+        <span style=color:#66d9ef>super</span>.viewWillAppear(animated)
+        navigationController?.customColorBar(item: .cyan, background: .red)
+    }
+    
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewWillDisappear</span>(<span style=color:#66d9ef>_</span> animated: Bool) {
+        <span style=color:#66d9ef>super</span>.viewWillDisappear(animated)
+        navigationController?.defaultBar()
+    }
+}
+</code></pre></div><table>
+<td><img src=./Root.png></td>
+<td><img src=./1st.png></td>
+<td><img src=./2nd.png></td>
+<td><img src=./3rd.png></td>
+</table>
+<p>お疲れ様でした。</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/uikit/ rel=tag>UIKit</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/dispatchqueue/>Alamofireで同期的にAPIを呼ぶ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/customnavigationbar/>ナビゲーションバーの色を変更するシンプルな方法</a></li>
+<li class=widget__item><a class=widget__link href=/posts/alamofiretutorial/>Alamofireで天気APIを取得してUITableViewに表示するiOSアプリを作成する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode6/>リーダブルコード6章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode7/>リーダブルコード7章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode5/>リーダブルコード5章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/calendardatedatecomponents/>SwiftのDateとDateComponentsの違いの整理</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode3-4/>リーダブルコード3章、4章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/usernotification/>UserNotificationを使ってローカル通知をするシンプルなアプリを作成する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/uibutton/>Storyboardで作成できるUIButtonと同じものをコードで実装する</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2022 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
