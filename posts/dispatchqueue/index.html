@@ -1,0 +1,340 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>Alamofireで同期的にAPIを呼ぶ - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Alamofireで同期的にAPIを呼ぶ">
+<meta name=twitter:description content="非同期な処理を処理を同期的に実行したい AlamofireでAPI取得をすると、基本的に非同期的に処理が行われます。 API通信をしている間、画">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>Alamofireで同期的にAPIを呼ぶ</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-08-08T00:00:00Z>August 08, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/ rel=category>iOSアプリ</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<h2 id=非同期な処理を処理を同期的に実行したい>非同期な処理を処理を同期的に実行したい</h2>
+<p>AlamofireでAPI取得をすると、基本的に非同期的に処理が行われます。</p>
+<p>API通信をしている間、画面が止まってしまったり次の処理が止まったりしてしまうと不便なので、普通は非同期的に動いてくれた方が嬉しいのですが、それが不便なこともあります。</p>
+<p>例えば、連続でAPIを呼ぶ時です。</p>
+<p>以前作ったAlamofireで複数地点の天気を取得してリストにするアプリでは、地点ごとに異なるURLにアクセスしなければいけないので、連続でAPIを呼んでいます。</p>
+<p><a href=https://seanwakasugi.github.io/posts/alamofiretutorial/>https://seanwakasugi.github.io/posts/alamofiretutorial/</a></p>
+<p>このアプリでは連続で非同期にAPIを呼び、API通信が完了したら表示用のリストに書き込むようにしています。</p>
+<p>実際どのように処理されているのか、API通信に番号を振って確認してみます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>getForecastAPIs</span>(cityIDs: [String]) {
+    cityIDs.enumerated().forEach ( { (index, cityID) <span style=color:#66d9ef>in</span>
+        getForecastAPI(cityID: cityID) { forecastResponse <span style=color:#66d9ef>in</span>
+            <span style=color:#75715e>// indexで最初に読んだAPIから0, 1, 2...と番号を振ってAPIを呼び出す</span>
+            <span style=color:#66d9ef>self</span>.forecastStrings.append(String(index) <span style=color:#f92672>+</span> forecastResponse.title <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34; は &#34;</span> <span style=color:#f92672>+</span> forecastResponse.forecasts[<span style=color:#ae81ff>1</span>].telop)
+            <span style=color:#66d9ef>self</span>.tableView.dataSource = <span style=color:#66d9ef>self</span>
+            <span style=color:#66d9ef>self</span>.tableView.reloadData()
+        }
+    })
+}
+</code></pre></div><p><img src=./bangobarabara.png alt=番号がバラバラ></p>
+<p>0, 3, 2, 4とバラバラにAPIが返ってきているのが分かります。</p>
+<p>順番にAPIを呼ぶために、APIを非同期的ではなく同期的に呼びたいと思います。</p>
+<p><code>DispatchQueue</code>を使って実現します。</p>
+<h2 id=dispatchqueue--dispatchgroup>DispatchQueue & DispatchGroup</h2>
+<p>DispatchQueueを使うと、指定したスレッドでキューを実行してくれます。</p>
+<p>iOSでは、UIの処理が走るmainスレッドと別にglobalスレッドが用意されています。</p>
+<p>globalスレッドで通信処理などを動かしたい時は、下のように括ります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>let</span> dispatchQueue = DispatchQueue.global()
+dispatchQueue.async {
+    <span style=color:#75715e>// globalキュー</span>
+}
+</code></pre></div><p>さらにDispatchGroupを使うことで、非同期処理をグループにしてグループにした処理が終わるまで待つことができます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>let</span> dispatchQueue = DispatchQueue.global()
+<span style=color:#66d9ef>let</span> dispatchGroup = DispatchGroup()
+dispatchQueue.async {
+    dispatchGroup.enter()
+    <span style=color:#75715e>// 非同期処理1</span>
+    dispatchGroup.leave()
+
+    <span style=color:#75715e>// 非同期処理が終わるまで待ち</span>
+    dispatchGroup.wait()
+    <span style=color:#75715e>// 非同期処理の後に行う処理</span>
+}
+</code></pre></div><h2 id=天気apiを同期的に呼ぶ>天気APIを同期的に呼ぶ</h2>
+<p><code>DispatchQueue</code>&<code>DispatchGroup</code>を使って、天気がバラバラではなく順番に表示されるようなコードを書いていきます。</p>
+<ol>
+<li>天気APIを呼ぶ</li>
+<li>APIを呼んでデータを書き込む処理が終わるまで待つ</li>
+<li>終わったのを確認してから次の天気APIを呼ぶ</li>
+<li>その繰り返し</li>
+</ol>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>getForecastAPIs</span>(cityIDs: [String], completion: @escaping (() -&gt; Void)) {
+    <span style=color:#66d9ef>let</span> dispatchQueue = DispatchQueue.global()
+    <span style=color:#66d9ef>let</span> dispatchGroup = DispatchGroup()
+    dispatchQueue.async {
+        <span style=color:#75715e>// globalキュー</span>
+        cityIDs.enumerated().forEach ( { (index, cityID) <span style=color:#66d9ef>in</span>
+            dispatchGroup.enter()
+            <span style=color:#66d9ef>self</span>.getForecastAPI(cityID: cityID) { forecastResponse <span style=color:#66d9ef>in</span>
+                <span style=color:#75715e>// mainキュー(Alamofireの仕様)</span>
+                <span style=color:#66d9ef>self</span>.forecastStrings.append(String(index) <span style=color:#f92672>+</span> forecastResponse.title <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34; は &#34;</span> <span style=color:#f92672>+</span> forecastResponse.forecasts[<span style=color:#ae81ff>0</span>].telop)
+                dispatchGroup.leave()
+            }
+            <span style=color:#75715e>// globalキュー</span>
+            dispatchGroup.wait()
+        })
+        <span style=color:#75715e>// globalキュー</span>
+        DispatchQueue.main.async {
+            <span style=color:#75715e>// mainキュー(画面を触るのでmainである必要がある)</span>
+            <span style=color:#66d9ef>self</span>.tableView.dataSource = <span style=color:#66d9ef>self</span>
+            <span style=color:#66d9ef>self</span>.tableView.reloadData()
+        }
+    }
+}
+</code></pre></div><p>AlamofireでAPIを呼んでいるメソッド<code>getForecastAPI()</code>を呼ぶ前に<code>dispatchGroup.enter()</code>をしています。</p>
+<p><code>getForecastAPI()</code>実行後に呼ばれるcompletionに<code>dispatchGroup.leave()</code>を書いています。</p>
+<p>APIを呼ぶループ内の最後に<code>dispatchGroup.wait()</code>をしています。</p>
+<p><code>enter()</code>が呼ばれた後API周りの処理が終わって<code>leave()</code>が呼ばれるまで、次のループへ進むことができなくなっています。</p>
+<p>これにより、同期的にAPIが呼ばれて順番が崩れることなく表示されます。</p>
+<p><img src=./junban.png alt=番号が順番通り></p>
+<p>例えば、<code>wait()</code>の位置をループの外に出すとどうなるでしょうか。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>getForecastAPIs</span>(cityIDs: [String], completion: @escaping (() -&gt; Void)) {
+    <span style=color:#66d9ef>let</span> dispatchQueue = DispatchQueue.global()
+    <span style=color:#66d9ef>let</span> dispatchGroup = DispatchGroup()
+    dispatchQueue.async {
+        <span style=color:#75715e>// globalキュー</span>
+        cityIDs.enumerated().forEach ( { (index, cityID) <span style=color:#66d9ef>in</span>
+            dispatchGroup.enter()
+            <span style=color:#66d9ef>self</span>.getForecastAPI(cityID: cityID) { forecastResponse <span style=color:#66d9ef>in</span>
+                <span style=color:#75715e>// mainキュー(Alamofireの仕様)</span>
+                <span style=color:#66d9ef>self</span>.forecastStrings.append(String(index) <span style=color:#f92672>+</span> forecastResponse.title <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34; は &#34;</span> <span style=color:#f92672>+</span> forecastResponse.forecasts[<span style=color:#ae81ff>0</span>].telop)
+                dispatchGroup.leave()
+            }
+        })
+        <span style=color:#75715e>// globalキュー</span>
+        dispatchGroup.wait()
+        DispatchQueue.main.async {
+            <span style=color:#75715e>// mainキュー(画面を触るのでmainである必要がある)</span>
+            <span style=color:#66d9ef>self</span>.tableView.dataSource = <span style=color:#66d9ef>self</span>
+            <span style=color:#66d9ef>self</span>.tableView.reloadData()
+        }
+    }
+}
+</code></pre></div><p>こうすると、APIはまたバラバラに呼ばれます。</p>
+<p>APIを読んだ後waitしていないからです。</p>
+<p>ただ、今回はループが終わった後にwaitしているので、<code>dispatchGroup</code>に<code>enter()</code>した全ての処理が<code>leave()</code>するまで<code>wait()</code>します。</p>
+<p>つまり、全部APIを呼び終わって、画面を表示する準備が終った後にその下の処理が動きます。</p>
+<p>今回は全部APIを呼び終わった後に<code>tableView</code>の更新をするという動きになります。（つまり、正常に表示されます。）</p>
+<h2 id=dispatchqueueasyncgroupがalamofireで使えない理由><code>DispatchQueue.async(group:)</code>がAlamofireで使えない理由</h2>
+<p><code>DispatchGroup</code>の一般的な使い方として以下のような書き方があります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>let</span> dispatchQueue = DispatchQueue.global()
+<span style=color:#66d9ef>let</span> dispatchGroup = DispatchGroup()
+dispatchQueue.async(group: dispatchGroup) {
+    <span style=color:#75715e>// 非同期処理</span>
+}
+
+<span style=color:#75715e>// 非同期処理が終わるまで待ち</span>
+dispatchGroup.wait()
+<span style=color:#75715e>// 非同期処理の後に行う処理</span>
+</code></pre></div><p><code>enter()</code>や<code>leave()</code>よりシンプルで書きやすいのですが、Alamofireでは使えませんでした。</p>
+<p>これを使って書いても、普通は<code>wait()</code>してくれずに次の処理へ進んでしまうと思います。</p>
+<p>理由は(恐らく)、Alamofireでは内部で複数のスレッドを使用してAPI通信を行なっているからです。</p>
+<p>Alamofireの内部では、リクエスト作成、通信、レスポンスのデコード、completion等々（処理の区切りかたはあくまでイメージですが）様々な処理が行われています。</p>
+<p>高速化のためにそれぞれの処理を別スレッドで行なっていると考えられます。</p>
+<p>例えば<code>global()</code>スレッドでAlamofireのスレッドを呼び出しても、リクエスト作成は<code>スレッド1(仮称)</code>、通信は<code>スレッド2</code>、デコードは<code>スレッド3</code>、completionは<code>main</code>スレッドみたいなイメージです。</p>
+<p>そのため、<code>global()</code>スレッドで<code>dispatchGroup</code>で括っても、<code>global()</code>での処理の終了を待つだけで他のスレッドでの処理の終了は感知できていません。</p>
+<p>処理が終わったことを知るためには、処理を終わった時に行うcompletion内に<code>leave()</code>を書く必要があるのです。</p>
+<h2 id=コード全文>コード全文</h2>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>Foundation</span>
+<span style=color:#66d9ef>import</span> <span style=color:#a6e22e>UIKit</span>
+<span style=color:#66d9ef>import</span> <span style=color:#a6e22e>Alamofire</span>
+
+<span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>ForecastResponse</span>: Decodable {
+    <span style=color:#66d9ef>let</span> title: String
+    <span style=color:#66d9ef>let</span> forecasts: [Forecast]
+    
+    <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Forecast</span>: Decodable {
+        <span style=color:#66d9ef>let</span> date: String
+        <span style=color:#66d9ef>let</span> telop: String
+    }
+}
+
+<span style=color:#66d9ef>class</span> <span style=color:#a6e22e>DispatchQueueViewController</span>: UIViewController {
+    
+    <span style=color:#66d9ef>@IBOutlet</span> <span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>var</span> tableView: UITableView!
+    <span style=color:#66d9ef>var</span> forecastStrings: [String] = []
+    
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewDidLoad</span>() {
+        <span style=color:#66d9ef>super</span>.viewDidLoad()
+        <span style=color:#66d9ef>let</span> cityIDs: [String] = [<span style=color:#e6db74>&#34;011000&#34;</span>, <span style=color:#e6db74>&#34;012010&#34;</span>, <span style=color:#e6db74>&#34;012020&#34;</span>, <span style=color:#e6db74>&#34;013010&#34;</span>, <span style=color:#e6db74>&#34;013020&#34;</span>, <span style=color:#e6db74>&#34;013030&#34;</span>, <span style=color:#e6db74>&#34;014010&#34;</span>, <span style=color:#e6db74>&#34;014020&#34;</span>, <span style=color:#e6db74>&#34;014030&#34;</span>, <span style=color:#e6db74>&#34;015010&#34;</span>, <span style=color:#e6db74>&#34;015020&#34;</span>, <span style=color:#e6db74>&#34;016010&#34;</span>, <span style=color:#e6db74>&#34;016020&#34;</span>, <span style=color:#e6db74>&#34;016030&#34;</span>, <span style=color:#e6db74>&#34;017010&#34;</span>, <span style=color:#e6db74>&#34;017020&#34;</span>]
+        getForecastAPIs(cityIDs: cityIDs) {
+            <span style=color:#66d9ef>self</span>.tableView.dataSource = <span style=color:#66d9ef>self</span>
+            <span style=color:#66d9ef>self</span>.tableView.reloadData()
+        }
+        
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>getForecastAPIs</span>(cityIDs: [String], completion: @escaping (() -&gt; Void)) {
+        <span style=color:#66d9ef>let</span> dispatchQueue = DispatchQueue.global()
+        <span style=color:#66d9ef>let</span> dispatchGroup = DispatchGroup()
+        dispatchQueue.async {
+            <span style=color:#75715e>// globalキュー</span>
+            cityIDs.enumerated().forEach ( { (index, cityID) <span style=color:#66d9ef>in</span>
+                dispatchGroup.enter()
+                <span style=color:#66d9ef>self</span>.getForecastAPI(cityID: cityID) { forecastResponse <span style=color:#66d9ef>in</span>
+                    <span style=color:#75715e>// mainキュー</span>
+                    <span style=color:#66d9ef>self</span>.forecastStrings.append(String(index) <span style=color:#f92672>+</span> forecastResponse.title <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34; は &#34;</span> <span style=color:#f92672>+</span> forecastResponse.forecasts[<span style=color:#ae81ff>0</span>].telop)
+                    dispatchGroup.leave()
+                }
+                <span style=color:#75715e>// globalキュー</span>
+                dispatchGroup.wait()
+            })
+            <span style=color:#75715e>// globalキュー</span>
+            DispatchQueue.main.async {
+                <span style=color:#75715e>// mainキュー(画面を触るのでmainである必要がある)</span>
+                completion()
+            }
+        }
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>getForecastAPI</span>(cityID: String, completion: @escaping ((ForecastResponse) -&gt; Void)) {
+        <span style=color:#75715e>// globalキュー</span>
+        AF.request(<span style=color:#e6db74>&#34;https://weather.tsukumijima.net/api/forecast/city/</span><span style=color:#e6db74>\(</span>cityID<span style=color:#e6db74>)</span><span style=color:#e6db74>&#34;</span>).responseDecodable(of: ForecastResponse.<span style=color:#66d9ef>self</span>, decoder: JSONDecoder()) { forecastResponse <span style=color:#66d9ef>in</span>
+            <span style=color:#75715e>// mainキュー(Alamofireの仕様)</span>
+            <span style=color:#66d9ef>switch</span> forecastResponse.result {
+            <span style=color:#66d9ef>case</span> .success(<span style=color:#66d9ef>let</span> response):
+                completion(response)
+                print(response)
+            <span style=color:#66d9ef>case</span> .failure(<span style=color:#66d9ef>let</span> error):
+                print(error)
+            }
+        }
+    }
+}
+
+<span style=color:#66d9ef>extension</span> <span style=color:#a6e22e>DispatchQueueViewController</span>: UITableViewDataSource {
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>tableView</span>(<span style=color:#66d9ef>_</span> tableView: UITableView, numberOfRowsInSection section: Int) -&gt; Int {
+        <span style=color:#66d9ef>return</span> forecastStrings.count
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>tableView</span>(<span style=color:#66d9ef>_</span> tableView: UITableView, cellForRowAt indexPath: IndexPath) -&gt; UITableViewCell {
+        <span style=color:#66d9ef>let</span> cell = tableView.dequeueReusableCell(withIdentifier: <span style=color:#e6db74>&#34;cell&#34;</span>, <span style=color:#66d9ef>for</span>: indexPath)
+        cell.textLabel!.text =  forecastStrings[indexPath.row]
+        <span style=color:#66d9ef>return</span> cell
+    }
+}
+
+</code></pre></div>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/alamofire/ rel=tag>Alamofire</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/uikit/ rel=tag>UIKit</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/dispatchqueue/>Alamofireで同期的にAPIを呼ぶ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/alamofiretutorial/>Alamofireで天気APIを取得してUITableViewに表示するiOSアプリを作成する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode6/>リーダブルコード6章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode7/>リーダブルコード7章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode5/>リーダブルコード5章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/calendardatedatecomponents/>SwiftのDateとDateComponentsの違いの整理</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode3-4/>リーダブルコード3章、4章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/usernotification/>UserNotificationを使ってローカル通知をするシンプルなアプリを作成する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/uibutton/>Storyboardで作成できるUIButtonと同じものをコードで実装する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode1-2/>リーダブルコード1章、2章まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2022 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
