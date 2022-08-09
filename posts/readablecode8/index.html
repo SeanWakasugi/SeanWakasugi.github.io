@@ -1,0 +1,228 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>リーダブルコード8章感想 - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="リーダブルコード8章感想">
+<meta name=twitter:description content="8章: 巨大な式を分割する 式がでかいと読みにくいので分割して短くしようというお話です。 説明変数・要約関数 こうではなくて、 if UserDefaultManager.shared.token() != nil { // 処理 } こう">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>リーダブルコード8章感想</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-08-09T00:00:00Z>August 09, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<h2 id=8章-巨大な式を分割する>8章: 巨大な式を分割する</h2>
+<p>式がでかいと読みにくいので分割して短くしようというお話です。</p>
+<h3 id=説明変数要約関数>説明変数・要約関数</h3>
+<p>こうではなくて、</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>if</span> UserDefaultManager.shared.token() <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+    <span style=color:#75715e>// 処理</span>
+}
+</code></pre></div><p>こういうふうに書いて式を分割しようという話です。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>let</span> IsTokenAssigned = UserDefaultManager.shared.token() <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span>)
+
+<span style=color:#66d9ef>if</span> IsTokenAssigned {
+    <span style=color:#75715e>// 処理</span>
+}
+</code></pre></div><p>コードが横に長くなるのが嫌でよく使っている方法でしたが、認識していないメリットがたくさんありました。</p>
+<p>一つ目は、変数に置き換えることで何をしている式なのか説明できることです。</p>
+<p><code>IsTokenAssigned</code>という名前をつけることで、変数のヌルチェックをしているという情報だけではなく、</p>
+<p>このトークンは割り当てられる(Assigned)もので、それが既に割り当てられているかどうかを調べている。</p>
+<p>ということまで推測できます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>let</span> IsTokenAssigned = (UserDefaultManager.shared.token() <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span>)
+</code></pre></div><p>2つ目のメリットは、コードの主要な概念を事前に伝えることができることです。</p>
+<p>例えば、先ほどのtokenの有無によって画面の設定を行うメソッドがいくつかあるとします。</p>
+<p>これでは読んで何をしているのか理解するのに時間をかかります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>configButton</span>() {
+    <span style=color:#75715e>// tokenがnilでないならボタンを表示</span>
+    <span style=color:#66d9ef>if</span> UserDefaultManager.shared.token() <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+        button.isHidden = <span style=color:#66d9ef>false</span>
+    }
+}
+
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>configTextLabel</span>() {
+    <span style=color:#75715e>// tokenがnilならエラーと表示</span>
+    textField.Label = UserDefaultManager.shared.token() ? <span style=color:#e6db74>&#34;成功&#34;</span> : <span style=color:#e6db74>&#34;エラー&#34;</span>
+}
+</code></pre></div><p>式を変数にして名前につけ、コードの最初に定義しておきます。</p>
+<p>こうすることで、最初の変数を読んだ時点で、「このコードではトークンをチェックしてこれによって処理が分岐するのだな」と予想できます。</p>
+<p>文字数自体は減っていませんが、事前に重要な概念を伝えることで理解しやすくなるのです。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#75715e>// トークンがあれば成功画面、なければエラー画面を表示</span>
+<span style=color:#66d9ef>let</span> IsTokenAssigned = UserDefaultManager.shared.token() <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span>)
+
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>configButton</span>() {
+    <span style=color:#66d9ef>if</span> IsTokenAssigned {
+        button.isHidden = <span style=color:#66d9ef>false</span>
+    }
+}
+
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>configTextLabel</span>() {
+    textField.Label = IsTokenAssigned ? <span style=color:#e6db74>&#34;成功&#34;</span> : <span style=color:#e6db74>&#34;エラー&#34;</span>
+}
+</code></pre></div><h3 id=短絡評価>短絡評価</h3>
+<p>私が全く意識していなかった内容です。</p>
+<p>短絡評価とは、</p>
+<p>複数の条件文が<code>&&</code>や<code>||</code>で結ばれている時、内部処理としては左から評価している。</p>
+<p>この時、左の評価だけで必要十分であれば左の評価だけで式全体の評価を終了してしまう。</p>
+<p>というものです。例えば、</p>
+<p><code>a && b</code>で<code>a = false</code>ならb関係なく<code>false</code>とか</p>
+<p><code>a || b</code>で<code>a = true</code>ならb関係なく<code>true</code>とか</p>
+<p>この処理を利用して、例えば<code>a && b</code>の式はaが真だった場合のみbを確認するような処理を書くことができますが、分かりにくいのでやめよう、という話です。</p>
+<p>例えば、こんな式です（多分コードエラーで動きませんが）。</p>
+<p>aがnilでなかった場合しか右の式は確認されないので、aがnilでないことを前提にaの中身を調べる条件を書いています。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>if</span> a <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> <span style=color:#f92672>&amp;&amp;</span> a.component == item {
+
+}
+</code></pre></div><p>書かないようにします。</p>
+<h3 id=より優雅な方法を見つける>より優雅な方法を見つける</h3>
+<p>これはなるほど！　と感心した話です。</p>
+<p>期間を扱う構造体があるとして、その期間が重複しているかどうかのメソッドを実装したいと考えているとします。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Range</span> {
+    <span style=color:#66d9ef>let</span> begin: Int
+    <span style=color:#66d9ef>let</span> end: Int
+
+    <span style=color:#75715e>// 例えば、[0,5) は [3,8) と重なっている。</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>OverlapsWith</span>() -&gt; Bool {
+        <span style=color:#75715e>// ここはどう書けばいい？</span>
+    } 
+}
+</code></pre></div><p>このメソッドを、普通に考えるとかなり複雑になります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>OverlapsWith</span>(other: Range) -&gt; Bool {
+    <span style=color:#75715e>// &#39;begin&#39; または &#39;end&#39; が &#39;other&#39; のなかにあるかを確認する。</span>
+    <span style=color:#66d9ef>return</span> (<span style=color:#66d9ef>self</span>.begin <span style=color:#f92672>&gt;=</span> other.begin <span style=color:#f92672>&amp;&amp;</span> <span style=color:#66d9ef>self</span>.begin <span style=color:#f92672>&lt;=</span> other.end) <span style=color:#f92672>||</span> (<span style=color:#66d9ef>self</span>.end <span style=color:#f92672>&gt;=</span> other.begin <span style=color:#f92672>&amp;&amp;</span> <span style=color:#66d9ef>self</span>.end <span style=color:#f92672>&lt;=</span> other.end)
+    <span style=color:#75715e>// まだカバーできていない条件が無数にある</span>
+}
+</code></pre></div><p>これを、逆転の発想で、重複していない条件を探してその逆を取ればいいと考えるとかなり簡単になります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>OverlapsWith</span>(other: Range) -&gt; Bool {
+    <span style=color:#75715e>// 一方の終点が、この始点よりも前にある</span>
+    <span style=color:#66d9ef>if</span> other.end <span style=color:#f92672>&lt;=</span> <span style=color:#66d9ef>self</span>.begin { <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span> }
+    <span style=color:#75715e>// 一方の始点が、この終点よりも後にある </span>
+    <span style=color:#66d9ef>if</span> other.begin <span style=color:#f92672>&gt;=</span> <span style=color:#66d9ef>self</span>.end { <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span> }
+    <span style=color:#75715e>// 残ったものは重なっている</span>
+    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>true</span>
+}
+</code></pre></div><h3 id=まとめ>まとめ</h3>
+<p>この章で学んだこと</p>
+<ul>
+<li>長い式を変数で置き換えることで、「何をしている式なのか説明できる」し、「コードで使う概念を事前に伝えられる」</li>
+<li>短絡評価はなるべく使わない</li>
+<li>複雑な条件式は、反対の条件を考えると簡単になることがある</li>
+</ul>
+<p>お疲れ様でした。</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ rel=tag>リーダブルコード</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/readablecode8/>リーダブルコード8章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/dispatchqueue/>Alamofireで同期的にAPIを呼ぶ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/customnavigationbar/>ナビゲーションバーの色を変更するシンプルな方法</a></li>
+<li class=widget__item><a class=widget__link href=/posts/alamofiretutorial/>Alamofireで天気APIを取得してUITableViewに表示するiOSアプリを作成する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode6/>リーダブルコード6章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode7/>リーダブルコード7章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode5/>リーダブルコード5章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/calendardatedatecomponents/>SwiftのDateとDateComponentsの違いの整理</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode3-4/>リーダブルコード3章、4章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/usernotification/>UserNotificationを使ってローカル通知をするシンプルなアプリを作成する</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2022 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
