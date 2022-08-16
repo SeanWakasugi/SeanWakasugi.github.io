@@ -170,14 +170,14 @@ class RootPageViewController: UIViewController {
     
     func animateToPreviousPage(completion: @escaping (()-> Void)) {
         index = index - 1
-        pageViewController.setViewControllers([controllers[index]], direction: .reverse, animated: true) { isFinished in
+        pageViewController.setViewControllers([controllers[index]], direction: .reverse, animated: true) { _ in
             completion()
         }
     }
     
     func animateToNextPage(completion: @escaping (()-> Void)) {
         index = index + 1
-        pageViewController.setViewControllers([controllers[index]], direction: .forward, animated: true) { isFinished in
+        pageViewController.setViewControllers([controllers[index]], direction: .forward, animated: true) { _ in
             completion()
         }
     }
@@ -343,14 +343,14 @@ class RootPageViewController: UIViewController {
     
     func animateToPreviousPage(completion: @escaping (()-> Void)) {
         index = index - 1
-        pageViewController.setViewControllers([controllers[index]], direction: .reverse, animated: true) { isFinished in
+        pageViewController.setViewControllers([controllers[index]], direction: .reverse, animated: true) { _ in
             completion()
         }
     }
     
     func animateToNextPage(completion: @escaping (()-> Void)) {
         index = index + 1
-        pageViewController.setViewControllers([controllers[index]], direction: .forward, animated: true) { isFinished in
+        pageViewController.setViewControllers([controllers[index]], direction: .forward, animated: true) { _ in
             completion()
         }
     }
