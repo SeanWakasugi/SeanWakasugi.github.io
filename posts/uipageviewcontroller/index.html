@@ -1,0 +1,477 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>UIPageViewControllerでボタンでもスワイプでも遷移できるチュートリアルを作る - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="UIPageViewControllerでボタンでもスワイプでも遷移できるチュートリアルを作る">
+<meta name=twitter:description content="UIPageViewControllerを使って、スワイプでの遷移に加えてボタンでの戻る/進むを追加したところ、いろいろとつまづいたのでどの">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>UIPageViewControllerでボタンでもスワイプでも遷移できるチュートリアルを作る</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-08-16T00:00:00Z>August 16, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/ rel=category>iOSアプリ</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p><code>UIPageViewController</code>を使って、スワイプでの遷移に加えてボタンでの戻る/進むを追加したところ、いろいろとつまづいたのでどのように解決したかメモを残しておきます。</p>
+<p>コードが見たい方はこちら、もしくは記事最下部に全文載せています。
+<a href=https://github.com/SeanWakasugi/SwipeAndButtonPageView>https://github.com/SeanWakasugi/SwipeAndButtonPageView</a></p>
+<p>作りたかったアプリはこのようなものです。</p>
+<ul>
+<li>とりあえず3ページの画面を行き来できる</li>
+<li>スワイプで遷移できる</li>
+<li>ボタンでも遷移できる</li>
+<li>現在のページをドットで表示</li>
+<li>ページが増えてもコードを変えずに対応できる</li>
+</ul>
+<p>作っていく中でつまづいた点は以下の5つです。</p>
+<ul>
+<li>どこにボタンを置けばいい？</li>
+<li>ボタンで遷移するコードの書き方は？</li>
+<li>現在のページ数の取得方法は？</li>
+<li>ボタンでの遷移中にスワイプ操作をすると遷移先がずれる</li>
+<li>スワイプ中にボタン操作をするとアプリが落ちる</li>
+</ul>
+<p>まず、<code>UIPageViewController</code>の一番簡単な使い方から、上の5つの疑問をどのように解消したか解説していきます。</p>
+<h3 id=uipageviewcontrollerの最小構成>UIPageViewControllerの最小構成</h3>
+<p>Storyboardで、このpageViewControllerをclassに設定したUIPageViewControllerを置いて、isInitialに設定する必要があります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>UIKit</span>
+
+<span style=color:#66d9ef>class</span> <span style=color:#a6e22e>pageViewController</span>: UIPageViewController {
+
+    <span style=color:#66d9ef>var</span> controllers: [UIViewController] = []
+    
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewDidLoad</span>() {
+        <span style=color:#66d9ef>super</span>.viewDidLoad()
+        <span style=color:#75715e>// 表示するViewControllerの配列を作成する</span>
+        <span style=color:#66d9ef>let</span> first = storyboard!.instantiateViewController(withIdentifier: <span style=color:#e6db74>&#34;firstView&#34;</span>)
+        <span style=color:#66d9ef>let</span> second = storyboard!.instantiateViewController(withIdentifier: <span style=color:#e6db74>&#34;secondView&#34;</span>)
+        <span style=color:#66d9ef>let</span> third = storyboard!.instantiateViewController(withIdentifier: <span style=color:#e6db74>&#34;thirdView&#34;</span>)
+        controllers = [first, second, third]
+        <span style=color:#75715e>// 最初に表示するViewControllerを設定する</span>
+        setViewControllers([controllers[<span style=color:#ae81ff>0</span>]], direction: .forward, animated: <span style=color:#66d9ef>false</span>)
+        <span style=color:#75715e>// 画面の移動先を決定するdataSourceを紐つける</span>
+        dataSource = <span style=color:#66d9ef>self</span>
+    }
+}
+
+<span style=color:#66d9ef>extension</span> <span style=color:#a6e22e>pageViewController</span>: UIPageViewControllerDataSource {
+    <span style=color:#75715e>/// スワイプ操作における次の画面を渡すメソッド。その画面が最後の画面なら、nilを返して遷移不可とする</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>pageViewController</span>(<span style=color:#66d9ef>_</span> pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -&gt; UIViewController? {
+        <span style=color:#66d9ef>guard</span> <span style=color:#66d9ef>let</span> index = controllers.firstIndex(of: viewController) <span style=color:#66d9ef>else</span> { <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span> }
+        <span style=color:#66d9ef>if</span> index <span style=color:#f92672>&lt;</span> controllers.count <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span> {
+            <span style=color:#66d9ef>return</span> controllers[index <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>]
+        } <span style=color:#66d9ef>else</span> {
+            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>
+        }
+    }
+    
+    <span style=color:#75715e>/// スワイプ操作における前の画面を渡すメソッド。その画面が最初の画面なら、nilを返して遷移不可とする</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>pageViewController</span>(<span style=color:#66d9ef>_</span> pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -&gt; UIViewController? {
+        <span style=color:#66d9ef>guard</span> <span style=color:#66d9ef>let</span> index = controllers.firstIndex(of: viewController) <span style=color:#66d9ef>else</span> { <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span> }
+        <span style=color:#66d9ef>if</span> index <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+            <span style=color:#66d9ef>return</span> controllers[index <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>]
+        } <span style=color:#66d9ef>else</span> {
+            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>
+        }
+    } 
+}
+</code></pre></div><p>これだけで、3枚の画面をスワイプで行き来できるページビューが完成します。</p>
+<p>ここにボタンを追加していきます。</p>
+<h3 id=どこにボタンを置けばいい>どこにボタンを置けばいい？</h3>
+<p><code>UIPageViewController</code>にはボタンを設置できません。</p>
+<p><code>UIPageViewController</code>は複数の<code>ViewController</code>をまとめて管理するクラスなので、それ自体は画面を持っていないからです。</p>
+<p>そこで、親となる<code>ViewController</code>を作成して、その中に<code>ContainerView</code>を設置し、ContainerViewの中に<code>UIPageViewController</code>を紐つけます。</p>
+<p>紐付けの方法は、<code>ContainerView</code>から<code>UIPageViewController</code>へControlを押しながらドラッグし(Segueをひっぱって)、<code>Embed</code>を選択することです。</p>
+<p>親のViewControllerに<code>UIPageControl</code>と戻ると進むの<code>UIButton</code>を設置しました。</p>
+<p><img src=./PageViewOnContainer.png alt=ContainerViewにPageViewを設定></p>
+<p>コードでは、親となる<code>RootPageViewController</code>を作成し、<code>UIPageViewController</code>を<code>RootPageViewController</code>のメンバー変数として持ち、viewDidLoadで紐付けを行うようにしました。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>RootPageViewController</span>: UIViewController {
+    
+    <span style=color:#66d9ef>@IBOutlet</span> <span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>var</span> pageControl: UIPageControl!
+    <span style=color:#66d9ef>@IBOutlet</span> <span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>var</span> backButton: UIButton!
+    <span style=color:#66d9ef>@IBOutlet</span> <span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>var</span> nextButton: UIButton!
+    
+    <span style=color:#66d9ef>var</span> pageViewController: UIPageViewController!
+    <span style=color:#66d9ef>var</span> controllers: [UIViewController] = []
+
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewDidLoad</span>() {
+        <span style=color:#75715e>// ContainerViewで持っているUIPageViewControllerをselfのpageViewControllerに設定</span>
+        <span style=color:#66d9ef>self</span>.pageViewController = children.first! <span style=color:#66d9ef>as</span>? UIPageViewController
+        
+        <span style=color:#66d9ef>let</span> first = storyboard!.instantiateViewController(withIdentifier: <span style=color:#e6db74>&#34;firstPage&#34;</span>)
+        <span style=color:#66d9ef>let</span> second = storyboard!.instantiateViewController(withIdentifier: <span style=color:#e6db74>&#34;secondPage&#34;</span>)
+        <span style=color:#66d9ef>let</span> third = storyboard!.instantiateViewController(withIdentifier: <span style=color:#e6db74>&#34;thirdPage&#34;</span>)
+        
+        controllers = [first, second, third]
+        pageViewController.setViewControllers([controllers[index]], direction: .forward, animated: <span style=color:#66d9ef>false</span>)
+        pageViewController.dataSource = <span style=color:#66d9ef>self</span>
+    }
+</code></pre></div><h3 id=ボタンで遷移するコードの書き方は>ボタンで遷移するコードの書き方は？</h3>
+<p><code>UIPageViewController</code>を使ってスワイプで遷移する際は<code>UIPageViewControllerDataSource</code>に前後の行き先を書いておくだけでうまくやってくれます。</p>
+<p>では、ボタンで遷移する場合は？　<code>setViewControllers()</code>を使います。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>setViewControllers</span>(<span style=color:#66d9ef>_</span> viewControllers: [UIViewController]?, direction: UIPageViewController.NavigationDirection, animated: Bool, completion: ((Bool) -&gt; Void)? = <span style=color:#66d9ef>nil</span>)
+</code></pre></div><p><code>setViewControllers()</code>は、通常のページビューでもページの始点をセットするのにも使うことができます。</p>
+<p>ボタンで遷移したい先の<code>ViewController</code>を指定して、アニメーションの方向を設定することで、遷移することができます。</p>
+<p>というわけで、進むボタンを押すときは次の画面を指定して、戻るボタンを押すときは前の画面を指定したいです。</p>
+<p>前の画面や次の画面を知るためには、今いる画面が何番目なのか知る必要があります。</p>
+<h3 id=現在のページ数の取得方法は>現在のページ数の取得方法は？</h3>
+<p>現在のページ数はスワイプで遷移した場合もボタンで遷移した場合も反映させなければいけません。</p>
+<p>初期値<code>0</code>のメンバー変数<code>index</code>を作って管理してみます。</p>
+<p>ボタンの方はこんな感じです。indexを書き換えて、書き換えた先にアニメーション付きで遷移しています。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>RootPageViewController</span>: UIViewController {
+    <span style=color:#75715e>// 追加</span>
+    <span style=color:#66d9ef>var</span> index: Int = <span style=color:#ae81ff>0</span>
+    <span style=color:#66d9ef>var</span> cacheIndex: Int?
+    
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewDidLoad</span>() {
+        <span style=color:#75715e>// 追加</span>
+        pageViewController.delegate = <span style=color:#66d9ef>self</span>
+        pageControl.numberOfPages = controllers.count
+        didMovePage()
+    }
+    
+    <span style=color:#66d9ef>@IBAction</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>didPressBackButton</span>(<span style=color:#66d9ef>_</span> sender: UIButton) {
+        animateToPreviousPage() { [<span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>self</span>] <span style=color:#66d9ef>in</span>
+            <span style=color:#66d9ef>self</span>?.didMovePage()
+        }
+    }
+    
+    <span style=color:#66d9ef>@IBAction</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>didPressNextButton</span>(<span style=color:#66d9ef>_</span> sender: UIButton) {
+        animateToNextPage() { [<span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>self</span>] <span style=color:#66d9ef>in</span>
+            <span style=color:#66d9ef>self</span>?.didMovePage()
+        }
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>animateToPreviousPage</span>(completion: @escaping (()-&gt; Void)) {
+        index = index <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>
+        pageViewController.setViewControllers([controllers[index]], direction: .reverse, animated: <span style=color:#66d9ef>true</span>) { <span style=color:#66d9ef>_</span> <span style=color:#66d9ef>in</span>
+            completion()
+        }
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>animateToNextPage</span>(completion: @escaping (()-&gt; Void)) {
+        index = index <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>
+        pageViewController.setViewControllers([controllers[index]], direction: .forward, animated: <span style=color:#66d9ef>true</span>) { <span style=color:#66d9ef>_</span> <span style=color:#66d9ef>in</span>
+            completion()
+        }
+    }
+    
+    <span style=color:#75715e>/// スワイプ、ボタンでのページ遷移終了後に呼ぶメソッド。</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>didMovePage</span>() {
+        pageControl.currentPage = index
+        <span style=color:#66d9ef>if</span> index == <span style=color:#ae81ff>0</span> {
+            backButton.isHidden = <span style=color:#66d9ef>true</span>
+        } <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> index == controllers.count <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span> {
+            nextButton.isHidden = <span style=color:#66d9ef>true</span>
+        } <span style=color:#66d9ef>else</span> {
+            backButton.isHidden = <span style=color:#66d9ef>false</span>
+            nextButton.isHidden = <span style=color:#66d9ef>false</span>
+        }
+    }
+}
+</code></pre></div><p>スワイプの方は、<code>UIPageViewControllerDelegate</code>を使います。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>extension</span> <span style=color:#a6e22e>RootPageViewController</span>: UIPageViewControllerDelegate {
+    <span style=color:#75715e>/// スワイプ操作が始まった時に呼ばれるメソッド。行き先画面のindexをcacheに入れておく</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>pageViewController</span>(<span style=color:#66d9ef>_</span> pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
+        <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>let</span> index = <span style=color:#66d9ef>self</span>.controllers.firstIndex(of: pendingViewControllers.first!) {
+            cacheIndex = index
+        }
+    }
+    
+    <span style=color:#75715e>/// スワイプ操作によるアニメーションが終わった時に呼ばれるメソッド。もし遷移完了ならcacheをindexに適用</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>pageViewController</span>(<span style=color:#66d9ef>_</span> pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        <span style=color:#66d9ef>if</span> completed {
+            <span style=color:#66d9ef>self</span>.index = cacheIndex!
+            didMovePage()
+        }
+    }
+}
+</code></pre></div><p>ユーザーがスワイプを始めると、<code>pageViewController(willTransitionTo)</code>が呼ばれ、どっちに向かってスワイプしているかによって、<code>pendingViewControllers</code>に行き先の<code>ViewController</code>が決定されます。</p>
+<p>ここでは、行き先のindexを調べて、<code>cacheIndex</code>に入れています。</p>
+<p>その後、ユーザーが操作を完了すると、<code>pageViewController(didFinishAnimating)</code>が呼ばれ、<code>if completed {}</code>で「遷移」が完了したかを見ています。</p>
+<p>遷移が完了していない場合とは、例えばスワイプして次の画面をちょっと覗いたけど、やめて元の画面に戻した場合などです。</p>
+<p>この場合、<code>pageViewController(didFinishAnimating)</code>は呼ばれますが、<code>finished = false</code>になっています。</p>
+<p>（私はこれが分からず、理解に時間がかかりました……。）</p>
+<p>遷移が完了していれば、<code>cacheIndex</code>を<code>index</code>に書き込んで、現在のページ番号を更新する処理が完了です。</p>
+<p><code>index</code>が取れれば、<code>UIPageControl</code>（現在のページを表すドット）や、最初のページで「戻る」を表示しない処理、最後のページで「進む」を表示しない処理も書けるので、<code>didMovePage()</code>として実装しました。</p>
+<p>ここまでで、ほぼ完成ですが、2つバグが残っています。</p>
+<ul>
+<li>ボタンでの遷移中にスワイプ操作をすると遷移先がずれる</li>
+<li>スワイプ中にボタン操作をするとアプリが落ちる</li>
+</ul>
+<h3 id=ボタンでの遷移中にスワイプ操作をすると遷移先がずれる対策>ボタンでの遷移中にスワイプ操作をすると遷移先がずれる対策</h3>
+<p>ボタンでの遷移中にスワイプで遷移を止めたり先に進めたりすると、遷移先のページが違うページになったり、ページ表示ドットがおかしくなったりします。</p>
+<p>これは、ボタンでの遷移を走らせた時に<code>index</code>を書き換えてしまっているので、アニメーションが正常に終了しないと、表示されているページと<code>index</code>の値がずれてしまうことに起因します。</p>
+<p>ここでは、ボタンでの遷移中にスワイプ操作を許すとコードが複雑になるので、ボタンでの遷移アニメーション中は<code>view.isUserInteractionEnabled</code>を使って画面を触れないようにします。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift>    <span style=color:#66d9ef>@IBAction</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>didPressBackButton</span>(<span style=color:#66d9ef>_</span> sender: UIButton) {
+        <span style=color:#75715e>// アニメーション中は画面を触れなくする</span>
+        view.isUserInteractionEnabled = <span style=color:#66d9ef>false</span>
+        animateToPreviousPage() { [<span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>self</span>] <span style=color:#66d9ef>in</span>
+            <span style=color:#66d9ef>self</span>?.didMovePage()
+            <span style=color:#66d9ef>self</span>?.view.isUserInteractionEnabled = <span style=color:#66d9ef>true</span>
+        }
+    }
+</code></pre></div><p>NextButtonにも同様の処理を実装しました。</p>
+<h3 id=スワイプ中にボタン操作をするとアプリが落ちる対策>スワイプ中にボタン操作をするとアプリが落ちる対策</h3>
+<p>スワイプしながら頑張って同時にボタンを押すと、アプリが落ちます。</p>
+<p>エラーコードは<code>"Duplicate states in queue"</code>です。このエラーが起きる理由はわかっていませんが、この実装ではスワイプ中のボタン押下をサポートしていないようです。</p>
+<p>ボタン遷移中のスワイプ操作無効化と同様に、スワイプ中はボタンを無効化します。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>extension</span> <span style=color:#a6e22e>RootPageViewController</span>: UIPageViewControllerDelegate {
+    <span style=color:#75715e>/// スワイプ操作が始まった時に呼ばれるメソッド。スワイプ中のボタン操作を無効にして、行き先画面のindexをcacheに入れておく</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>pageViewController</span>(<span style=color:#66d9ef>_</span> pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
+        backButton.isEnabled = <span style=color:#66d9ef>false</span>
+        nextButton.isEnabled = <span style=color:#66d9ef>false</span>
+        <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>let</span> index = <span style=color:#66d9ef>self</span>.controllers.firstIndex(of: pendingViewControllers.first!) {
+            cacheIndex = index
+        }
+    }
+    
+    <span style=color:#75715e>/// スワイプ操作によるアニメーションが終わった時に呼ばれるメソッド。ボタン操作を再び有効にして、もし遷移完了ならcacheをindexに適用</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>pageViewController</span>(<span style=color:#66d9ef>_</span> pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        backButton.isEnabled = <span style=color:#66d9ef>true</span>
+        nextButton.isEnabled = <span style=color:#66d9ef>true</span>
+        <span style=color:#66d9ef>if</span> completed {
+            <span style=color:#66d9ef>self</span>.index = cacheIndex!
+            didMovePage()
+        }
+    }
+}
+</code></pre></div><p>以上で、スワイプでもボタンでも遷移できるアプリは完成です。</p>
+<h3 id=コード全文>コード全文</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>UIKit</span>
+
+<span style=color:#66d9ef>class</span> <span style=color:#a6e22e>RootPageViewController</span>: UIViewController {
+    
+    <span style=color:#66d9ef>@IBOutlet</span> <span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>var</span> pageControl: UIPageControl!
+    <span style=color:#66d9ef>@IBOutlet</span> <span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>var</span> backButton: UIButton!
+    <span style=color:#66d9ef>@IBOutlet</span> <span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>var</span> nextButton: UIButton!
+    
+    <span style=color:#66d9ef>var</span> pageViewController: UIPageViewController!
+    <span style=color:#66d9ef>var</span> controllers: [UIViewController] = []
+    <span style=color:#66d9ef>var</span> index: Int = <span style=color:#ae81ff>0</span>
+    <span style=color:#66d9ef>var</span> cacheIndex: Int?
+    
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>viewDidLoad</span>() {
+        <span style=color:#75715e>// ContainerViewで持っているUIPageViewControllerをselfのpageViewControllerに設定</span>
+        <span style=color:#66d9ef>self</span>.pageViewController = children.first! <span style=color:#66d9ef>as</span>? UIPageViewController
+        
+        <span style=color:#66d9ef>let</span> first = storyboard!.instantiateViewController(withIdentifier: <span style=color:#e6db74>&#34;firstPage&#34;</span>)
+        <span style=color:#66d9ef>let</span> second = storyboard!.instantiateViewController(withIdentifier: <span style=color:#e6db74>&#34;secondPage&#34;</span>)
+        <span style=color:#66d9ef>let</span> third = storyboard!.instantiateViewController(withIdentifier: <span style=color:#e6db74>&#34;thirdPage&#34;</span>)
+        
+        controllers = [first, second, third]
+        pageViewController.setViewControllers([controllers[index]], direction: .forward, animated: <span style=color:#66d9ef>false</span>)
+        pageViewController.dataSource = <span style=color:#66d9ef>self</span>
+        pageViewController.delegate = <span style=color:#66d9ef>self</span>
+        
+        pageControl.numberOfPages = controllers.count
+        didMovePage()
+    }
+    
+    <span style=color:#66d9ef>@IBAction</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>didPressBackButton</span>(<span style=color:#66d9ef>_</span> sender: UIButton) {
+        <span style=color:#75715e>// アニメーション中は画面を触れなくする</span>
+        view.isUserInteractionEnabled = <span style=color:#66d9ef>false</span>
+        animateToPreviousPage() { [<span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>self</span>] <span style=color:#66d9ef>in</span>
+            <span style=color:#66d9ef>self</span>?.didMovePage()
+            <span style=color:#66d9ef>self</span>?.view.isUserInteractionEnabled = <span style=color:#66d9ef>true</span>
+        }
+    }
+    
+    <span style=color:#66d9ef>@IBAction</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>didPressNextButton</span>(<span style=color:#66d9ef>_</span> sender: UIButton) {
+        <span style=color:#75715e>// アニメーション中は画面を触れなくする</span>
+        view.isUserInteractionEnabled = <span style=color:#66d9ef>false</span>
+        animateToNextPage() { [<span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>self</span>] <span style=color:#66d9ef>in</span>
+            <span style=color:#66d9ef>self</span>?.didMovePage()
+            <span style=color:#66d9ef>self</span>?.view.isUserInteractionEnabled = <span style=color:#66d9ef>true</span>
+        }
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>animateToPreviousPage</span>(completion: @escaping (()-&gt; Void)) {
+        index = index <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>
+        pageViewController.setViewControllers([controllers[index]], direction: .reverse, animated: <span style=color:#66d9ef>true</span>) { <span style=color:#66d9ef>_</span> <span style=color:#66d9ef>in</span>
+            completion()
+        }
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>animateToNextPage</span>(completion: @escaping (()-&gt; Void)) {
+        index = index <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>
+        pageViewController.setViewControllers([controllers[index]], direction: .forward, animated: <span style=color:#66d9ef>true</span>) { <span style=color:#66d9ef>_</span> <span style=color:#66d9ef>in</span>
+            completion()
+        }
+    }
+    
+    <span style=color:#75715e>/// スワイプ、ボタンでのページ遷移終了後に呼ぶメソッド。</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>didMovePage</span>() {
+        pageControl.currentPage = index
+        <span style=color:#66d9ef>if</span> index == <span style=color:#ae81ff>0</span> {
+            backButton.isHidden = <span style=color:#66d9ef>true</span>
+        } <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> index == controllers.count <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span> {
+            nextButton.isHidden = <span style=color:#66d9ef>true</span>
+        } <span style=color:#66d9ef>else</span> {
+            backButton.isHidden = <span style=color:#66d9ef>false</span>
+            nextButton.isHidden = <span style=color:#66d9ef>false</span>
+        }
+    }
+}
+
+<span style=color:#66d9ef>extension</span> <span style=color:#a6e22e>RootPageViewController</span>: UIPageViewControllerDelegate {
+    <span style=color:#75715e>/// スワイプ操作が始まった時に呼ばれるメソッド。スワイプ中のボタン操作を無効にして、行き先画面のindexをcacheに入れておく</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>pageViewController</span>(<span style=color:#66d9ef>_</span> pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
+        backButton.isEnabled = <span style=color:#66d9ef>false</span>
+        nextButton.isEnabled = <span style=color:#66d9ef>false</span>
+        <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>let</span> index = <span style=color:#66d9ef>self</span>.controllers.firstIndex(of: pendingViewControllers.first!) {
+            cacheIndex = index
+        }
+    }
+    
+    <span style=color:#75715e>/// スワイプ操作によるアニメーションが終わった時に呼ばれるメソッド。ボタン操作を再び有効にして、もし遷移完了ならcacheをindexに適用</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>pageViewController</span>(<span style=color:#66d9ef>_</span> pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        backButton.isEnabled = <span style=color:#66d9ef>true</span>
+        nextButton.isEnabled = <span style=color:#66d9ef>true</span>
+        <span style=color:#66d9ef>if</span> completed {
+            <span style=color:#66d9ef>self</span>.index = cacheIndex!
+            didMovePage()
+        }
+    }
+}
+
+<span style=color:#66d9ef>extension</span> <span style=color:#a6e22e>RootPageViewController</span>: UIPageViewControllerDataSource {
+    <span style=color:#75715e>/// スワイプ操作における次の画面を渡すメソッド。その画面が最後の画面なら、nilを返して遷移不可とする</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>pageViewController</span>(<span style=color:#66d9ef>_</span> pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -&gt; UIViewController? {
+        <span style=color:#66d9ef>if</span> index <span style=color:#f92672>&lt;</span> controllers.count <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span> {
+            <span style=color:#66d9ef>return</span> controllers[index <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>]
+        } <span style=color:#66d9ef>else</span> {
+            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>
+        }
+    }
+    
+    <span style=color:#75715e>/// スワイプ操作における前の画面を渡すメソッド。その画面が最初の画面なら、nilを返して遷移不可とする</span>
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>pageViewController</span>(<span style=color:#66d9ef>_</span> pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -&gt; UIViewController? {
+        <span style=color:#66d9ef>if</span> index <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+            <span style=color:#66d9ef>return</span> controllers[index <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>]
+        } <span style=color:#66d9ef>else</span> {
+            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>
+        }
+    }
+}
+</code></pre></div>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/uikit/ rel=tag>UIKit</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/uipageviewcontroller/ rel=tag>UIPageViewController</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/uipageviewcontroller/>UIPageViewControllerでボタンでもスワイプでも遷移できるチュートリアルを作る</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode8/>リーダブルコード8章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/dispatchqueue/>Alamofireで同期的にAPIを呼ぶ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/customnavigationbar/>ナビゲーションバーの色を変更するシンプルな方法</a></li>
+<li class=widget__item><a class=widget__link href=/posts/alamofiretutorial/>Alamofireで天気APIを取得してUITableViewに表示するiOSアプリを作成する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode6/>リーダブルコード6章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode7/>リーダブルコード7章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode5/>リーダブルコード5章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/calendardatedatecomponents/>SwiftのDateとDateComponentsの違いの整理</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode3-4/>リーダブルコード3章、4章まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2022 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
