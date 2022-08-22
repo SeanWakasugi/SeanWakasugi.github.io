@@ -1,0 +1,208 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>リーダブルコード9章感想 - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="リーダブルコード9章感想">
+<meta name=twitter:description content="9章: 変数と読みやすさ 変数を消す/減らす/わかりやすくして読みやすくしようという話です。 変数を削除する いらない変数を消せば、読む人も覚える数">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>リーダブルコード9章感想</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-08-22T00:00:00Z>August 22, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<h2 id=9章-変数と読みやすさ>9章: 変数と読みやすさ</h2>
+<p>変数を消す/減らす/わかりやすくして読みやすくしようという話です。</p>
+<h3 id=変数を削除する>変数を削除する</h3>
+<p>いらない変数を消せば、読む人も覚える数が減って楽になります。</p>
+<p>いらない変数とは、例えば制御フロー変数と呼んでいます。</p>
+<p>例えば、関数の返り値にする予定の変数<code>res</code>を最初に定義しておいて、関数内の条件分岐で<code>res</code>に値を入れたり変更したりして、最終的に<code>res</code>を返り値として返すようにします。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>makeDebugLog</span>() -&gt; String? {
+    <span style=color:#66d9ef>var</span> res: String?
+    <span style=color:#66d9ef>if</span> isChecked {
+        res = <span style=color:#e6db74>&#34;checked&#34;</span>
+        <span style=color:#66d9ef>if</span> isCorrect {
+            res = <span style=color:#e6db74>&#34;correct&#34;</span>
+        } <span style=color:#66d9ef>else</span> {
+            res = <span style=color:#e6db74>&#34;not correct&#34;</span>
+        }
+        res = res <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34; result is:&#34;</span> <span style=color:#f92672>+</span> resultString
+    } 
+    <span style=color:#66d9ef>return</span> res
+}
+</code></pre></div><p>この変数が、制御フロー変数です。<code>res</code>があると、以下の問題点があります。</p>
+<ul>
+<li><code>res</code>を順番に追っていかないと、今<code>res</code>に何が入っているか分からない。</li>
+<li><code>res</code>の値を常に意識していなければいけない。</li>
+</ul>
+<p>これを解決するには、早めに関数やループから抜けることです。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>makeDebugLog</span>() -&gt; String? {
+    <span style=color:#66d9ef>if</span> isChecked {
+        <span style=color:#66d9ef>if</span> isCorrect {
+            <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;checked and correct result is:&#34;</span> <span style=color:#f92672>+</span> resultString
+        } <span style=color:#66d9ef>else</span> {
+            <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;checked and not correct result is:&#34;</span> <span style=color:#f92672>+</span> resultString
+        }
+    } 
+    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>
+}
+</code></pre></div><h3 id=変数のスコープを縮める>変数のスコープを縮める</h3>
+<p>変数を減らすというのは変数の記述を減らすことだけではありません。</p>
+<p>変数の使える範囲（スコープ）を狭めることで、ある場所で使える変数を減らすことができます。</p>
+<p>変数のスコープを縮めると、以下のメリットがあります。</p>
+<ul>
+<li>1度に考えなくてもいい変数を減らせる</li>
+<li>意図しない場所で呼んでしまう事故を減らせる</li>
+</ul>
+<p>私はSwiftだと、以下を使い分けています。呼び名はおそらく間違っています。</p>
+<h5 id=メンバー変数>メンバー変数</h5>
+<p><code>internal let</code>, <code>let</code>
+プロジェクト全体からアクセスしたい場合。</p>
+<p>クラスごとに0〜2つくらいに絞りたいと思っています。</p>
+<h5 id=プライベートメンバー変数>プライベートメンバー変数</h5>
+<p><code>private let</code>
+同一クラス内だけからアクセスできるようにしたい場合。</p>
+<p>複数の関数が使うという理由の他に、クラスとして持つべき値かどうかを考えているつもりです。</p>
+<h5 id=関数の引数返り値で受け渡しする変数>関数の引数、返り値で受け渡しする変数</h5>
+<p>2、3個の関数のみで使う場合。</p>
+<h5 id=関数内の変数>関数内の変数</h5>
+<p>1個の関数のみで使う場合。</p>
+<h3 id=staticメソッドを使う>staticメソッドを使う</h3>
+<p>これは初めて知りました。</p>
+<p>staticメソッドは、クラスをインスタンス化しなくても使えるメソッドなので、メソッドをstaticにすることでメンバー変数と関係ない処理であることが明示できます。</p>
+<p>そのため、なるべくstaticなメソッドを作れば、クラスのメンバー変数のことを考えなくていいし、何のインスタンスを使っているかも考えなくて良くなる、ということです。</p>
+<p>Swiftではstaticメソッドは同一クラス内でも毎回クラス名を書かないといけなかったりと、少し不便です。</p>
+<p>そのため、うまく使っている人に出会うまで使わない予定です。</p>
+<h3 id=変数は一度だけ書き込む>変数は一度だけ書き込む</h3>
+<p>Swiftでは<code>var</code>（可変の変数）にしておいて、一度しか書き込まないと<code>let</code>（変更不可な変数）にしろと軽く怒られます。</p>
+<p>そのため、何となく<code>let</code>にする癖がついていましたが、この変数は一度だけ書き込むメリットはしっかり認識できていませんでした。</p>
+<p>作者によると、変数を操作する場所が増えると現在の値を判断するのが難しくなるので、操作する箇所は減らすか1つにしたほうがいいとのことです。</p>
+<p>私も同意です。</p>
+<p>より<code>let</code>を多く使うための方法として、<code>let</code>でも、<code>var</code>のように書き込み1回目だけ値を変える使い方ができます。</p>
+<p>オプショナルな<code>message</code>を定義して、条件によっては<code>message</code>に書き込むようなプログラムを作ります。</p>
+<p>オプショナルな<code>message</code>は、1度しか書き込めない変数ですが、初期値は<code>nil</code>で書き込むと<code>String</code>型が入る（正確にはOptional型だが）という特徴があります。</p>
+<p>そのため、<code>var</code>でなくても、<code>nil</code>だったら書き込み前、<code>String</code>が入っていれば書き込みされた後だと書き込みを調べることができます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>let</span> message: String?
+
+<span style=color:#66d9ef>if</span> hasNewMessage {
+    message = inbox[<span style=color:#ae81ff>0</span>].message
+}
+</code></pre></div>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ rel=tag>リーダブルコード</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/readablecode9/>リーダブルコード9章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/uipageviewcontroller/>UIPageViewControllerでボタンでもスワイプでも遷移できるチュートリアルを作る</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode8/>リーダブルコード8章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/dispatchqueue/>Alamofireで同期的にAPIを呼ぶ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/customnavigationbar/>ナビゲーションバーの色を変更するシンプルな方法</a></li>
+<li class=widget__item><a class=widget__link href=/posts/alamofiretutorial/>Alamofireで天気APIを取得してUITableViewに表示するiOSアプリを作成する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode6/>リーダブルコード6章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode7/>リーダブルコード7章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode5/>リーダブルコード5章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/calendardatedatecomponents/>SwiftのDateとDateComponentsの違いの整理</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2022 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
