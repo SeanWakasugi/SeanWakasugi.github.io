@@ -1,0 +1,185 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>リーダブルコード11章12章13章感想 - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="リーダブルコード11章12章13章感想">
+<meta name=twitter:description content="11章: 一度に1つのことを 何か問題を解決するときは、一度に1つのことをすべきという話です。 なぜなら、 処理の塊が1つ1つ別に書かれていれば、読">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>リーダブルコード11章12章13章感想</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-08-25T00:00:00Z>August 25, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<h2 id=11章-一度に1つのことを>11章: 一度に1つのことを</h2>
+<p>何か問題を解決するときは、一度に1つのことをすべきという話です。</p>
+<h4 id=なぜなら>なぜなら、</h4>
+<ul>
+<li>処理の塊が1つ1つ別に書かれていれば、読みやすく理解しやすい。</li>
+<li>領域それぞれを分離すれば、ある領域にいるときは、他の領域のことは考えなくて済む。</li>
+</ul>
+<h4 id=どうやって>どうやって？</h4>
+<ol>
+<li>読みにくいコードで行われているタスクをすべて列挙する</li>
+<li>別の関数やクラスに分割できるタスクを分割する</li>
+<li>分割して残ったタスクは、関数内の論理的な「段落」として分けて書く</li>
+</ol>
+<h2 id=12章-コードに想いを込める>12章: コードに想いを込める</h2>
+<p>簡単な言葉で説明することで、自分の中で整理されて綺麗に書けるようになる、という話です。</p>
+<h4 id=どうやって-1>どうやって？</h4>
+<ol>
+<li>コードの動作を簡単な言葉で同僚にもわかるように説明する</li>
+<li>その説明のなかで使っているキーワードやフレーズに応じて、下位問題を抽出したりコードを分割する</li>
+<li>その説明に合わせてコードを書く</li>
+</ol>
+<h4 id=感想>感想</h4>
+<p>私がコードを書くときも、何の処理をするのか言語化してからコードを書くようにしています。</p>
+<p>混乱してきたら、言語化した言葉の一言一言に対応するようにコードを書くことで、言語化が誤っていることに気がついたり、処理が抜けているのに気がついたりするので、助けになっています。</p>
+<p>声に出して説明するのはラバーダッキングという手法としても知られています。これは、おもちゃのアヒルちゃんに説明するようにコードを1行ずつ説明することでコードの誤りに気づくという方法です。</p>
+<p>先日もSwiftのコードの勉強のためにこのブログを書いていて、自分の誤りに気づくことがありました。</p>
+<p>どんなにプログラミングについて詳しくなっても、こうやって言葉に起こしていくのは続けていきたいです。</p>
+<h2 id=13章-短いコードを書く>13章: 短いコードを書く</h2>
+<p>コードを短くすることも大事、という話です。</p>
+<h4 id=なぜなら-1>なぜなら、</h4>
+<ul>
+<li>時間の節約</li>
+<li>テストや保守の手間が減る</li>
+</ul>
+<h4 id=どうやって-2>どうやって？</h4>
+<ul>
+<li>不必要な機能を減らす。不必要な将来の機能のためのコードを書かない</li>
+<li>実装は100％正確で高速でなくてもいい、必要な正確さでスピードであれば、実装が短い方を優先して良い</li>
+<li>汎用的な「ユーティリティ」コードを作って、重複コードを削除する(10章: 無関係の下位問題を抽出する)</li>
+<li>未使用のコードや無用の機能を削除する</li>
+<li>プロジェクトをサブプロジェクトに分割する</li>
+<li>コードの「重量」を意識する。軽量で機敏にしておく</li>
+<li>ライブラリを使う(定期的にライブラリの関数、モジュールや型の名前を読んでおくといい)</li>
+</ul>
+<h4 id=感想-1>感想</h4>
+<p>「コードを短くすること」と「コードをわかりやすくすること」はコンフリクトするのではないかと考えていました。</p>
+<p>現在の私の結論は、これらは別の段階で処理することなのではないかと思っています。</p>
+<p>コードには3つのレイヤーがあります。</p>
+<p>仕様→言語化された処理→実際のコードです。</p>
+<p>仕様（実現したいこと）を、どうすれば実現できるか考えて言語化し、言葉から1行1行コードに起こしていくことができます。</p>
+<p>「コードを短くすること」は、前半の処理を言語化する段階で、なるべく処理を最小限にとどめ、分割することで実現できます。</p>
+<p>「コードをわかりやすくすること」は、後半の言葉からコードに起こしていく段階で、コードをなるべく言葉に近づけて実装することで実現できるのではないかと考えています。</p>
+<p>他の言い方をすると、仕様→言語化された処理→実際のコードの変換プロセスの中で、余分な部分を付け加えず前の段階に忠実に進めていくことで、「コードが短く」「わかりやすく」なるということです。</p>
+<p>以上</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ rel=tag>リーダブルコード</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/readablecode11-13/>リーダブルコード11章12章13章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode10/>リーダブルコード10章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode9/>リーダブルコード9章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/uipageviewcontroller/>UIPageViewControllerでボタンでもスワイプでも遷移できるチュートリアルを作る</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode8/>リーダブルコード8章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/dispatchqueue/>Alamofireで同期的にAPIを呼ぶ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/customnavigationbar/>ナビゲーションバーの色を変更するシンプルな方法</a></li>
+<li class=widget__item><a class=widget__link href=/posts/alamofiretutorial/>Alamofireで天気APIを取得してUITableViewに表示するiOSアプリを作成する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode6/>リーダブルコード6章まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecode7/>リーダブルコード7章感想</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2022 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
