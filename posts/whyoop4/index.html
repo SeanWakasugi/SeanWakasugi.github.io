@@ -3,11 +3,11 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>オブジェクト指向でなぜ作るのか1-3章感想 - しょ〜んの技術メモ😗</title>
+<title>オブジェクト指向でなぜ作るのか4章感想 - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="オブジェクト指向でなぜ作るのか1-3章感想">
+<meta name=twitter:title content="オブジェクト指向でなぜ作るのか4章感想">
 <meta name=twitter:description content="この記事では、SwiftでiOSアプリのプログラミングをする初学者として、 「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
@@ -36,7 +36,7 @@
 <main class=main role=main>
 <article class=post>
 <header class=post__header>
-<h1 class=post__title>オブジェクト指向でなぜ作るのか1-3章感想</h1>
+<h1 class=post__title>オブジェクト指向でなぜ作るのか4章感想</h1>
 <div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
 <svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-09-27T00:00:00Z>September 27, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
@@ -47,41 +47,50 @@
 <p>「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計、アジャイル開発の基礎知識」</p>
 <p><a href=https://www.amazon.co.jp/dp/4296000187>https://www.amazon.co.jp/dp/4296000187</a></p>
 <p>の感想、学びになった点を書いていきます。</p>
-<h2 id=オブジェクト指向が現れた歴史的経緯>オブジェクト指向が現れた歴史的経緯</h2>
-<p>私はプログラミングを初めて日が浅く、扱える言語も少ないため3章のプログラミング言語に関する記述がとても勉強になりました。</p>
-<p>理解を軽くまとめてみます。</p>
-<h4 id=人間に親しみやすい言語をの進化>「人間に親しみやすい言語を」の進化</h4>
-<p>機械語 → アセンブリ言語 → 高級言語(FORTRAN, COBOL)</p>
-<h5 id=高級言語の課題>高級言語の課題</h5>
+<h2 id=オブジェクト指向の3つの仕組み>オブジェクト指向の3つの仕組み</h2>
+<p>オブジェクト指向の基礎は知っていたので、この本で改めて知ったことや整理できたことを書いていきます。</p>
+<h3 id=クラス>クラス</h3>
+<p>一般的にはオブジェクト指向の仕組みとしてはカプセル化が挙げられますが、著者としてはそれはクラスの1つの特徴に過ぎないので、&ldquo;クラス"としているそうです。</p>
+<p>クラスとは、まとめて隠して（カプセル化）、たくさん作る（インスタンス化）仕組み。</p>
+<h3 id=ポリモーフィズム>ポリモーフィズム</h3>
+<p>共通のメインルーチンを作る仕組み。</p>
+<p>共通のメインルーチンという言葉がしっくりこなかったので、調べました。</p>
+<p>プログラムでは、メインルーチンがサブルーチンを呼び出す、という構造を取ります。</p>
+<p>同じサブルーチンを何回も使うような場合、共通サブルーチンを使って効率化を図ります → <code>関数</code></p>
+<p>では、同じメインルーチンを何回も使うためには、共通メインルーチンを作ります → <code>ポリモーフィズム</code></p>
+<p>全く異なるメインルーチンからでも、共通内容を呼び出せる<code>関数</code>に対して、<br>
+全く異なるサブルーチンでも、共通の呼び出し方で呼び出せるのが<code>ポリモーフィズム</code>です。</p>
+<h3 id=継承>継承</h3>
+<p>クラスの共通部分を別クラスにしてまとめる仕組み。</p>
+<h2 id=進化したオブジェクト指向の仕組み>進化したオブジェクト指向の仕組み</h2>
+<h3 id=型>型</h3>
+<p>クラスを型として使うことができる</p>
+<p>型を使うメリット（オブジェクト指向に限らず）</p>
 <ul>
-<li>ソフトウェアの需要が爆発的に増加した</li>
-<li>プログラムの寿命が長くなった（毎回新たに作るのではなく、修正を加えながら長く作るようになった）</li>
+<li>メモリの確保領域が確定する</li>
+<li>プログラムのエラーを防止する</li>
 </ul>
-<p>→ プログラミングを理解しやすく、修正しやすくしたい</p>
-<h4 id=保守性の高い言語をの進化>「保守性の高い言語を」の進化</h4>
-<h5 id=構造化言語c言語>構造化言語(C言語)</h5>
+<p>エラー防止の型チェックをいつ行うかによって2つに分けられる。</p>
+<p>静的型付け<br>
+コンパイル時点で型チェックをする</p>
+<p>動的型付け<br>
+プログラム実行時に型チェックをする</p>
+<p>Swiftは静的型付けの言語。</p>
+<h3 id=例外>例外</h3>
+<p>メソッドにおけるエラー時の特別な処理。</p>
+<p>Swiftにも<code>try-catch</code>と呼ばれる例外処理がありますが、メリットについて整理しきれていなかったので、勉強になりました。</p>
+<p>通常メソッド（関数）は処理が終わると戻り値を返しますが、その代わりに別の形式でエラーを返すのが例外処理です。</p>
+<p>メリット</p>
 <ul>
-<li>構造化プログラミング<br>
-GOTO文を使わず「順次実行」「条件分岐」「繰り返し」の基本3構造だけで表現する</li>
-<li>ローカル変数と引数の値渡しの登場<br>
-グローバル変数は影響範囲が広く修正しづらかったので、範囲が限定的なローカル変数を用いるようになった</li>
+<li>エラーの受け取りを書き忘れることがない<br>
+例外を処理するコードを書かないとプログラムがエラーになる</li>
+<li>連鎖するメソッドで簡単にエラーを受け渡すことができる
+エラーの処理を行わずにより上位のメソッドに伝えるだけなら、例外が発生することを明示する(<code>throws</code>)だけで良い</li>
 </ul>
-<h5 id=構造化言語の課題>構造化言語の課題</h5>
-<ul>
-<li>グローバル変数問題<br>
-複数のサブルーチンで利用する場合はグローバル変数が必要だったが、影響範囲が広いため、修正しづらい</li>
-<li>貧弱な再利用<br>
-再利用できるのはサブルーチンだけだった。</li>
-</ul>
-<p>→ さらに修正しやすく、再利用できる言語へ</p>
-<h4 id=オブジェクト指向言語へ>オブジェクト指向言語へ</h4>
-<h5 id=オブジェクト指向言語javaなど>オブジェクト指向言語(Javaなど)</h5>
-<ul>
-<li>クラス</li>
-<li>ポリモーフィズム</li>
-<li>継承</li>
-</ul>
-<p>オブジェクト指向言語の詳細は4書の記事で。</p>
+<h3 id=ガベージコレクション>ガベージコレクション</h3>
+<p>自動でインスタンスをメモリから削除してくれる機能。</p>
+<p>参照が0になると消える（詳細は5章の感想で）</p>
+<p>メモリリーク問題を解決してくれる。</p>
 </div>
 <footer class=post__footer>
 <div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
