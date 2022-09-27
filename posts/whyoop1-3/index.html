@@ -3,19 +3,18 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>Swift - しょ〜んの技術メモ😗</title>
+<title>オブジェクト指向でなぜ作るのか1-3章感想 - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="Swift">
-<meta name=twitter:description content>
+<meta name=twitter:title content="オブジェクト指向でなぜ作るのか1-3章感想">
+<meta name=twitter:description content="この記事では、SwiftでiOSアプリのプログラミングをする初学者として、 「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
 <link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
 <link rel=stylesheet href=/css/style.css>
 <link rel=stylesheet href=/css/custom.css>
-<link rel=alternate type=application/rss+xml href=/categories/swift/index.xml title=しょ〜んの技術メモ😗>
 <link rel="shortcut icon" href=/favicon.ico>
 </head>
 <body class=body>
@@ -34,30 +33,75 @@
 </header>
 <div class="wrapper flex">
 <div class=primary>
-<main class="main list" role=main>
-<header class=main__header>
-<h1 class=main__title>Swift</h1>
-</header><article class="list__item post">
-<header class=list__header>
-<h2 class="list__title post__title">
-<a href=/posts/calendardatedatecomponents/ rel=bookmark>
-SwiftのDateとDateComponentsの違いの整理
-</a>
-</h2>
-<div class="list__meta meta">
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>オブジェクト指向でなぜ作るのか1-3章感想</h1>
+<div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-19T00:00:00Z>July 19, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-08-25T00:00:00Z>August 25, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
 </span>
 </div></div>
-</header>
-<div class="content list__excerpt post__content clearfix">
-DateとDateComponentsの違い Dateはカレンダーやタイムゾーン情報を含まない絶対的な時間のことです。 DateComponen
+</header><div class="content post__content clearfix">
+<p>この記事では、SwiftでiOSアプリのプログラミングをする初学者として、</p>
+<p>「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計、アジャイル開発の基礎知識」</p>
+<p><a href=https://www.amazon.co.jp/dp/4296000187>https://www.amazon.co.jp/dp/4296000187</a></p>
+<p>の感想、学びになった点を書いていきます。</p>
+<h3 id=オブジェクト指向が現れた歴史的経緯>オブジェクト指向が現れた歴史的経緯</h3>
+<p>私はプログラミングを初めて日が浅く、扱える言語も少ないため3章のプログラミング言語に関する記述がとても勉強になりました。</p>
+<p>理解を軽くまとめてみます。</p>
+<p><strong>「人間に親しみやすい言語を」の進化</strong>
+機械語 → アセンブリ言語 → 高級言語(FORTRAN, COBOL)</p>
+<p>課題</p>
+<ul>
+<li>ソフトウェアの需要が爆発的に増加した</li>
+<li>プログラムの寿命が長くなった（毎回新たに作るのではなく、修正を加えながら長く作るようになった）</li>
+</ul>
+<p>→ プログラミングを理解しやすく、修正しやすくしたい</p>
+<p><strong>「保守性の高い言語を」の進化</strong>
+構造化言語(C言語)</p>
+<ul>
+<li>構造化プログラミング
+GOTO文を使わず「順次実行」「条件分岐」「繰り返し」の基本3構造だけで表現する</li>
+<li>ローカル変数と引数の値渡しの登場
+グローバル変数は影響範囲が広く修正しづらかったので、範囲が限定的なローカル変数を用いるようになった</li>
+</ul>
+<p>課題</p>
+<ul>
+<li>グローバル変数問題
+複数のサブルーチンで利用する場合はグローバル変数が必要だったが、影響範囲が広いため、修正しづらい</li>
+<li>貧弱な再利用
+再利用できるのはサブルーチンだけだった。</li>
+</ul>
+<p>→ さらに修正しやすく、再利用できる言語へ</p>
+<p><strong>オブジェクト指向言語へ</strong>
+オブジェクト指向言語(Javaなど)</p>
+<ul>
+<li>クラス</li>
+<li>ポリモーフィズム</li>
+<li>継承</li>
+</ul>
+<p>オブジェクト指向言語の詳細は4書の記事で。</p>
 </div>
-<div class="list__footer clearfix">
-<a class="list__footer-readmore btn" href=/posts/calendardatedatecomponents/>続きを読む…</a>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E4%BD%9C%E3%82%8B%E3%81%AE%E3%81%8B/ rel=tag>オブジェクト指向でなぜ作るのか</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
+</li>
+</ul>
 </div>
+</footer>
 </article>
 </main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
 </div>
 <aside class=sidebar><div class="widget-search widget">
 <form class=widget-search__form role=search method=get action=https://google.com/search>
