@@ -3,11 +3,11 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>オブジェクト指向でなぜつくるのか 5章感想 - しょ〜んの技術メモ😗</title>
+<title>オブジェクト指向でなぜつくるのか 6章感想 - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="オブジェクト指向でなぜつくるのか 5章感想">
+<meta name=twitter:title content="オブジェクト指向でなぜつくるのか 6章感想">
 <meta name=twitter:description content="この記事では、SwiftでiOSアプリのプログラミングをする初学者として、 「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
@@ -36,10 +36,10 @@
 <main class=main role=main>
 <article class=post>
 <header class=post__header>
-<h1 class=post__title>オブジェクト指向でなぜつくるのか 5章感想</h1>
+<h1 class=post__title>オブジェクト指向でなぜつくるのか 6章感想</h1>
 <div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-09-30T00:00:00Z>September 30, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-10-03T00:00:00Z>October 03, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
 </span>
 </div></div>
 </header><div class="content post__content clearfix">
@@ -47,62 +47,44 @@
 <p>「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計、アジャイル開発の基礎知識」</p>
 <p><a href=https://www.amazon.co.jp/dp/4296000187>https://www.amazon.co.jp/dp/4296000187</a></p>
 <p>の感想、学びになった点を書いていきます。</p>
-<h2 id=実行方式について>実行方式について</h2>
-<h3 id=コンパイラ方式>コンパイラ方式</h3>
-<p>機械語に変換してから実行。</p>
-<p>実行は速いがコンパイルが面倒臭い</p>
-<h3 id=インタプリタ方式>インタプリタ方式</h3>
-<p>プログラムを逐一解釈して動作。</p>
-<p>メリットは機械語に変換しないのでプラットフォームに依存しないこと</p>
-<h3 id=中間コード方式>中間コード方式</h3>
-<p>中間コードに変換してから、中間コードを解釈して動作</p>
-<p>中間コードを解釈するためにVirtualMachineが使われる。Java VMなど</p>
-<p>プラットフォームに依存せず、実行が速い、2つのいいとこ取り</p>
-<h2 id=cpuについて>CPUについて</h2>
-<p>複数のスレッドを同時に（正確には小さく区切って順次）実行している</p>
-<p>待ち時間を減らすため、仕事を小さく切ってできることからどんどんやっていく</p>
-<h2 id=メモリについて>メモリについて</h2>
-<h3 id=メソッドエリアstatic-area>メソッドエリア/static area</h3>
-<p>static: 静的。プログラム開始時から終了時まで配置が固定（中身は変えられる）</p>
-<p>クラスなどのコード情報、グローバル変数などが置いてある</p>
-<h3 id=ヒープエリア>ヒープエリア</h3>
-<p>heap: 山ほど、たくさん</p>
-<p>実行時に必要な情報を割り当てて一時的に置いておく</p>
-<p>OOPだと、インスタンスが置いてある</p>
-<h3 id=スタックエリア>スタックエリア</h3>
-<p>stack: Last in First Out後から入れたものから取り出す。メソッドを読んで、1つ1つ上から処理していく感じ</p>
-<p>1スレッドあたりひとつ用意されるメモリ領域。処理中のメソッドの引数やローカル変数等々が置かれている</p>
-<h2 id=oopのメモリ管理>OOPのメモリ管理</h2>
-<p>クラス→メソッドエリア</p>
-<p>インスタンス→ヒープエリア</p>
-<p>処理中のデータ→スタックエリア</p>
-<h3 id=garbage-collector>Garbage Collector</h3>
-<p>スタックエリアとメソッドエリアから辿れなくなったインスタンスを削除する。</p>
-<p>(例)なんらかのインスタンスの処理を実行しているとき：<br>
-スタックエリアがインスタンスを参照しているので、インスタンスは削除されない。</p>
-<p>(？疑問：メソッドエリアがインスタンスを参照しているとはどういうことか？)</p>
-<p>Swiftの場合は、ARC(Automatic Reference Counting: 自動参照カウント)と呼ばれる一種のガベージコレクタ(以降GC)が実装されています。</p>
-<p>ARCとJava等通常のGCとの違いは、</p>
-<p>ARC(Swift)</p>
+<h2 id=クラスライブラリ>クラスライブラリ</h2>
+<p>オブジェクト指向以前は関数が集まったライブラリだったが、クラスが集まったライブラリが作れるように。</p>
+<p>関数の場合は関数を「呼び出す」ことしかできませんでしたが、クラスライブラリなら</p>
 <ul>
-<li>常に参照をカウントしており、参照が0になった時に自動的に削除する<br>
-+)参照0になった直後に削除されるのでメモリのピーク使用量が小さい。<br>
--)循環参照によるメモリリークが起きる</li>
-<li>コンパイラが処理を自動的にコードに埋め込む<br>
-+)メモリ解放のタイミングがわかる</li>
+<li>クラスライブラリからインスタンスを作成する（呼び出す）</li>
+<li>クラスライブラリから呼び出される側の処理を書き換える（ポリモーフィズム）</li>
+<li>継承して新しいクラスを作る</li>
 </ul>
-<p>GC(Java, Kotlin, C#)</p>
-<ul>
-<li>あるタイミングで、参照のないインスタンスをメモリ内から探し出して削除処理を行う<br>
-+)循環参照によるメモリリークが起きない<br>
--)削除処理が重く、アプリが中断しうる</li>
-<li>Java VMなど実行環境側が提供する<br>
--)メモリ解放のタイミングがコードで制御しにくい</li>
-</ul>
-<p>(参考)</p>
-<p><a href=https://qiita.com/m__ike_/items/c021e280c5b2c659c59d>https://qiita.com/m__ike_/items/c021e280c5b2c659c59d</a></p>
-<p>私はSwiftを初めて最初にぶつかったのが循環参照、弱参照などの概念でした。</p>
-<p>ここで仕組みを知ることができ納得できました。</p>
+<p>と多彩な活用ができるようになりました。</p>
+<p>特に言語に標準で付属しているものは言語仕様の一部となっており、言語の互換性を保ちながら追加機能提供できるメリットも。</p>
+<h3 id=言語標準の継承構造>言語標準の継承構造</h3>
+<p>Javaなら基本的に全てのクラスが<code>Object</code>というクラスを継承しています。</p>
+<p><code>Object</code>にはクラスとして必要なメソッド（コピーを作成する等）が定義されており、これを継承することでどのクラスでも使えるようになっています。</p>
+<p>Swiftでは<code>Object</code>クラスに相当するものはありません。</p>
+<blockquote>
+<p>Swift は、全てのクラスで共通する基本クラスを継承しません。スーパークラスを指定せずに定義したクラスは、自動的に基本クラスになります。</p>
+</blockquote>
+<p><a href=https://www.swiftlangjp.com/language-guide/inheritance.html#>https://www.swiftlangjp.com/language-guide/inheritance.html#</a>基本クラスの定義defining-a-base-class</p>
+<p>しかし、Swiftとある程度の互換性のあるObjective-Cには<code>NSObject</code>というクラスが存在しました。</p>
+<p>Swiftでも<code>NSObject</code>内で定義されているメソッドを利用するために<code>NSObject</code>を継承することがあります。</p>
+<h2 id=フレームワーク>フレームワーク</h2>
+<p>ライブラリというだけでなく、アプリケーションの半完成品であるものです。</p>
+<p>アプリからライブラリを呼び出すのとは逆で、フレームワークから、アプリケーションを呼び出すように使います。</p>
+<p>基本的な制御をフレームワーク側が提供して個別の処理をアプリケーションで実装して利用します。</p>
+<p>ハリウッドの原則 ”Don’t call us, we will call you”とは、<br>
+アプリからはcall(呼び出し)しないで、フレームワーク側からcallするよ、という決まりです。</p>
+<h2 id=コンポーネント>コンポーネント</h2>
+<p>機能の独立性が高く、内部の詳細を知らなくても利用できる部品です。</p>
+<p>内部の詳細を知らなくてもいいため、バイナリで提供されます。</p>
+<h2 id=デザインパターン>デザインパターン</h2>
+<p>言語や分野によらず再利用できるクラス構造のアイディアのことです。</p>
+<p>1995年に発表されたGoFのデザインパターンと呼ばれるものが有名です。</p>
+<p>これ以降、デザインパターンに限らず設計について知見を貯めたり共有する動きが生まれました。</p>
+<p>部分的に利用しているものの、読んだことがないのでいつか読んでみたいものです。</p>
+<h2 id=この章の感想>この章の感想</h2>
+<p>オブジェクト指向になったことで向上した「再利用性」について注目した章でした。</p>
+<p>私がプログラミングをしている中でも再利用性を高めることは重視されており、なんとなく言語側で用意されたライブラリや良く知られているいい設計方法を利用するなどしていました。</p>
+<p>この章では、再利用性が高められていった経緯を知ることができ、ベストプラクティスとされている方法論がどうして優れているのか、など考える機会になりました。</p>
 </div>
 <footer class=post__footer>
 <div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
