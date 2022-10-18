@@ -3,12 +3,12 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>リーダブルコード5章まとめ - しょ〜んの技術メモ😗</title>
+<title>オブジェクト指向でなぜつくるのか 9章感想 - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="リーダブルコード5章まとめ">
-<meta name=twitter:description content="5章: コメントすべきことを知る コメントの目的は、書き手の意図を読み手に知らせることである。 コメントすべきでは「ない」こと コードからすぐにわか">
+<meta name=twitter:title content="オブジェクト指向でなぜつくるのか 9章感想">
+<meta name=twitter:description content="この記事では、SwiftでiOSアプリのプログラミングをする初学者として、 「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
@@ -36,64 +36,46 @@
 <main class=main role=main>
 <article class=post>
 <header class=post__header>
-<h1 class=post__title>リーダブルコード5章まとめ</h1>
+<h1 class=post__title>オブジェクト指向でなぜつくるのか 9章感想</h1>
 <div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-25T00:00:00Z>July 25, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-10-18T00:00:00Z>October 18, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
 </span>
 </div></div>
 </header><div class="content post__content clearfix">
-<h2 id=5章-コメントすべきことを知る>5章: コメントすべきことを知る</h2>
-<p><strong>コメントの目的は、書き手の意図を読み手に知らせることである。</strong></p>
-<h3 id=コメントすべきではないこと>コメントすべきでは「ない」こと</h3>
-<p><strong>コードからすぐにわかることをコメントに書かない</strong></p>
-<p>関数の名前や引数名でわかることをわざわざコメントに書き直さなくて良い。</p>
-<p>わかりにくい関数名の補足をコメントに書かない。<br>
-関数名をわかりやすくするべきである。</p>
-<h3 id=自分の考えを記録する>自分の考えを記録する</h3>
-<p>映画のコメンタリーのように、何を考えて作ったか書くと良い。</p>
-<p>例えば、コードが汚い理由を書いてもいい。</p>
-<pre><code>// このクラスは汚くなってきている。  
-// サブクラスを作った方がいいかもしれない。  
-</code></pre><p>コードの欠陥にコメントをつけるときの記法の例</p>
+<p>この記事では、SwiftでiOSアプリのプログラミングをする初学者として、</p>
+<p>「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計、アジャイル開発の基礎知識」</p>
+<p><a href=https://www.amazon.co.jp/dp/4296000187>https://www.amazon.co.jp/dp/4296000187</a></p>
+<p>の感想、学びになった点を書いていきます。</p>
+<h2 id=9章-モデリング>9章: モデリング</h2>
+<p>現実世界とソフトウエアの間には大きなギャップがある、それを埋めるためのモデリング。</p>
 <ul>
-<li>TODO: 後で手を付ける</li>
-<li>FIXME: 既知の不具合がある</li>
-<li>HACK: あまり綺麗ではない解決策</li>
-<li>XXX: 大きな問題があり危険</li>
+<li>このギャップを埋めるためには、現実世界の様子を整理する「業務分析」</li>
+<li>コンピュータにまかせる仕事の範囲を決める「要件定義」</li>
+<li>ソフトウエアの構造を定義する「設計」</li>
 </ul>
-<p>定数がなぜその値なのかその背景をコメントを書く</p>
-<pre><code>// 合理的な限界値。人間はこんなに読めない。   
-const int MAX_RSS_SUBSCRIPTIONS = 1000;
-</code></pre><h3 id=読み手の立場になって考える>読み手の立場になって考える</h3>
-<p>質問されそうなところ、ハマりそうな罠は前もって予測してコメントを書いておく。</p>
-<p>例えば普通に考える実装とは異なる場合、なぜそのような実装をしているかとか、<br>
-入力によっては処理に時間がかかる関数に、処理時間を書いておいたりとか。</p>
-<p>システムの全体像のコメントを書くことで、新しいチームメンバーがコードを読みやすくなる。</p>
-<p>新しくチームに参加した人に教えるようなイメージで言葉を考えてコメントに書くと良い。</p>
-<h3 id=ライターズブロックを乗り越える>ライターズブロックを乗り越える</h3>
-<p>簡単にコメントを書くためには</p>
-<ol>
-<li>頭のなかにあるコメントをとにかく書き出す。</li>
-<li>コメントを読んで改善が必要なものを見つける。</li>
-<li>改善する。</li>
-</ol>
-<p>まずはとにかく書き出して、</p>
-<p><code>// ヤバい。これはリストに重複があったら面倒なことになる。 </code></p>
-<p>これを改善すればいい。</p>
-<p><code>// 注意:このコードはリストの重複を処理できません(実装が難しいので)。 </code></p>
-<h3 id=5章の感想>5章の感想</h3>
-<p>“正しい”コメントの書き方とは、もっときっちりルール通りに書くものだと思っていた。</p>
-<p>例えば、関数の定義を書き、関数がどこで呼び出され、引数は何をとるのか。などを全ての関数について書いていけば読みやすいのではと今までは考えていた。</p>
-<p>しかし、この章ではもっと人間の考えに沿った、コメントの書き方が紹介されていた。</p>
-<p><strong>コメントの目的は、書き手の意図を読み手に知らせることである。</strong></p>
-<p>コメントを読む人も人間なので、読む人のことを想定して必要な言葉をかけるというのが、一番大事なことなのだと認識した。</p>
+<h2 id=ビジネスアプリケーションdxソフトの例>ビジネスアプリケーション（DXソフト）の例</h2>
+<p>現実の出来事を記録するアプリケーション</p>
+<ul>
+<li>「業務分析」現実の仕事をアクティビティ図を使って仕事の様子を理解する</li>
+<li>「要件定義」ユースケース図を使って誰（どのユーザー）にどんな機能を提供するか考える</li>
+<li>「要件定義」管理する情報の構造を表現する概念データモデルをクラス図を使って考える</li>
+</ul>
+<p>「設計」は次の章で解説されるようです。</p>
+<h2 id=感想>感想</h2>
+<p>私は、ソフトウェアを作る、となると、ユーザーの課題を解決しなければ！　とか最先端の技術を活かしたい！　とかを一番に思いついてしまいます。</p>
+<p>そのため、現実世界とソフトウエアの間の大きなギャップを埋める、という視点は私にとって新しいものでした。</p>
+<p>開発をしていると、現実世界ではないソフトウェアの世界を動かすのが上手くなりますが、ソフトウェアの世界と現実世界をどう関連づけるかが結局ソフトウェアの価値となるはずです。</p>
+<p>今後は、例えば新しい技術を習得したときに、これは現実世界で言うと何が起こるのか、考えるようにしたいです。</p>
 </div>
 <footer class=post__footer>
 <div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
 <ul class=tags__list>
 <li class=tags__item>
-<a class="tags__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ rel=tag>リーダブルコード</a>
+<a class="tags__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ rel=tag>オブジェクト指向でなぜつくるのか</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
 </li>
 </ul>
 </div>
