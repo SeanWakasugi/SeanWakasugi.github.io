@@ -3,19 +3,18 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>Alamofire - しょ〜んの技術メモ😗</title>
+<title>オブジェクト指向でなぜつくるのか 10章感想 - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="Alamofire">
-<meta name=twitter:description content>
+<meta name=twitter:title content="オブジェクト指向でなぜつくるのか 10章感想">
+<meta name=twitter:description content="この記事では、SwiftでiOSアプリのプログラミングをする初学者として、 「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
 <link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
 <link rel=stylesheet href=/css/style.css>
 <link rel=stylesheet href=/css/custom.css>
-<link rel=alternate type=application/rss+xml href=/tags/alamofire/index.xml title=しょ〜んの技術メモ😗>
 <link rel="shortcut icon" href=/favicon.ico>
 </head>
 <body class=body>
@@ -34,49 +33,66 @@
 </header>
 <div class="wrapper flex">
 <div class=primary>
-<main class="main list" role=main>
-<header class=main__header>
-<h1 class=main__title>Alamofire</h1>
-</header><article class="list__item post">
-<header class=list__header>
-<h2 class="list__title post__title">
-<a href=/posts/dispatchqueue/ rel=bookmark>
-Alamofireで同期的にAPIを呼ぶ
-</a>
-</h2>
-<div class="list__meta meta">
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>オブジェクト指向でなぜつくるのか 10章感想</h1>
+<div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-08-08T00:00:00Z>August 08, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/ rel=category>iOSアプリ</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-10-25T00:00:00Z>October 25, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
 </span>
 </div></div>
-</header>
-<div class="content list__excerpt post__content clearfix">
-非同期な処理を処理を同期的に実行したい AlamofireでAPI取得をすると、基本的に非同期的に処理が行われます。 API通信をしている間、画
+</header><div class="content post__content clearfix">
+<p>この記事では、SwiftでiOSアプリのプログラミングをする初学者として、</p>
+<p>「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計、アジャイル開発の基礎知識」</p>
+<p><a href=https://www.amazon.co.jp/dp/4296000187>https://www.amazon.co.jp/dp/4296000187</a></p>
+<p>の感想、学びになった点を書いていきます。</p>
+<h2 id=10章-設計>10章: 設計</h2>
+<h3 id=保守性と再利用性>保守性と再利用性</h3>
+<p>設計の目標は、</p>
+<p>第一に、要求仕様通りに正しく動かすこと。</p>
+<p>第二は、以前は実行効率だったが、現在は<strong>保守性や再利用性</strong>。</p>
+<p>保守に強く再利用しやすいソフトウェアとは</p>
+<ol>
+<li>重複を排除</li>
+<li>部品の独立性を高める</li>
+<li>依存関係を循環させない</li>
+</ol>
+<h3 id=重複を排除>重複を排除</h3>
+<p>同じ部分をコピペではなく、関数、クラスやポリモーフィズムを使って共通化をすること</p>
+<h3 id=部品の独立性を高める>部品の独立性を高める</h3>
+<p>ソフトウェアを一枚岩にするのではなく、複数のサブシステム、部品から作ること<br>
+さらにそれぞれが独立性が高いこと</p>
+<p>凝集度: 個々の部品の機能のまとまり度合い。強いほど良い。<br>
+結合度: 部品間の結びつき度合い。弱いほど良い。</p>
+<h4 id=独立性を高めるコツ>独立性を高めるコツ</h4>
+<p>一言で表現する名前をつける: 適切な名前をつけれるなら、そのクラスは機能がまとまっている。</p>
+<p>秘密をたくさん作る: クラスが外部に公開する情報を最小限にする</p>
+<p>小さく作る: 1つのクラスやメソッドに詰め込みすぎると全体として何をしているか理解できない。</p>
+<p>擬人化: オブジェクトが役割を分担して、まるで人のように相互にメッセージを送り合うように設計する。</p>
+<h3 id=依存関係を循環させない>依存関係を循環させない</h3>
+<p>依存関係が循環していると、その部品は修正したり再利用するときに循環している部品全てを修正したりまとめて利用しなくてはならなくなる</p>
+<p>依存関係を最低限で一方通行にすれば、独立した部品が作られて修正や再利用の影響範囲が狭まる</p>
 </div>
-<div class="list__footer clearfix">
-<a class="list__footer-readmore btn" href=/posts/dispatchqueue/>続きを読む…</a>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ rel=tag>オブジェクト指向でなぜつくるのか</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
+</li>
+</ul>
 </div>
-</article><article class="list__item post">
-<header class=list__header>
-<h2 class="list__title post__title">
-<a href=/posts/alamofiretutorial/ rel=bookmark>
-Alamofireで天気APIを取得してUITableViewに表示するiOSアプリを作成する
-</a>
-</h2>
-<div class="list__meta meta">
-<div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-08-01T00:00:00Z>August 01, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/ rel=category>iOSアプリ</a>
-</span>
-</div></div>
-</header>
-<div class="content list__excerpt post__content clearfix">
-Swiftの通信用のライブラリAlamofireを使って、簡単な天気一覧表示アプリを作成します。 北海道のさまざまな地点の明日の天気を一覧で確
-</div>
-<div class="list__footer clearfix">
-<a class="list__footer-readmore btn" href=/posts/alamofiretutorial/>続きを読む…</a>
-</div>
+</footer>
 </article>
 </main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
 </div>
 <aside class=sidebar><div class="widget-search widget">
 <form class=widget-search__form role=search method=get action=https://google.com/search>

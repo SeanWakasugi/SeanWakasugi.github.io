@@ -3,12 +3,12 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>リーダブルコード3章、4章まとめ - しょ〜んの技術メモ😗</title>
+<title>オブジェクト指向でなぜつくるのか 11章12章感想(終) - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="リーダブルコード3章、4章まとめ">
-<meta name=twitter:description content="3章: 誤解されない名前 積極的に「誤解」を探して曖昧な名前を変えると良い。 複数の名前を検討して、何が起きるかを明確に表していてかつ誤解を生む">
+<meta name=twitter:title content="オブジェクト指向でなぜつくるのか 11章12章感想(終)">
+<meta name=twitter:description content="この記事では、SwiftでiOSアプリのプログラミングをする初学者として、 「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
@@ -36,61 +36,62 @@
 <main class=main role=main>
 <article class=post>
 <header class=post__header>
-<h1 class=post__title>リーダブルコード3章、4章まとめ</h1>
+<h1 class=post__title>オブジェクト指向でなぜつくるのか 11章12章感想(終)</h1>
 <div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-07-19T00:00:00Z>July 19, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-10-26T00:00:00Z>October 26, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
 </span>
 </div></div>
 </header><div class="content post__content clearfix">
-<h2 id=3章-誤解されない名前>3章: 誤解されない名前</h2>
-<p>積極的に「誤解」を探して曖昧な名前を変えると良い。</p>
-<p>複数の名前を検討して、何が起きるかを明確に表していてかつ誤解を生む可能性が低い言葉を選ぶといい。</p>
-<p>filter()<br>
-選択するのか除外するのか分かりにくい<br>
-選択する→select()<br>
-除外する→exclude()</p>
-<p>限界値を含めるときはminとmaxを使う。<br>
-CART_TOO_BIG_LIMITでは、条件がCART_TOO_BIG_LIMIT未満ならOKなのか以下ならOKなのかわからない。MAX_ITEMS_IN_CARTなら以下であると分かる。</p>
-<p>似た規則</p>
+<p>この記事では、SwiftでiOSアプリのプログラミングをする初学者として、</p>
+<p>「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計、アジャイル開発の基礎知識」</p>
+<p><a href=https://www.amazon.co.jp/dp/4296000187>https://www.amazon.co.jp/dp/4296000187</a></p>
+<p>の感想、学びになった点を書いていきます。</p>
+<h2 id=11章-アジャイル開発>11章: アジャイル開発</h2>
+<h3 id=開発プロセス>開発プロセス</h3>
+<p>作業手順や成果物の形式を体系的にまとめている</p>
 <ul>
-<li>min &lt;= x &lt;= max</li>
-<li>first &lt;= x &lt;= last</li>
-<li>begin &lt;= x &lt; end</li>
+<li>ウォーターフォール型<br>
+早い段階で要件を確定して仕様変更を抑える開発プロセス</li>
+<li>反復型<br>
+要件定義から開発テストまでを繰り返す。仕様変更に対応できる。</li>
 </ul>
-<p>ブール値は、is, has, can, shouldを先頭につけるとわかりやすい。<br>
-否定系は混乱しやすいので肯定系に。<br>
-disable→use</p>
-<p>get~は軽量な動作を想起させるので、処理が大きいならcomputeなどにした方がいい。</p>
-<h2 id=4章-美しさ>4章: 美しさ</h2>
-<p>美しい、目に優しい、読みやすいソースコードを作るための3つの原則</p>
+<p>XP(eXtream Programming)、スクラムといった手法が有名。</p>
+<p>軽量な反復型開発プロセスをひっくるめてアジャイル開発手法と呼ぶように。</p>
+<h3 id=アジャイル開発の3つのプラクティス>アジャイル開発の3つのプラクティス</h3>
 <ul>
-<li>読み手が慣れているパターンと一貫性のあるレイアウトを使う。</li>
-<li>似ているコードは似ているように見せる。</li>
-<li>関連するコードをまとめてブロックにする。</li>
+<li>TDD(Test Driven Development)<br>
+テストコードを先に書いてから開発する</li>
+<li>リファクタリング<br>
+動くコードを後から内部構造を安全に改善する</li>
+<li>CI(継続的インテグレーション)<br>
+定期的にコンパイル、ビルド、ユニットテストを自動で実行させる</li>
 </ul>
-<p>似ているコードは、改行を使って同じ「シルエット」にすると似ている処理であることが一目でわかる。</p>
-<p>重複したり複雑な処理はメソッドにして分離することで、コードが簡潔になり、何のための処理であるかなどの大切な部分が見やすくなる。</p>
-<p>列を揃える</p>
-<pre><code>CheckFullName(&quot;Doug Adams&quot;, &quot;Mr. Douglas Adams&quot;, &quot;&quot;); 
-CheckFullName(&quot; Jake Brown &quot;, &quot;Mr. Jacob Brown III&quot;, &quot;&quot;); 
-CheckFullName(&quot;No Such Guy&quot;, &quot;&quot;, &quot;no match found&quot;); 
-CheckFullName(&quot;John&quot;, &quot;&quot;, &quot;more than one result&quot;); 
-</code></pre><p>上を、下のように整形すると読みやすい。</p>
-<pre><code>CheckFullName(&quot;Doug Adams&quot;,     &quot;Mr. Douglas Adams&quot;,    &quot;&quot;);
-CheckFullName(&quot; Jake Brown &quot;,   &quot;Mr. Jake Brown III&quot;,   &quot;&quot;);
-CheckFullName(&quot;No Such Guy&quot; ,   &quot;&quot; ,                    &quot;no match found&quot;);
-CheckFullName(&quot;John&quot; ,          &quot;&quot; ,                    &quot;more than one result&quot;);
-</code></pre><p>（という意図らしいが、できればやりたくないと思った。
-見やすいのは確かだが、保守コストとかが高すぎる気がしている。）</p>
-<p>どんな順番でも処理が変わらないようなものでも、意味のある順番を選んで、常にその順番を守ること。例えば使う順番とか、出力する時の並び順とか。</p>
-<p>大きな処理の塊を空の行やコメントで区切って書くこと。</p>
+<p>アジャイル開発はオブジェクト指向との相性が良いため、一緒に発展してきた</p>
+<h2 id=12章-本を通してのしめくくり>12章： 本を通してのしめくくり</h2>
+<p>オブジェクト指向は、いっときのブームではない。<br>
+なぜなら、以前から確立されてきた技術やアイディアを洗練したものだから。</p>
+<p>これからオブジェクト指向が拡張されていくことが考えられる。<br>
+例えば、アスペクト指向、エージェント指向、サービス指向などが注目を集めた。<br>
+しかし、どれもオブジェクト指向の基本の仕組みは変わっていないので、オブジェクト指向を学ぶことは大事。</p>
+<h2 id=本一冊を通しての感想>本一冊を通しての感想</h2>
+<p>オブジェクト指向でなぜつくるのかの本編の内容はこの章までで終わりです。</p>
+<p>この本を通して一番良かったのは、歴史を学ぶことができたことです。</p>
+<p>オブジェクト指向がどう発展してきたのかという歴史を知ると、過去何が課題でどうして開発されたのかが分かります。</p>
+<p>例えばプログラミング技術としてのオブジェクト指向は、「保守性や再利用性」が課題だったから、生まれました。</p>
+<p>さらにオブジェクト指向とは、それ一つだけで生まれてきた訳ではありません。</p>
+<p>コンピュータの性能の発展、プログラミングソフトウェアの進化、ソフトウェア開発の手法の変化などなど。</p>
+<p>過去に起こった変化を通じてある意味必然的に生まれてきたということがわかりました。</p>
+<p>このような歴史を追体験し、オブジェクト指向が生まれた過程を知ることができたので、読んで良かったと感じています。</p>
 </div>
 <footer class=post__footer>
 <div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
 <ul class=tags__list>
 <li class=tags__item>
-<a class="tags__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ rel=tag>リーダブルコード</a>
+<a class="tags__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ rel=tag>オブジェクト指向でなぜつくるのか</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
 </li>
 </ul>
 </div>
