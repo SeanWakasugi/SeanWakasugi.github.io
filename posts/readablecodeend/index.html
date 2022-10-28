@@ -3,12 +3,12 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>オブジェクト指向でなぜつくるのか 7章8章感想 - しょ〜んの技術メモ😗</title>
+<title>リーダブルコード読了感想 - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="オブジェクト指向でなぜつくるのか 7章8章感想">
-<meta name=twitter:description content="この記事では、SwiftでiOSアプリのプログラミングをする初学者として、 「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計">
+<meta name=twitter:title content="リーダブルコード読了感想">
+<meta name=twitter:description content="読みやすいコードを書くための本として一番おすすめされている本なので購入しました。 私は複数人でコードを共有するような開発の経験が浅く、コメント">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
@@ -36,49 +36,28 @@
 <main class=main role=main>
 <article class=post>
 <header class=post__header>
-<h1 class=post__title>オブジェクト指向でなぜつくるのか 7章8章感想</h1>
+<h1 class=post__title>リーダブルコード読了感想</h1>
 <div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-10-14T00:00:00Z>October 14, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-10-28T00:00:00Z>October 28, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
 </span>
 </div></div>
 </header><div class="content post__content clearfix">
-<p>この記事では、SwiftでiOSアプリのプログラミングをする初学者として、</p>
-<p>「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計、アジャイル開発の基礎知識」</p>
-<p><a href=https://www.amazon.co.jp/dp/4296000187>https://www.amazon.co.jp/dp/4296000187</a></p>
-<p>の感想、学びになった点を書いていきます。</p>
-<h2 id=オブジェクト指向はプログラミング技術だけではない>オブジェクト指向はプログラミング技術だけではない</h2>
-<p>ここまで、オブジェクト指向をプログラミング言語の技術的な仕組みとして学んできました。</p>
-<p>さらに、オブジェクト指向の考え方は汎用の整理術としても活かすことができます。</p>
-<p>集合論(クラスや継承の考え方)と役割分担(個々のインスタンス)を軸に、現実世界の行動や仕組み、システムをオブジェクト指向の考え方で整理し直すことができるということでした。</p>
-<h2 id=uml図>UML図</h2>
-<p>コードだけでなく、視覚的なUML図を利用することで全体を理解するのに役立ちます。</p>
-<p>また、より良いデザインパターンに気づきやすくなる効果もあります。</p>
-<p>細かいUML図の説明は省略します。</p>
-<h2 id=汎用の整理術を表現するuml図>汎用の整理術を表現するUML図</h2>
-<p>コードをより理解するためのUML図だけでなく、先述した汎用の整理術としてのオブジェクト指向を記述するためにもUML図が使われます。</p>
-<ul>
-<li>集合論としてのクラス図<br>
-ベン図で整理し、共通する属性をクラスとして整理する</li>
-<li>役割分担を示すコミュニケーション図<br>
-インスタンス名ではなく人物やシステムを書く<br>
-メソッド名ではなく意思伝達を書く</li>
-</ul>
-<h2 id=オブジェクト指向でないuml図>オブジェクト指向でないUML図</h2>
-<ul>
-<li>ユースケース図<br>
-システムと外部の境界を決める</li>
-<li>アクティビティ図<br>
-フローチャート。現在はアルゴリズムにはあまり使わないが、現実世界の業務の流れを表現するのに使う</li>
-<li>ステートマシン図<br>
-状態遷移図、外部からのイベントによりモノの状態が変化していく</li>
-</ul>
+<p>読みやすいコードを書くための本として一番おすすめされている本なので購入しました。</p>
+<p>私は複数人でコードを共有するような開発の経験が浅く、コメントの書き方とか命名とかに悩んでいたのでそれを解決したいと考えていました。</p>
+<p>読み終わってみてわかったことは、読みやすいコードとはコメントや命名だけでなく、コードの構造も含まれるし、実装のロジックも含まれるということがわかりました。</p>
+<p>この本では、私が最初に改善していたいと思っていた「表面上の改善」から始まって、「ループとロジックの単純化」でコードの中身やロジックを修正し、「コードの再構成」でそもそも何をコードに書くのか、どこに書くのかという根本まで迫っていく3部構成になっています。</p>
+<p>それぞれの章でとても具体的な改善例と改善するためにどう考えればいいのかという思考プロセスが示されており、すぐに実行に移したいと思います。</p>
+<p>また、本の最後で解説として（本の作者と別の方が）</p>
+<p>読みやすいコードを書くということはたまに思い出してやることではない。習慣にして常に実践することなんだ。</p>
+<p>と述べられています。</p>
+<p>これを胸に、リーダブルコードをたまに見返すのではなく、何かコードを書くたびにこれは読みやすいコードだろうか？　と自問自答するようにします。</p>
 </div>
 <footer class=post__footer>
 <div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
 <ul class=tags__list>
 <li class=tags__item>
-<a class="tags__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ rel=tag>オブジェクト指向でなぜつくるのか</a>
+<a class="tags__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ rel=tag>リーダブルコード</a>
 </li>
 <li class=tags__item>
 <a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
