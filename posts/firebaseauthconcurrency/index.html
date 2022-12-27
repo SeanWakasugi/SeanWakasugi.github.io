@@ -1,0 +1,247 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>Firebase Auth MFA x Swift Concurrency - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Firebase Auth MFA x Swift Concurrency">
+<meta name=twitter:description content="2022年7月にFirebase Authenticationで多要素認証(MFA)が利用可能になりました。 また、2022年5月のGoogle">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>Firebase Auth MFA x Swift Concurrency</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-12-27T00:00:00Z>December 27, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>2022年7月にFirebase Authenticationで多要素認証(MFA)が利用可能になりました。</p>
+<p>また、2022年5月のGoogle I/OでFirebaseはSwift Concurrencyに完全対応することが発表されています。</p>
+<blockquote>
+<p>We’re updating Firebase to fully embrace the modern Swift language
+<a href=https://firebase.blog/posts/2022/05/whats-new-at-google-io>https://firebase.blog/posts/2022/05/whats-new-at-google-io</a></p>
+</blockquote>
+<p>つまり、Firebaseでの多要素認証をasync/awaitを利用してシンプルに書くことが可能になりました。</p>
+<p>しかし、多要素認証のチュートリアルは依然としてcompletionを利用したものになっています。</p>
+<p><a href=https://firebase.google.com/docs/auth/ios/multi-factor>https://firebase.google.com/docs/auth/ios/multi-factor</a></p>
+<p>これをasync/await、そしてthrowを用いて書き直します。</p>
+<p>Firebaseバージョンは10.2.0です。</p>
+<h2 id=アカウント登録>アカウント登録</h2>
+<p>Firebaseコンソールから多要素認証をオンにするのを忘れずに。</p>
+<h3 id=メールアドレスとパスワードの登録>メールアドレスとパスワードの登録</h3>
+<p>通常のアカウント作成と同じです。
+アカウントを作成し、メールアドレス確認用メールを送信します。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>register</span>(email: String, password: String) async <span style=color:#66d9ef>throws</span> {
+    <span style=color:#66d9ef>let</span> result = <span style=color:#66d9ef>try</span> await Auth.auth().createUser(withEmail: email, password: password)
+    <span style=color:#66d9ef>try</span> await result.user.sendEmailVerification()
+}
+</code></pre></div><p><code>sendEmailVerification(with: )</code>を使って、メールでの確認後にアクションコードを走らせることができます（メールでの確認後にアプリに戻ってくる等）</p>
+<p>このメソッドが正常に終了すると、ログイン状態となります。</p>
+<h3 id=多要素認証用の電話番号の登録>多要素認証用の電話番号の登録</h3>
+<p>電話番号の登録には、以下の2つの条件が必要です。</p>
+<ol>
+<li>ログイン状態であること(= <code>Auth.auth().currentUser</code>がnilではないこと)</li>
+<li>メールアドレスが確認されていること(= <code>Auth.auth().currentUser.isEmailVerified</code>がtrueであること)</li>
+</ol>
+<p>そのため、メアド・パスワードの登録をした直後に電話番号登録をする場合は、メールアドレスの確認をユーザーに促しましょう。
+メールアドレスが確認されたことをプッシュ等で受け取ることはできないので、適当なタイミングで<code>Auth.auth().currentUser.reload</code>で更新して<code>.isEmailVerified</code>を確認するのが良いです。</p>
+<p>電話番号の登録は以下のメソッドです。入力した電話番号にSMSコードを送信するところまでやってくれます。
+返り値は<code>verificationID</code>として次の認証コードの確認に利用します。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>registerPhone</span>(phoneNumber: String) async <span style=color:#66d9ef>throws</span> -&gt; String {
+    <span style=color:#66d9ef>let</span> session = <span style=color:#66d9ef>try</span> await Auth.auth().currentUser?.multiFactor.session()
+    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>try</span> await PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber, uiDelegate: <span style=color:#66d9ef>nil</span>, multiFactorSession: session)
+}
+</code></pre></div><h3 id=電話番号について>電話番号について</h3>
+<p>上の<code>PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber, uiDelegate: nil, multiFactorSession: session)</code>で使う<code>phoneNumber</code>についてです。</p>
+<p>この電話番号は、<code>+819012345678</code>のような形式の文字列で入力しなくてはいけません。国番号付きの国際電話番号です。</p>
+<p>確実に国内のみでしか使えないサービスであれば、ユーザーの入力した電話番号に<code>+81</code>をつけるだけでもいいのですが、国際対応するなら国番号の取得が必要になります。</p>
+<p><a href=https://github.com/SURYAKANTSHARMA/CountryPicker>SKCountryPicker</a>というライブラリにUIまで含めて国番号選択をやってもらいました。
+詳細は省きますが、選択された<code>country: Country</code>を取得して、<code>country.dialingCode</code>を取ると、<code>+81</code>のような文字列が取れます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>if</span> phoneNumber.text!.first! == <span style=color:#e6db74>&#34;0&#34;</span> {
+    phoneNumber.removeFirst()
+}
+<span style=color:#66d9ef>let</span> verificationId = <span style=color:#66d9ef>try</span> await registerPhone(phoneNumber: country.dialingCode! <span style=color:#f92672>+</span> phoneNumber)
+</code></pre></div><p>なお、<code>+819012345678</code>でも<code>+8109012345678</code>でも一応<code>verifyPhoneNumber(...)</code>は動きました（検証数少なめ）。</p>
+<h3 id=認証コードの確認>認証コードの確認</h3>
+<p><code>verifyPhoneNumber(...)</code>でSMSに認証コードが送信されるので、ユーザーにそれを入力してもらいます(<code>verificationCode</code>)。
+<code>verificationID</code>は<code>verifyPhoneNumber(...)</code>の返り値です。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>verifyCodeWhileRegistration</span>(verificationID: String, verificationCode: String) async <span style=color:#66d9ef>throws</span> {
+    <span style=color:#66d9ef>let</span> credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationID, verificationCode: verificationCode)
+    <span style=color:#66d9ef>let</span> assertion = PhoneMultiFactorGenerator.assertion(with: credential)
+    <span style=color:#66d9ef>try</span> await Auth.auth().currentUser?.multiFactor.enroll(with: assertion, displayName: <span style=color:#e6db74>&#34;phone number&#34;</span>)
+}
+</code></pre></div><p><code>Auth.auth().currentUser?.multiFactor.enroll(with: assertion, displayName: "phone number")</code>の<code>displayName</code>は、多要素認証の認証方法の名前です。
+複数の多要素認証の登録を可能にする場合は、ユーザーにこの名前を設定させることでログイン時にどの方法で認証するか選択しやすくなります。
+登録後は、<code>Auth.auth().currentUser?.multiFactor.enrolledFactors[0].displayName</code>で登録した名前が取れます。</p>
+<h2 id=ログイン>ログイン</h2>
+<h3 id=メールアドレスとパスワードの入力>メールアドレスとパスワードの入力</h3>
+<p>Firebase Authenticationでは、すべてのアカウントで多要素認証必須、という設定はできません。
+もし全てのアカウントで多要素認証必須としたければ、アプリ側で多要素認証が有効でないアカウントをブロックしたり、多要素認証登録のフローに誘導したりする必要があります。</p>
+<p>下のコードでは、多要素認証設定済みかどうかで<code>enum LoginType</code>を返すようにしています。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>LoginType</span> {
+    <span style=color:#66d9ef>case</span> noMultiFactor
+    <span style=color:#66d9ef>case</span> withMultiFactor(resolver: MultiFactorResolver)
+}
+
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>login</span>(email: String, password: String) async <span style=color:#66d9ef>throws</span> -&gt; LoginType {
+    <span style=color:#66d9ef>do</span> {
+        <span style=color:#66d9ef>try</span> await Auth.auth().signIn(withEmail: email, password: password)
+        <span style=color:#66d9ef>guard</span> isEmailVerified() <span style=color:#66d9ef>else</span> {
+            <span style=color:#66d9ef>throw</span> AuthErrorCode.Code.unverifiedEmail
+        }
+        <span style=color:#75715e>// 多要素認証が未設定のアカウント</span>
+        <span style=color:#66d9ef>return</span> .noMultiFactor
+    } <span style=color:#66d9ef>catch</span> <span style=color:#66d9ef>let</span> error <span style=color:#66d9ef>as</span> NSError {
+        <span style=color:#66d9ef>switch</span> AuthErrorCode(_nsError: error).code {
+        <span style=color:#66d9ef>case</span> .secondFactorRequired:
+            <span style=color:#75715e>// 多要素認証設定済みのアカウント</span>
+            <span style=color:#66d9ef>let</span> resolver = error.userInfo[AuthErrorUserInfoMultiFactorResolverKey] <span style=color:#66d9ef>as</span>? MultiFactorResolver
+            <span style=color:#66d9ef>return</span> .withMultiFactor(resolver: resolver!)
+        <span style=color:#66d9ef>case</span> .unverifiedEmail:
+            <span style=color:#75715e>// ログイン時にメールアドレスの確認が済んでいなかった場合はメールアドレス確認メールを再送信</span>
+            <span style=color:#66d9ef>try</span> await Auth.auth().currentUser?.sendEmailVerification()
+            <span style=color:#66d9ef>throw</span> error
+        <span style=color:#66d9ef>default</span>:
+            <span style=color:#66d9ef>throw</span> error
+        }
+    }
+}
+</code></pre></div><p>多要素認証が一度登録されると、多要素認証なしではログインできなくなります。
+<code>signIn(...)</code>を実行すると、エラーとして<code>.secondFactorRequired</code>がthrowされます。
+エラーから<code>MultiFactorResolver</code>を生成して、次の認証コードの確認に利用します。</p>
+<h3 id=認証コードの送信>認証コードの送信</h3>
+<p>登録時とは違い、自動で認証コードSMSは送信されません。
+先述の<code>MultiFactorResolver</code>を引数に、SMSを送信します。
+返り値は、<code>verificationID</code>です。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>sendSMSWhileLogin</span>(resolver: MultiFactorResolver) async <span style=color:#66d9ef>throws</span> -&gt; String {
+    <span style=color:#66d9ef>let</span> multiFactorInfo = resolver.hints[<span style=color:#ae81ff>0</span>] <span style=color:#66d9ef>as</span>? PhoneMultiFactorInfo
+    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>try</span> await PhoneAuthProvider.provider().verifyPhoneNumber(with: multiFactorInfo!, uiDelegate: <span style=color:#66d9ef>nil</span>, multiFactorSession: resolver.session)
+}
+</code></pre></div><p>多要素認証方法を複数登録している場合は、<code>resolver.hints[0]</code>のindexでどの方法を利用するか指定できます。
+それぞれのhintに対し、下4桁のみの電話番号<code>phoneNumber</code>、登録時に入力した<code>displayName</code>や登録日<code>enrollmentDate</code>を取得できるので、選択肢としてこれらを表示して選んでもらうことができます。</p>
+<h3 id=認証コードの確認-1>認証コードの確認</h3>
+<p>ユーザーに認証コード<code>verificationCode</code>を入力してもらい、確認します。
+メールアドレスとパスワード入力時に取得できる<code>MultiFactorResolver</code>とSMS送信時に取得できる<code>verificationID</code>の両方が必要です。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>verifyCodeWhileLogin</span>(resolver: MultiFactorResolver, verificationID: String, verificationCode: String) async <span style=color:#66d9ef>throws</span> {
+    <span style=color:#66d9ef>let</span> credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationID, verificationCode: verificationCode)
+    <span style=color:#66d9ef>let</span> assertion = PhoneMultiFactorGenerator.assertion(with: credential)
+    <span style=color:#66d9ef>try</span> await resolver.resolveSignIn(with: assertion)
+}
+</code></pre></div><p>これで多要素認証を用いたログイン完了です。</p>
+<p>次回は、多要素認証を導入するにあたって修正が必要になったことを書きます。</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/firebase/ rel=tag>Firebase</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency/>Firebase Auth MFA x Swift Concurrency</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecodeend/>リーダブルコード読了感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop11-12/>オブジェクト指向でなぜつくるのか 11章12章感想(終)</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop10/>オブジェクト指向でなぜつくるのか 10章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop9/>オブジェクト指向でなぜつくるのか 9章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop7-8/>オブジェクト指向でなぜつくるのか 7章8章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop6/>オブジェクト指向でなぜつくるのか 6章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop5/>オブジェクト指向でなぜつくるのか 5章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop1-3/>オブジェクト指向でなぜつくるのか 1-3章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop4/>オブジェクト指向でなぜつくるのか 4章感想</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/firebase/ title=Firebase>Firebase</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ title=オブジェクト指向でなぜつくるのか>オブジェクト指向でなぜつくるのか</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2022 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
