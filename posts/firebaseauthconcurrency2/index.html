@@ -3,12 +3,12 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>オブジェクト指向でなぜつくるのか 9章感想 - しょ〜んの技術メモ😗</title>
+<title>Firebase多要素認証におけるメールアドレス変更の仕様 - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="オブジェクト指向でなぜつくるのか 9章感想">
-<meta name=twitter:description content="この記事では、SwiftでiOSアプリのプログラミングをする初学者として、 「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計">
+<meta name=twitter:title content="Firebase多要素認証におけるメールアドレス変更の仕様">
+<meta name=twitter:description content="Firebase多要素認証を導入したことで、メールアドレス変更後にログアウトしたりとメールアドレス変更周りの動作に違いがあったので、検証しま">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
@@ -36,46 +36,57 @@
 <main class=main role=main>
 <article class=post>
 <header class=post__header>
-<h1 class=post__title>オブジェクト指向でなぜつくるのか 9章感想</h1>
+<h1 class=post__title>Firebase多要素認証におけるメールアドレス変更の仕様</h1>
 <div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-10-18T00:00:00Z>October 18, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-12-27T00:00:00Z>December 27, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
 </span>
 </div></div>
 </header><div class="content post__content clearfix">
-<p>この記事では、SwiftでiOSアプリのプログラミングをする初学者として、</p>
-<p>「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計、アジャイル開発の基礎知識」</p>
-<p><a href=https://www.amazon.co.jp/dp/4296000187>https://www.amazon.co.jp/dp/4296000187</a></p>
-<p>の感想、学びになった点を書いていきます。</p>
-<h2 id=9章-モデリング>9章: モデリング</h2>
-<p>現実世界とソフトウエアの間には大きなギャップがある、それを埋めるためのモデリング。</p>
-<ul>
-<li>このギャップを埋めるためには、現実世界の様子を整理する「業務分析」</li>
-<li>コンピュータにまかせる仕事の範囲を決める「要件定義」</li>
-<li>ソフトウエアの構造を定義する「設計」</li>
-</ul>
-<h2 id=ビジネスアプリケーションdxソフトの例>ビジネスアプリケーション（DXソフト）の例</h2>
-<p>現実の出来事を記録するアプリケーション</p>
-<ul>
-<li>「業務分析」現実の仕事をアクティビティ図を使って仕事の様子を理解する</li>
-<li>「要件定義」ユースケース図を使って誰（どのユーザー）にどんな機能を提供するか考える</li>
-<li>「要件定義」管理する情報の構造を表現する概念データモデルをクラス図を使って考える</li>
-</ul>
-<p>「設計」は次の章で解説されるようです。</p>
-<h2 id=感想>感想</h2>
-<p>私は、ソフトウェアを作る、となると、ユーザーの課題を解決しなければ！　とか最先端の技術を活かしたい！　とかを一番に思いついてしまいます。</p>
-<p>そのため、現実世界とソフトウエアの間の大きなギャップを埋める、という視点は私にとって新しいものでした。</p>
-<p>開発をしていると、現実世界ではないソフトウェアの世界を動かすのが上手くなりますが、ソフトウェアの世界と現実世界をどう関連づけるかが結局ソフトウェアの価値となるはずです。</p>
-<p>今後は、例えば新しい技術を習得したときに、これは現実世界で言うと何が起こるのか、考えるようにしたいです。</p>
+<p>Firebase多要素認証を導入したことで、メールアドレス変更後にログアウトしたりとメールアドレス変更周りの動作に違いがあったので、検証しました。</p>
+<p>iOSで検証してはいますが、Androidでも同じ仕様のようです。</p>
+<p>(Firebase ver10.2.0)</p>
+<h2 id=メールアドレス変更>メールアドレス変更</h2>
+<h3 id=多要素認証関係ない仕様>多要素認証関係ない仕様</h3>
+<p>変更には直近(大体10分以内)の認証が必要です。</p>
+<p>メールアドレス変更直前に再度ログインさせるのが無難です。</p>
+<p>ログインから時間が経過しすぎるとエラーとして<code>.requiresRecentLogin</code>が返ってきます。</p>
+<p>また、メールアドレス変更のメソッドを実行すると確認メールが届き、リンクをタップし次第メールアドレス変更が確定となります。</p>
+<p>具体的には、</p>
+<ol>
+<li>新しいメールアドレスに確認メールが届く。確認メールのリンクタップで変更が確定。</li>
+<li>変更確定すると、古いメールアドレスにメールアドレスが変更されたというお知らせメールが届く。</li>
+<li>もしお知らせメールのリンクをタップすると、メールアドレスが古い方に戻る。</li>
+</ol>
+<h3 id=多要素認証導入前>多要素認証導入前</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>changeEmail</span>(email: String) async <span style=color:#66d9ef>throws</span> {
+    <span style=color:#66d9ef>try</span> await Auth.auth().currentUser?.updateEmail(to: email)
+}
+</code></pre></div><h3 id=多要素認証導入後>多要素認証導入後</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>changeEmail</span>(email: String) async <span style=color:#66d9ef>throws</span> {
+    <span style=color:#66d9ef>try</span> await Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email)
+}
+</code></pre></div><p>多要素認証を導入すると、メールアドレス変更が確定すると強制ログアウトされる、という仕様が追加されます。</p>
+<ol>
+<li>新しいメールアドレスに確認メールが届く。確認メールのリンクタップで変更が確定。
+→強制ログアウト</li>
+<li>変更確定すると、古いメールアドレスにメールアドレスが変更されたというお知らせメールが届く。</li>
+<li>もしお知らせメールのリンクをタップすると、メールアドレスが古い方に戻る。
+→もしここでタップしたらまた強制ログアウト</li>
+</ol>
+<p>ログアウト、と言ってもリアルタイムではなく、Authが認証情報を再読み込みするタイミング?(詳細不明)で<code>Auth.auth().currentUser</code>がnilになってしまいます。</p>
+<p><code>Auth.auth().currentUser.reload</code>で強制再読み込みさせれば、最新のログイン状態が取れます。</p>
+<p>メールアドレス変更後は、<code>Auth.auth().currentUser.reload</code>を実行し再ログインさせるのが良さそうです。</p>
+<p>（また、確認メールをタップするのはいつでもできてしまうので、変なタイミングでログアウトしても大丈夫なようにアプリを設計した方が良さそうです。）</p>
 </div>
 <footer class=post__footer>
 <div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
 <ul class=tags__list>
 <li class=tags__item>
-<a class="tags__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ rel=tag>オブジェクト指向でなぜつくるのか</a>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
 </li>
 <li class=tags__item>
-<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
+<a class="tags__link btn" href=/tags/firebase/ rel=tag>Firebase</a>
 </li>
 </ul>
 </div>
