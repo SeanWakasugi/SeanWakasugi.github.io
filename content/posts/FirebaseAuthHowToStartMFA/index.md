@@ -1,6 +1,6 @@
 ---
 title: "Firebase多要素認証まとめ"
-date: 2023-1-5
+date: 2023-01-05
 categories: ["Firebase"]
 tags: ["Firebase"]
 ---
