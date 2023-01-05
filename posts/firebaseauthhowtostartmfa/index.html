@@ -1,0 +1,218 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>Firebase多要素認証まとめ - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Firebase多要素認証まとめ">
+<meta name=twitter:description content="Firebase Authenticationの多要素認証の有効化の仕方と動作まとめです。 Firebaseコンソール側の作業 メール+パスワードでログインし、">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>Firebase多要素認証まとめ</h1>
+<div class="post__meta meta"><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/firebase/ rel=category>Firebase</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>Firebase Authenticationの多要素認証の有効化の仕方と動作まとめです。</p>
+<h2 id=firebaseコンソール側の作業>Firebaseコンソール側の作業</h2>
+<p>メール+パスワードでログインし、多要素認証にSMSを使う形になります。</p>
+<p>FirebaseのAuthenticationのコンソールのSign-in methodを設定します。</p>
+<p>ログインプロバイダで<code>メール/パスワード</code>と<code>電話番号</code>を有効化し、SMS多要素認証を有効にします。</p>
+<p><img src=./Console.png alt=コンソールの設定></p>
+<p>電話番号を有効化したりSMS多要素認証をオンにしても、既存のメールとパスワードでログインしていたユーザに（観測範囲内での）影響はありませんでした。</p>
+<h2 id=iosアプリの準備>iOSアプリの準備</h2>
+<p>実装は公式や基本的なメソッドをasync/awaitで書き直した以下の記事を参考にして下さい。</p>
+<p><a href="https://firebase.google.com/docs/auth/ios/multi-factor?hl=ja">Firebase公式のガイド</a></p>
+<p><a href=https://seanwakasugi.github.io/posts/firebaseauthconcurrency/>async/awaitで書いた多要素認証実装例</a></p>
+<p>コード以外の部分で必要になるのは、サイレントプッシュの設定とreCAPTCHAの設定です。</p>
+<p>reCAPTCHAの設定は必須、サイレントプッシュの設定もなるべくした方がいいです。（サイレントプッシュの設定をしないと毎回SMS送信前に10秒強の待ち時間が発生します）</p>
+<p>Firebase多要素認証では、SMSの送信リクエストが（ロボットではなく）アプリからのものであることを確認するために、サイレントプッシュを使います。</p>
+<p>初回SMS送信前にFirebaseが端末にサイレントプッシュを送信し、端末は自動で受信を確認して認証してくれます。</p>
+<p>iOSシミュレータなどサイレントプッシュが使用できない場合は、reCAPTCHAを利用して自動で確認されます。場合によっては画像を選択して人間であることを確認されます。</p>
+<p>Androidではこの準備が必要無いようです。</p>
+<h3 id=サイレントプッシュの設定>サイレントプッシュの設定</h3>
+<ol>
+<li>
+<p>iOSプロジェクトの通知を有効にします。</p>
+</li>
+<li>
+<p>FirebaseにAPNキーを登録します。</p>
+</li>
+</ol>
+<p>Firebaseコンソールのプロジェクト設定、CloudMessagingのiOSアプリの項で<code>APNs 認証キー</code>か<code>APNs 証明書</code>を登録します。<code>APNs 認証キー</code>が推奨のようですが、<code>APNs 証明書</code>でも動きます。</p>
+<ol start=3>
+<li>ユーザに通知の許可を求めます。サイレント通知なので、通知が許可されない場合でも機能するはずです(要確認)が、少なくとも<code>application.registerForRemoteNotifications()</code>を書かないと機能しないようです(要確認)。</li>
+</ol>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>AppDelegate</span>: UIResponder, UIApplicationDelegate {
+       <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>application</span>(<span style=color:#66d9ef>_</span> application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -&gt; Bool {
+        FirebaseApp.configure()
+        setRemoteNotification(application: application)
+        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>true</span>
+    }
+}
+
+<span style=color:#66d9ef>extension</span> <span style=color:#a6e22e>AppDelegate</span>: UNUserNotificationCenterDelegate {
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>setRemoteNotification</span>(application: UIApplication) {
+        UNUserNotificationCenter.current().delegate = <span style=color:#66d9ef>self</span>
+        <span style=color:#66d9ef>let</span> authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+        UNUserNotificationCenter.current().requestAuthorization(options: authOptions, completionHandler: {<span style=color:#66d9ef>_</span>, <span style=color:#66d9ef>_</span> <span style=color:#66d9ef>in</span> })
+        application.registerForRemoteNotifications()
+    }
+}
+</code></pre></div><h3 id=recaptchaの設定>reCAPTCHAの設定</h3>
+<p>前述のサイレントプッシュを設定していても、reCAPTCHAの設定をすることをおすすめします。</p>
+<p>サイレントプッシュに失敗しタイムアウト(5秒?)した場合にreCAPTCHAが使われるからです。</p>
+<ol>
+<li>
+<p>プロジェクト設定 → TARGETのアプリ名 → Info → URL Types</p>
+</li>
+<li>
+<p>URL Schemesに<code>GoogleService-Info.plist</code>の<code>REVERSED_CLIENT_ID</code>を入れる</p>
+</li>
+</ol>
+<h2 id=既存のメールパスワード認証に追加実装が必要な点>既存のメール/パスワード認証に追加実装が必要な点</h2>
+<p>Firebaseコンソールで多要素認証をオンにしても全ユーザーの多要素認証が必須になるわけでは無いので、全員必須としたい場合はアプリ側での実装が必要になります。</p>
+<p>詳しい実装方法は以下を見て下さい。</p>
+<p><a href="https://firebase.google.com/docs/auth/ios/multi-factor?hl=ja">Firebase公式のガイド</a></p>
+<p><a href=https://seanwakasugi.github.io/posts/firebaseauthconcurrency/>async/awaitで書いた多要素認証実装例</a></p>
+<h3 id=新規登録>新規登録</h3>
+<p>変更なし。</p>
+<p>iOSだと<code>Auth.auth().createUser(withEmail: , password: )</code></p>
+<p>多要素認証は新規登録後に別途メソッドを呼ぶ必要があります。</p>
+<h3 id=ログイン>ログイン</h3>
+<p>多要素認証が設定されていないアカウントは変更なし。</p>
+<p>多要素認証が設定されているアカウントは、サインインメソッドを呼んだ後にエラーが返ってくるので、その後SMS認証コードを入力させる必要があります。</p>
+<p>iOSだと<code>Auth.auth().signIn(withEmail: , password: )</code></p>
+<h3 id=ログアウト>ログアウト</h3>
+<p>変更なし。</p>
+<p>iOSだと<code>Auth.auth().signOut()</code></p>
+<h3 id=メールアドレス変更>メールアドレス変更</h3>
+<p>呼ぶメソッドが変わり、変更確定後に強制ログアウトされるようになります。</p>
+<p>また、直近の認証(15分?)が必要なので、このメソッドを呼ぶ前にログイン+SMS認証コード確認をしなくてはいけません。</p>
+<p>詳しくは以下。</p>
+<p><a href=https://seanwakasugi.github.io/posts/firebaseauthconcurrency2/>多要素認証のメアド変更仕様</a></p>
+<h3 id=パスワード変更>パスワード変更</h3>
+<p>変更なしですが、直近の認証(15分?)が必要なので、このメソッドを呼ぶ前にログイン+SMS認証コード確認をしなくてはいけません。</p>
+<p>iOSだと<code>Auth.auth().currentUser?.updatePassword(to: )</code></p>
+<h3 id=アカウント削除>アカウント削除</h3>
+<p>変更なしですが、直近の認証(15分?)が必要なので、このメソッドを呼ぶ前にログイン+SMS認証コード確認をしなくてはいけません。</p>
+<p>iOSだと<code>Auth.auth().currentUser?.delete()</code></p>
+<h3 id=パスワードを忘れたパスワードリセット>パスワードを忘れた(パスワードリセット)</h3>
+<p>変更なし。</p>
+<p>iOSだと<code>Auth.auth().sendPasswordReset(withEmail: )</code></p>
+<p>メールアドレスにパスワードリセット用のリンクが送信されますが、リンク先でも多要素認証は必要ありません。</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/firebase/ rel=tag>Firebase</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency/>Firebase Auth MFA x Swift Concurrency</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency2/>Firebase多要素認証におけるメールアドレス変更の仕様</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecodeend/>リーダブルコード読了感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop11-12/>オブジェクト指向でなぜつくるのか 11章12章感想(終)</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop10/>オブジェクト指向でなぜつくるのか 10章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop9/>オブジェクト指向でなぜつくるのか 9章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop7-8/>オブジェクト指向でなぜつくるのか 7章8章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop6/>オブジェクト指向でなぜつくるのか 6章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop5/>オブジェクト指向でなぜつくるのか 5章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop1-3/>オブジェクト指向でなぜつくるのか 1-3章感想</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/firebase/>Firebase</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/firebase/ title=Firebase>Firebase</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ title=オブジェクト指向でなぜつくるのか>オブジェクト指向でなぜつくるのか</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2023 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
