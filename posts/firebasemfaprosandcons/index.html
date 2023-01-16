@@ -3,12 +3,12 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>Firebase多要素認証におけるメールアドレス変更の仕様 - しょ〜んの技術メモ😗</title>
+<title>Firebase多要素認証のメリットデメリット - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="Firebase多要素認証におけるメールアドレス変更の仕様">
-<meta name=twitter:description content="Firebase多要素認証を導入したことで、メールアドレス変更後にログアウトしたりとメールアドレス変更周りの動作に違いがあったので、検証しま">
+<meta name=twitter:title content="Firebase多要素認証のメリットデメリット">
+<meta name=twitter:description content="Firebase多要素認証 今年の夏あたりに追加されたFirebase Authenticationの新機能 メールアドレス+パスワードの通常の認">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
@@ -36,55 +36,124 @@
 <main class=main role=main>
 <article class=post>
 <header class=post__header>
-<h1 class=post__title>Firebase多要素認証におけるメールアドレス変更の仕様</h1>
+<h1 class=post__title>Firebase多要素認証のメリットデメリット</h1>
 <div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-12-27T00:00:00Z>December 27, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2023-01-16T00:00:00Z>January 16, 2023</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/firebase/ rel=category>Firebase</a>
 </span>
 </div></div>
 </header><div class="content post__content clearfix">
-<p>Firebase多要素認証を導入したことで、メールアドレス変更後にログアウトしたりとメールアドレス変更周りの動作に違いがあったので、検証しました。</p>
-<p>iOSで検証してはいますが、Androidでも同じ仕様のようです。</p>
-<p>(Firebase ver10.2.0)</p>
-<h2 id=メールアドレス変更>メールアドレス変更</h2>
-<h3 id=多要素認証関係ない仕様>多要素認証関係ない仕様</h3>
-<p>変更には直近(大体10分以内)の認証が必要です。</p>
-<p>メールアドレス変更直前に再度ログインさせるのが無難です。</p>
-<p>ログインから時間が経過しすぎるとエラーとして<code>.requiresRecentLogin</code>が返ってきます。</p>
-<p>また、メールアドレス変更のメソッドを実行すると確認メールが届き、リンクをタップし次第メールアドレス変更が確定となります。</p>
-<p>具体的には、</p>
+<h2 id=firebase多要素認証>Firebase多要素認証</h2>
+<ul>
+<li>今年の夏あたりに追加されたFirebase Authenticationの新機能</li>
+<li>メールアドレス+パスワードの通常の認証にプラスして、登録した携帯電話番号のSMSに確認コードを送って本人確認する</li>
+<li>(少ないユーザー数なら)無料！</li>
+</ul>
+<h2 id=メリットデメリット>メリット/デメリット</h2>
+<p>メリット</p>
 <ol>
-<li>新しいメールアドレスに確認メールが届く。確認メールのリンクタップで変更が確定。</li>
-<li>変更確定すると、古いメールアドレスにメールアドレスが変更されたというお知らせメールが届く。</li>
-<li>もしお知らせメールのリンクをタップすると、メールアドレスが古い方に戻る。</li>
+<li>超簡単に実装できる</li>
+<li>ユーザーの所在国問わずSMS認証ができる</li>
+<li>様々なプラットフォームのSDKが用意されている</li>
 </ol>
-<h3 id=多要素認証導入前>多要素認証導入前</h3>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>changeEmail</span>(email: String) async <span style=color:#66d9ef>throws</span> {
-    <span style=color:#66d9ef>try</span> await Auth.auth().currentUser?.updateEmail(to: email)
-}
-</code></pre></div><h3 id=多要素認証導入後>多要素認証導入後</h3>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>changeEmail</span>(email: String) async <span style=color:#66d9ef>throws</span> {
-    <span style=color:#66d9ef>try</span> await Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email)
-}
-</code></pre></div><p>多要素認証を導入すると、メールアドレス変更が確定すると強制ログアウトされる、という仕様が追加されます。</p>
+<p>デメリット</p>
 <ol>
-<li>新しいメールアドレスに確認メールが届く。確認メールのリンクタップで変更が確定。
-→強制ログアウト</li>
-<li>変更確定すると、古いメールアドレスにメールアドレスが変更されたというお知らせメールが届く。</li>
-<li>もしお知らせメールのリンクをタップすると、メールアドレスが古い方に戻る。
-→もしここでタップしたらまた強制ログアウト</li>
+<li>電話番号認証をするが、1人1アカウントは保証されない</li>
+<li>メールや電話番号を別DBと同期できない</li>
+<li>弱いパスワードを排除できない</li>
 </ol>
-<p>ログアウト、と言ってもリアルタイムではなく、Authが認証情報を再読み込みするタイミング?(詳細不明)で<code>Auth.auth().currentUser</code>がnilになってしまいます。</p>
-<p><code>Auth.auth().currentUser.reload</code>で強制再読み込みさせれば、最新のログイン状態が取れます。</p>
-<p>メールアドレス変更後は、<code>Auth.auth().currentUser.reload</code>を実行し再ログインさせるのが良さそうです。</p>
-<p>（また、確認メールをタップするのはいつでもできてしまうので、変なタイミングでログアウトしても大丈夫なようにアプリを設計した方が良さそうです。）</p>
+<h2 id=メリット-超簡単に実装できる>メリット: 超簡単に実装できる</h2>
+<ul>
+<li>アプリ側はメソッドを1つ1つ呼んでいくだけで全部やってくれる
+<ul>
+<li>例: 電話番号を引数にメソッドを呼ぶだけで、SMSに確認コードを送信まで自動でやってくれる</li>
+</ul>
+</li>
+<li>アカウント管理が自動
+<ul>
+<li>パスワードを自分で管理しなくていい！</li>
+</ul>
+</li>
+<li>SMS送信が自動
+<ul>
+<li>SMS送信、人間の操作であることの確認、確認コードの生成や、一致チェック等々ハードルの高そうな作業を全部Googleにやってもらえる</li>
+</ul>
+</li>
+</ul>
+<h2 id=メリット-ユーザーの所在国問わずsms認証ができる>メリット: ユーザーの所在国問わずSMS認証ができる</h2>
+<ul>
+<li>日本だけでなく、海外のユーザーもSMS認証ができる
+<ul>
+<li>簡単にサービスのグローバル展開が可能</li>
+</ul>
+</li>
+<li>+81 90 1234 5678のような国際電話番号で管理されるので、国番号を選択するUIなどが必要になる</li>
+</ul>
+<h2 id=メリット-様々なプラットフォームのsdkが用意されている>メリット: 様々なプラットフォームのSDKが用意されている</h2>
+<ul>
+<li>対応プラットフォームは、iOS、Android、Flutter、Web(JS)、C++、Unity</li>
+<li>基本的に同じように実装できる</li>
+</ul>
+<h2 id=デメリット-電話番号認証をするが1人1アカウントは保証されない>デメリット: 電話番号認証をするが、1人1アカウントは保証されない</h2>
+<ul>
+<li>電話番号が既存ユーザーと同じであるかのチェックはされない
+<ul>
+<li>多要素認証を1人1アカウントまでに制限する手段としてよく使われるが、その用途には使用できない</li>
+</ul>
+</li>
+<li>一応電話番号登録時にadmin sdkで同一の電話番号が登録されていないかチェックすることならできるはず……。</li>
+</ul>
+<h2 id=デメリット-メールや電話番号を別dbと同期できない>デメリット: メールや電話番号を別DBと同期できない</h2>
+<ul>
+<li>メール、電話番号の変更タイミングに通知を受け取ったり、そのタイミングで別DBを書かせたりすることができない</li>
+<li>想定外のタイミングでメール、電話番号が変更されることがある
+<ul>
+<li>メールの変更は、確認メールのリンクを押下したときに確定される、押さないと変更されない</li>
+<li>電話番号の登録は登録確認メールのリンクから解除できてしまう</li>
+</ul>
+</li>
+<li>メールと電話番号はFirebase Authのみで管理するのが無難</li>
+</ul>
+<h2 id=デメリット-弱いパスワードを排除できない>デメリット: 弱いパスワードを排除できない</h2>
+<ul>
+<li>Firebase Auth標準のパスワード規則は<strong>6文字以上</strong>のみ
+<ul>
+<li>&ldquo;123456"も"aaaaaa"も登録できる</li>
+<li>なぜか"ああああああ"も"รหัสผ่าน"も登録できる</li>
+</ul>
+</li>
+<li>新規登録の時にパスワードのバリデーション→抜け道あり
+<ul>
+<li>「パスワードを忘れた」メールアドレスにパスワードリセットのリンクが送信されて、ブラウザ上で新パスワードが設定できてしまうので、バリデーションをすり抜けたパスワードが設定できる</li>
+</ul>
+</li>
+<li>パスワード規則を設定できるようになりそう……?
+<a href=https://cloud.google.com/identity-platform/docs/password-policy>https://cloud.google.com/identity-platform/docs/password-policy</a></li>
+</ul>
+<h2 id=まとめ>まとめ</h2>
+<p>簡単に多要素認証を実装できるが、カスタマイズの自由度は低い</p>
+<ol>
+<li>電話番号認証をするが、1人1アカウントは保証されない
+<ul>
+<li>複数アカウント防止の目的に使用しない</li>
+</ul>
+</li>
+<li>メールや電話番号を別DBと同期できない
+<ul>
+<li>Firebase Authのみで管理する</li>
+</ul>
+</li>
+<li>弱いパスワードを排除できない
+<ul>
+<li>新規登録時にパスワードのバリデーションをする。</li>
+<li>「パスワードを忘れた」から設定された弱い&変なパスワードも許容するか、ユーザーに促して再設定させる</li>
+</ul>
+</li>
+</ol>
 </div>
 <footer class=post__footer>
 <div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
 <ul class=tags__list>
-<li class=tags__item>
-<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
-</li>
 <li class=tags__item>
 <a class="tags__link btn" href=/tags/firebase/ rel=tag>Firebase</a>
 </li>
