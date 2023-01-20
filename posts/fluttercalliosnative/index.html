@@ -1,0 +1,243 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>FlutterでiOSのネイティブ画面を表示する - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="FlutterでiOSのネイティブ画面を表示する">
+<meta name=twitter:description content="Flutterで作成したアプリから部分的にiOSで作成した画面を呼ぶ上で必要になったことをまとめました。 Method Channel Method Channelを利用して、Fl">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>FlutterでiOSのネイティブ画面を表示する</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2023-01-19T00:00:00Z>January 19, 2023</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/flutter/ rel=category>Flutter</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>Flutterで作成したアプリから部分的にiOSで作成した画面を呼ぶ上で必要になったことをまとめました。</p>
+<h2 id=method-channel>Method Channel</h2>
+<p>Method Channelを利用して、Flutterからネイティブのメソッドを呼び出すことができます。</p>
+<p>今回は、動画と説明ページを表示するための<code>VideoViewController</code>をネイティブで用意しました。</p>
+<p>この<code>VideoViewController</code>にビデオのURLと説明ページのURLを引数として渡し、モーダルとして表示してみます。</p>
+<p>参考
+<a href=https://zenn.dev/mukkun69n/articles/7438bae5082ed5>DartからAndroid / iOS等のメソッドを呼び出したい（Flutter MethodChannel）</a></p>
+<p>公式ドキュメント
+<a href=https://docs.flutter.dev/development/platform-integration/platform-channels>Writing custom platform-specific code</a></p>
+<h3 id=flutter側>Flutter側</h3>
+<p>main.dart</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dart data-lang=dart><span style=color:#66d9ef>import</span> <span style=color:#e6db74>&#39;package:flutter/services.dart&#39;</span>;
+
+<span style=color:#66d9ef>class</span> <span style=color:#a6e22e>_MyHomePageState</span> <span style=color:#66d9ef>extends</span> State<span style=color:#f92672>&lt;</span>MyHomePage<span style=color:#f92672>&gt;</span> {
+
+  Future showVideoScreen() <span style=color:#66d9ef>async</span> {
+    MethodChannel methodChannel <span style=color:#f92672>=</span> <span style=color:#66d9ef>const</span> MethodChannel(<span style=color:#e6db74>&#39;jp.wakasugi.chatFlutter/main&#39;</span>);
+    <span style=color:#66d9ef>try</span> {
+      <span style=color:#66d9ef>final</span> arguments <span style=color:#f92672>=</span> {
+        <span style=color:#e6db74>&#39;contentURL&#39;</span><span style=color:#f92672>:</span>
+            <span style=color:#e6db74>&#39;https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8&#39;</span>,
+        <span style=color:#e6db74>&#39;infoURL&#39;</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;https://google.com/&#39;</span>
+    };
+      <span style=color:#66d9ef>final</span> <span style=color:#66d9ef>String</span> result <span style=color:#f92672>=</span>
+        <span style=color:#66d9ef>await</span> methodChannel.invokeMethod(<span style=color:#e6db74>&#39;showVideoScreen&#39;</span>, arguments);
+      print(result);
+    } on PlatformException <span style=color:#66d9ef>catch</span> (e) {
+      print(e);
+    }
+  }
+
+  <span style=color:#960050;background-color:#1e0010>@</span>override
+  Widget build(BuildContext context) {...
+</code></pre></div><p>ネイティブのコードを呼びたいところで<code>showVideoScreen()</code>のメソッドを非同期で呼ぶと、ネイティブコードが実行されます。</p>
+<p><code>methodChannel = const MethodChannel('jp.wakasugi.chatFlutter/main');</code>でMethod Channelの識別用のStringを設定します。</p>
+<p>一意である必要があるため、&lsquo;アプリパッケージ名/チャンネル名&rsquo;とするのが一般的とのことです。</p>
+<p><code>methodChannel.invokeMethod('showVideoScreen', arguments);</code>でMethod Channelを通して<code>'showVideoScreen'</code>のメソッドが呼び出されます。</p>
+<p><code>arguments</code>にはネイティブ側に渡したい引数を渡します。StringやDictionary( = DartのMap)で渡すことができます。</p>
+<p>以下のURLから渡すときに使える型と変換について確認できます。</p>
+<p><a href=https://flutter.dev/docs/development/platform-integration/platform-channels#codec>codec</a></p>
+<h3 id=iosネイティブ側>iOSネイティブ側</h3>
+<p>AppDelegate.swift</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>UIKit</span>
+<span style=color:#66d9ef>import</span> <span style=color:#a6e22e>Flutter</span>
+
+<span style=color:#66d9ef>@UIApplicationMain</span>
+<span style=color:#66d9ef>@objc</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>AppDelegate</span>: FlutterAppDelegate {
+    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>let</span> methodChannelName = <span style=color:#e6db74>&#34;jp.wakasugi.chatFlutter/main&#34;</span>
+    
+    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>var</span> flutterViewController: FlutterViewController {
+        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>self</span>.window.rootViewController <span style=color:#66d9ef>as</span>! FlutterViewController
+    }
+    
+    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>application</span>(<span style=color:#66d9ef>_</span> application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -&gt; Bool {
+        
+        <span style=color:#66d9ef>let</span> methodChannel = FlutterMethodChannel(name: methodChannelName, binaryMessenger: flutterViewController.binaryMessenger)
+        methodChannel.setMethodCallHandler { [<span style=color:#66d9ef>weak</span> <span style=color:#66d9ef>self</span>] methodCall, result  <span style=color:#66d9ef>in</span>
+            <span style=color:#66d9ef>if</span> methodCall.method == <span style=color:#e6db74>&#34;showVideoScreen&#34;</span> {
+                <span style=color:#66d9ef>let</span> arguments = methodCall.arguments <span style=color:#66d9ef>as</span>! [String: String]
+                <span style=color:#66d9ef>self</span>?.showVideoScreen(contentURL: arguments[<span style=color:#e6db74>&#34;contentURL&#34;</span>]<span style=color:#f92672>!</span>, infoURL: arguments[<span style=color:#e6db74>&#34;infoURL&#34;</span>]<span style=color:#f92672>!</span>)
+            } <span style=color:#66d9ef>else</span> {
+                result(FlutterError(code: <span style=color:#e6db74>&#34;ErrorCode&#34;</span>, message: <span style=color:#e6db74>&#34;ErrorMessage&#34;</span>, details: <span style=color:#66d9ef>nil</span>))
+            }
+        }
+        GeneratedPluginRegistrant.register(with: <span style=color:#66d9ef>self</span>)
+        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>super</span>.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+    
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>showVideoScreen</span>(contentURL: String, infoURL: String) {
+        <span style=color:#66d9ef>let</span> video = UIStoryboard(name: <span style=color:#e6db74>&#34;Video&#34;</span>, bundle: <span style=color:#66d9ef>nil</span>).instantiateInitialViewController()<span style=color:#f92672>!</span> <span style=color:#66d9ef>as</span>! VideoViewController
+        video.contentURL = URL(string: contentURL)
+        video.infoURL = URL(string: infoURL)
+        flutterViewController.present(video, animated: <span style=color:#66d9ef>true</span>)
+    }
+}
+</code></pre></div><p><code>application(.. didFinishLaunchingWithOptions ..)</code>内で<code>methodChannel.setMethodCallHandler(..)</code>でMethod Channelを受け取る場所を作成します。</p>
+<p>Flutter側と</p>
+<ul>
+<li>Method Channelの名前</li>
+<li>メソッド名</li>
+<li>argumentsの型</li>
+</ul>
+<p>この3つが正しければ、正常に受け取りができるかと思います。</p>
+<p>どうしても型を手動でキャストしなければいけないのが微妙だなぁと思っていたら、↓のような方法もあるようです。</p>
+<p><a href=https://zenn.dev/kotaro666/articles/method-channel-with-pigeon>【Flutter】型安全に MethodChannel でネイティブとデータ通信を行う</a></p>
+<h3 id=できたこと>できたこと</h3>
+<p>どこから呼び出してもiOS側ではflutterViewControllerが実行していることになるので、ネイティブ側で複数画面を順番に呼び出したり、TabBarやNavigationControllerなどを使うこともできそうです。</p>
+<p>今回は<code>present()</code>でモーダルを表示していますが、モーダルを閉じるとそのままFlutter側の画面に戻ってきて、Flutterで作った画面で動作が継続できました。通常のモーダルと同じように使えます。</p>
+<h2 id=iosとandroidやその他で処理を変える>iOSとAndroid(やその他)で処理を変える</h2>
+<p>Method ChannelはiOSでもAndroidでも利用可能な方法ですが、</p>
+<p>iOS → ネイティブ呼び出し</p>
+<p>Android → Flutterのまま実行</p>
+<p>という動作にしたい場合などは環境によって実行を変える必要があります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dart data-lang=dart><span style=color:#66d9ef>if</span> (Platform.isIOS) {
+  <span style=color:#75715e>// MethodChannelによる処理
+</span><span style=color:#75715e></span>} <span style=color:#66d9ef>else</span> {
+  <span style=color:#75715e>// Flutterによる処理
+</span><span style=color:#75715e></span>}
+</code></pre></div><p><a href=https://www.automation-technology.info/index.php/2021/07/10/post-359/>【Flutter】実行環境がiOSかAndroidか判断</a></p>
+<p>Method Channelだけで実装するのではなく、Flutterでも実装しておくとAndroidだけではなくWebアプリやMacなどに展開する時にとりあえず動くので、良さそうです。</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/flutter/ rel=tag>Flutter</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/ios/ rel=tag>iOS</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/fluttercalliosnative/>FlutterでiOSのネイティブ画面を表示する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebasemfaprosandcons/>Firebase多要素認証のメリットデメリット</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthhowtostartmfa/>Firebase多要素認証まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency/>Firebase Auth MFA x Swift Concurrency</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency2/>Firebase多要素認証におけるメールアドレス変更の仕様</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecodeend/>リーダブルコード読了感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop11-12/>オブジェクト指向でなぜつくるのか 11章12章感想(終)</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop10/>オブジェクト指向でなぜつくるのか 10章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop9/>オブジェクト指向でなぜつくるのか 9章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop7-8/>オブジェクト指向でなぜつくるのか 7章8章感想</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/firebase/>Firebase</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/flutter/>Flutter</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/firebase/ title=Firebase>Firebase</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/flutter/ title=Flutter>Flutter</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ios/ title=iOS>iOS</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ title=オブジェクト指向でなぜつくるのか>オブジェクト指向でなぜつくるのか</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2023 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
