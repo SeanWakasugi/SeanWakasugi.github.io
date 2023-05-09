@@ -1,0 +1,231 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>M1MacでLLMを動かす - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="M1MacでLLMを動かす">
+<meta name=twitter:description content="Chat GPTを代表にLLM(大規模言語モデル)が盛り上がっています。 Chat GPTは優秀ですが、自社のサービスに活かすことを考えると、オンラインでOp">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>M1MacでLLMを動かす</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2023-05-09T00:00:00Z>May 09, 2023</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/llm/ rel=category>LLM</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>Chat GPTを代表にLLM(大規模言語モデル)が盛り上がっています。</p>
+<p>Chat GPTは優秀ですが、自社のサービスに活かすことを考えると、オンラインでOpen AIと通信しなくてはいけないことが一番のネックになると思っています。</p>
+<p>顧客の個人情報やプライバシーのある情報を外部に通信すること、
+もしくは自社の価値あるデータをプロンプトに入力すること、
+これらによるリスクは避けられません。</p>
+<p>また、Chat GPTでは独自のモデルや追加学習を使えないことも、他サービスとの差別化が難しいところです。</p>
+<p>そこで、ローカルでLLMを動かしたい！　と考えました。</p>
+<h2 id=オープンソースのllm-llama>オープンソースのLLM LLaMA</h2>
+<p>Chat GPTの中身であるGPT-3.5やGPT-4のモデルは公開されていません。</p>
+<p>Metaが公開したLLaMAという言語モデルはオープンソースで公開されています。<br>
+<a href=https://github.com/facebookresearch/llama>https://github.com/facebookresearch/llama</a><br>
+ただし、商用利用は禁止されており、学術研究目的でしか使用できません。<br>
+また、モデルをダウンロードするにはgitHubに貼ってあるフォームを入力して返答を待つ必要があります。(4/28にフォームを送信しましたが、1週間強経ってもまだ返信はありませんでした……。)</p>
+<p>LLaMAをさらに改造して、Chat GPTっぽい振る舞いをさせようとしたモデルがAlpacaです。<br>
+<a href=https://github.com/tatsu-lab/stanford_alpaca>https://github.com/tatsu-lab/stanford_alpaca</a><br>
+Alpacaは、LLaMAをGPT(正確には<code>text-davinci-003</code>)の学習データを使ってチューニングしています。これにより命令追従性(=問いかけに対してより呼応した返答をしてくれる)が高まりChat GPTで想像するような"会話ができる"LLMを実現しています。<br>
+詳しくはAlpacaをまとめている分かりやすい記事を: <a href=https://note.com/npaka/n/n1a0ab681dc70>https://note.com/npaka/n/n1a0ab681dc70</a><br>
+今回のモデルはこのAlpacaを使いました。</p>
+<p>このモデルをM1Macで動かせるllama.cppというCとC++で書かれた実行環境を使います。
+<a href=https://github.com/ggerganov/llama.cpp>https://github.com/ggerganov/llama.cpp</a></p>
+<h2 id=インストール手順>インストール手順</h2>
+<p>cloneしたllama.cppのルートで<code>make</code>します。
+<a href=https://github.com/ggerganov/llama.cpp#build>https://github.com/ggerganov/llama.cpp#build</a></p>
+<p>Alpacaはとりあえずすぐ動かせるggmlをアップロードしてくださっている方がいたのでそちらを利用します。
+<a href=https://huggingface.co/Sosaka/Alpaca-native-4bit-ggml/blob/main/ggml-alpaca-7b-q4.bin>https://huggingface.co/Sosaka/Alpaca-native-4bit-ggml/blob/main/ggml-alpaca-7b-q4.bin</a>
+このファイルを<code>models</code>フォルダ下に直接置きます。</p>
+<p><code>./examples/alpaca.sh</code>を実行します。
+<a href=https://github.com/ggerganov/llama.cpp#instruction-mode-with-alpaca>https://github.com/ggerganov/llama.cpp#instruction-mode-with-alpaca</a></p>
+<p>こんな感じで動きます。</p>
+<pre><code>llama_init_from_file: kv self size  = 1024.00 MB
+
+system_info: n_threads = 7 / 8 | AVX = 0 | AVX2 = 0 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | FMA = 0 | NEON = 1 | ARM_FMA = 1 | F16C = 0 | FP16_VA = 1 | WASM_SIMD = 0 | BLAS = 1 | SSE3 = 0 | VSX = 0 | 
+main: interactive mode on.
+Reverse prompt: '### Instruction:
+
+'
+sampling: temp = 0.200000, top_k = 10000, top_p = 0.950000, repeat_last_n = 64, repeat_penalty = 1.100000
+generate: n_ctx = 2048, n_batch = 256, n_predict = -1, n_keep = 23
+
+
+== Running in interactive mode. ==
+ - Press Ctrl+C to interject at any time.
+ - Press Return to return control to LLaMa.
+ - If you want to submit another line, end your input in '\'.
+
+ Below is an instruction that describes a task. Write a response that appropriately completes the request.
+&gt; 
+</code></pre><h2 id=動作テスト>動作テスト</h2>
+<p>利用したのは、MacBook Air(M1, 2020)です。メモリは16GBですが、それ以外は一番安いモデルです。</p>
+<p>動かす前は、初代M1だしノートパソコンだし動くのかな〜と心配していました。</p>
+<p>実際は、爆速でした。</p>
+<p><img src=alpaca_bakusoku.gif alt=爆速></p>
+<p>私の英語を読むスピードが追いつけないレベルなのでスピードはもう十分だと感じています。</p>
+<p>今回はAlpaca-7B(7 Billionのパラメータの意)のquantized(?)を利用しているので、必要なメモリは3.9GBあれば大丈夫なようです。もう一個上の13Bもメモリ7.8GBで動作するとのことなので、動きそうです。</p>
+<p>ついでに、Windows2台でも試しました。</p>
+<p>1: ゲーミングデスクトップ<br>
+Corei7-10700 / メモリ 16GB / RTX2070 super</p>
+<p>M1 Macと同程度の速度でした。<br>
+なお、llama.cppはCPUしか使っていないようなのでGPUは関係ないはずです。<br>
+Corei7とM1は同程度の性能ということでしょうか。</p>
+<p>2: 一般ノートパソコン(友人に検証手伝ってもらいました)<br>
+Corei3-8130U / メモリ 8GB / 内蔵GPU</p>
+<p>めちゃめちゃ遅かったとのことです。<br>
+入力ももたついて、返答も10分で1単語見える程度でした。<br>
+1時間かかって以下のスクショの状態まで進んだらしく。</p>
+<p><img src=old_windows.jpg alt=遅い></p>
+<h2 id=llmはモバイル端末上で動くのか>LLMはモバイル端末上で動くのか？</h2>
+<p>LLMはモバイル端末上で動きます。もう動いているサンプルもいくつかありました。</p>
+<p>iPhone 14(GPT-J)
+<a href="https://twitter.com/antimatter15/status/1644456371121954817?s=20">https://twitter.com/antimatter15/status/1644456371121954817?s=20</a></p>
+<p>iPhone TestFlightで試せましたが、かなりスピードが速いです。
+<a href=https://mlc.ai/mlc-llm/>https://mlc.ai/mlc-llm/</a></p>
+<p>Pixel 6(LLaMa)
+<a href="https://twitter.com/thiteanish/status/1635188333705043969?s=20">https://twitter.com/thiteanish/status/1635188333705043969?s=20</a></p>
+<p>Raspberry Pi4(LLaMa)
+<a href=https://twitter.com/miolini/status/1634982361757790209>https://twitter.com/miolini/status/1634982361757790209</a></p>
+<p>次は</p>
+<ul>
+<li>モバイル端末で動かすこと</li>
+<li>日本語を喋らせること</li>
+<li>LLMに自前の学習データを追加学習させること</li>
+</ul>
+<p>を学習していきたいです。</p>
+<h2 id=おまけ>おまけ</h2>
+<p>AIが同じ言葉をひたすら繰り返して止まらなくなり、暴走して怖かったスクショです。</p>
+<p><img src=ai_no_bousou.png alt=AIの暴走></p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/llama/ rel=tag>LLaMA</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/applesilicon/ rel=tag>AppleSilicon</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/llmonm1mac/>M1MacでLLMを動かす</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fluttercalliosnative/>FlutterでiOSのネイティブ画面を表示する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebasemfaprosandcons/>Firebase多要素認証のメリットデメリット</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthhowtostartmfa/>Firebase多要素認証まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency/>Firebase Auth MFA x Swift Concurrency</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency2/>Firebase多要素認証におけるメールアドレス変更の仕様</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecodeend/>リーダブルコード読了感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop11-12/>オブジェクト指向でなぜつくるのか 11章12章感想(終)</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop10/>オブジェクト指向でなぜつくるのか 10章感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop9/>オブジェクト指向でなぜつくるのか 9章感想</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/firebase/>Firebase</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/flutter/>Flutter</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/llm/>LLM</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/applesilicon/ title=AppleSilicon>AppleSilicon</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/cocoapods/ title=CocoaPods>CocoaPods</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/firebase/ title=Firebase>Firebase</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/flutter/ title=Flutter>Flutter</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ios/ title=iOS>iOS</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/llama/ title=LLaMA>LLaMA</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftpm/ title=SwiftPM>SwiftPM</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ title=オブジェクト指向でなぜつくるのか>オブジェクト指向でなぜつくるのか</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2023 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
