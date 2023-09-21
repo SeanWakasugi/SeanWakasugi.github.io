@@ -1,0 +1,158 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>自然言語処理の基礎感想 - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="自然言語処理の基礎感想">
+<meta name=twitter:description content="ChatGPTないしLLMを活用したサービス研究をする中、自然言語処理について基礎から学ぶ必要性に駆られ、自然言語処理を研究していた方にこの">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>自然言語処理の基礎感想</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2023-09-21T00:00:00Z>September 21, 2023</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>ChatGPTないしLLMを活用したサービス研究をする中、自然言語処理について基礎から学ぶ必要性に駆られ、自然言語処理を研究していた方にこの本を勧められて購入しました。</p>
+<p>正直なところ、機械学習の初学者にとってこの本は難しかったです。それでも自然言語処理について基礎的な部分からどのように発展してきたか、そしてGPTまで体系的に流れを学べたことには価値がありました。トピックごとに本からキーワードをピックアップし、ChatGPTに質問して前提知識を増やしながら読むことでかなり勉強になりました。以下のまとめでは、本に書いていることだけではなくChatGPTやネットの記事を参照して補完し、この本を読む前の自分が理解できるレベルで書いています。誤りや適切ではない表現を使っている点があるかもしれませんが、ご了承ください。</p>
+<p>1章は自然言語処理の基本的な部分の解説です。自然言語を処理する上での大きな課題である「曖昧性」、1つの言葉が複数の解釈が可能な点を説明しています。基本的な自然言語へのアプローチとして「形態素解析」「構文解析」「意味解析」と呼ばれる、文章を単語などの単位に分割し、文法的、構造的に解釈する方法論を紹介しています。</p>
+<p>2章は機械学習を用いて自然言語処理をする方法について触れています。例えば、文章がポジティブかネガティブか判断する文章分類の処理を行いたいとします。&ldquo;bad"という単語が含まれるとネガティブ、&ldquo;good"という単語が含まれるとポジティブというルールベースでの分類では限界があります。自然言語による入力をあるパラメータによって変換して出力することでその処置が行えると仮定し、適切なパラメータを探し出すために正しい入力-出力のペアで機械学習を行うことで、ルールベースよりも汎用な処理が高速に作成できます。パラメータを多層にしたニューラルネットワークにより複雑なタスクができます。</p>
+<p>3章は単語ベクトル表現についてです。機械学習では単語をベクトルに変換して処理するので、より単語の性質を表したベクトルに変換する必要があります。単語自体の特徴(例: 品詞、語幹など)を反映する基本的な手法から発展して、文脈によって単語の意味は決まっているという仮説「分布仮説」に基づいてある単語と文脈との関連の強さを計算するアイディアが生まれました。実際に、ニューラルネットワークを使うことで、文脈の中の単語の意味をニューラルネットワークが利用する実数空間に埋め込む「単語埋め込み(word embedding)」が実現しました。</p>
+<p>4章は文や文章などの単語より広い範囲についてベクトル表現を扱っています。文全体のベクトルを構成している単語の合成によってを求めるアプローチがいくつかあります。「再帰型ニューラルネットワーク」は、文の最初の単語から順番にベクトルの合成を繰り返すことで、全部の単語の情報が入り、文脈や並びの順番も反映されるメリットがあります。しかし、全ての単語を"記憶"していることが原因で、最初の方の単語の影響が大きすぎてしまい後の単語の影響が小さくなる「勾配消失」や逆に直近の単語の影響が大きすぎて不安定になる「勾配爆発」の問題があります。これらの解決のため、特定のタイミングで"忘却"させる「LSTM」「ゲート付き再帰ユニット」などのアプローチがあります。</p>
+<p>5章はベクトル表現を拡張して文章を生成する方法についてです。単語の羅列について、それが文章であるかの確率(自然さ)をモデル化した「言語モデル」というものがあり、与えられた文章が自然な文章かどうかを判別することができます。言語モデルを利用して、前方の文脈から最も自然な次の単語を探索することで文章生成を行うことができます。ニューラル言語モデルでは、前方の文脈のベクトルから次の単語ベクトルを予測するニューラルネットワークのパラメータを学習で求めます。</p>
+<p>言語モデルの発展として、入力文を出力文に変換するモデル「系列変換モデル」を使うと、機械翻訳などのタスクを行うことができます。系列変換モデルは、入力の単語の列から特徴ベクトルの作成する「エンコーダ」、特徴ベクトルから出力を作成する「デコーダ」、単語の重要度を判断して重みづけをする「注意機構」がエンコーダをデコーダを繋ぐようにできています。</p>
+<p>6章は「Transformer」と呼ばれる系列変換モデルの重要なアーキテクチャについてです。一番の特徴は「自己注意機構」があることで、エンコーダ内で単語ベクトルから周辺単語を考慮したベクトルを学習、再計算することで、文脈に応じたベクトル計算を実現しています。自己注意機構は、系列変換モデルの注意機構や再帰型ニューラルネットワークの忘却の仕組みなどの複数の仕組みをシンプルに統合したような役割があります。Transformerを用いたモデルは様々な分野で高い性能を発揮しています。</p>
+<p>7章はTransformerによって発展した大規模な事前学習モデルとそれらモデルを調整するファインチューニングについてです。今まではベクトル化とベクトルを利用するタスクのモデルは別々でしたが、事前学習したベクトル化のモデルのパラメータを後段タスクのモデルでも使うアプローチが現れました。大規模事前学習を行ったモデルとして、「GPT」「BERT」「BART, T5」などがあります。GPTはTransformerのデコーダを採用しており、文章生成に強い特徴があります。BERTはエンコーダを採用し、文章分類などに強いです。BART, T5はBERTとGPTを組み合わせており、GPTと比較して、要約、対話、機械翻訳など入力文に強く条件づけられた言語生成タスクに強いです。</p>
+<p>ベクトル化モデルのパラメータを後段タスクのモデルでも使う際に、訓練データを用いてパラメータを調整することで、特定のタスクやトピック(例えば特定の言語)が扱えるよう適応させることができ、これを「ファインチューニング」と呼びます。例えば、機械翻訳を行うためにmBART(多言語対応BART)に10万~1000万対訳文章セットの追加学習を行うことで、ゼロから訓練するよりも顕著に高い性能になると報告されています。</p>
+<p>パラメータが多い大規模な事前学習モデルは性能がいいですが、動作にマシンスペックや時間が要求されるので、軽くするためのアプローチとして「知識蒸留」があります。大規模モデル(教師モデル)の挙動を真似るように小規模モデル(生徒モデル)を訓練することです。DistilBERTはパラメータ数40%でBERTの97%の性能を発揮していると報告されています。</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/%E8%87%AA%E7%84%B6%E8%A8%80%E8%AA%9E%E5%87%A6%E7%90%86%E3%81%AE%E5%9F%BA%E7%A4%8E/ rel=tag>自然言語処理の基礎</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/fundamentalsofnlp/>自然言語処理の基礎感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/appstorepreorder/>AppStoreの予約注文について</a></li>
+<li class=widget__item><a class=widget__link href=/posts/llmonm1mac/>M1MacでLLMを動かす</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fluttercalliosnative/>FlutterでiOSのネイティブ画面を表示する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebasemfaprosandcons/>Firebase多要素認証のメリットデメリット</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthhowtostartmfa/>Firebase多要素認証まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency/>Firebase Auth MFA x Swift Concurrency</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency2/>Firebase多要素認証におけるメールアドレス変更の仕様</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecodeend/>リーダブルコード読了感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/whyoop11-12/>オブジェクト指向でなぜつくるのか 11章12章感想(終)</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/appstore/>AppStore</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/firebase/>Firebase</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/flutter/>Flutter</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/llm/>LLM</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/applesilicon/ title=AppleSilicon>AppleSilicon</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/appstore/ title=AppStore>AppStore</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/cocoapods/ title=CocoaPods>CocoaPods</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/firebase/ title=Firebase>Firebase</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/flutter/ title=Flutter>Flutter</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ios/ title=iOS>iOS</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/llama/ title=LLaMA>LLaMA</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftpm/ title=SwiftPM>SwiftPM</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ title=オブジェクト指向でなぜつくるのか>オブジェクト指向でなぜつくるのか</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%87%AA%E7%84%B6%E8%A8%80%E8%AA%9E%E5%87%A6%E7%90%86%E3%81%AE%E5%9F%BA%E7%A4%8E/ title=自然言語処理の基礎>自然言語処理の基礎</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2023 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
