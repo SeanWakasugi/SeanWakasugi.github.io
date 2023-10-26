@@ -1,0 +1,260 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>UIKitからSwiftUIに移行する際のアーキテクチャについて - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="UIKitからSwiftUIに移行する際のアーキテクチャについて">
+<meta name=twitter:description content="Appleとしては、iOSアプリはSwiftUIに移行していく流れのようです。 UIKitも引き続きサポートされていますが、ウィジェットなどS">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>UIKitからSwiftUIに移行する際のアーキテクチャについて</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2023-10-26T00:00:00Z>October 26, 2023</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>Appleとしては、iOSアプリはSwiftUIに移行していく流れのようです。
+UIKitも引き続きサポートされていますが、ウィジェットなどSwiftUIでしか書けないようなケースも増えてきており、既存アプリも徐々にSwiftUIに移行し始めても良さそうです。</p>
+<p>ただ、アプリ内でSwiftUIとUIKitが混ざる場合はどこまでSwiftUI、どこまでUIKitと明確に線引きをしないと、SwiftUIとUIKitの橋渡しだけでコードが煩雑になってしまいます。
+以下、SwiftUIとUIKitの線引きとして考えられるケースとSwiftUIとUIKitのシンプルな橋渡しの方法を書いていきます。</p>
+<h2 id=ケース1-1画面だけのモーダルをswiftuiで作成する>ケース1: 1画面だけのモーダルをSwiftUIで作成する</h2>
+<p>UIViewControllerからSwiftUIで書いたモーダルを呼び出して表示するだけのシンプルな場合です。</p>
+<pre><code class=language-mermaid data-lang=mermaid>graph TB
+    A[UIKit App] --&gt; B[UIKit UIViewController] --&gt; C[UIKit UIHostingViewController] --&gt; D[SwiftUI View]
+</code></pre><p>重要なのは、Viewから呼び出し元のUIViewControllerを参照したり、UIViewController側からViewのメソッドを呼んだりしないようにすることです。
+UINavigationControllerを参照してpush/popすることも、複雑になるので避けたほうが良いです。
+Navigationを使いたい場合は、ケース2を参考にNavigationごとSwiftUIに移行するほうが簡単です。</p>
+<p>既存のUIViewControllerから以下のようにモーダルで呼ぶのが一番楽な実装です。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>let</span> privacy = UIHostingController(rootView: PrivacyView())
+present(privacy, animated: <span style=color:#66d9ef>true</span>)
+</code></pre></div><p>閉じるボタンを実装したい場合は、SwiftUI側で以下のように呼ぶだけです。</p>
+<p>iOS 14以下をサポートする場合</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift>    @Environment(<span style=color:#960050;background-color:#1e0010>\</span>.presentationMode) <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>var</span> presentationMode
+    <span style=color:#66d9ef>var</span> body: some View {
+        Button {
+            presentationMode.wrappedValue.dismiss()
+        } label {
+            Image(systemName: <span style=color:#e6db74>&#34;xmark&#34;</span>)
+        }
+    }
+</code></pre></div><p>iOS 15以上のみのサポートの場合</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift>    @Environment(<span style=color:#960050;background-color:#1e0010>\</span>.dismiss) <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>var</span> dismiss
+        <span style=color:#66d9ef>var</span> body: some View {
+        Button {
+            dismiss()
+        } label {
+            Image(systemName: <span style=color:#e6db74>&#34;xmark&#34;</span>)
+        }
+    }
+</code></pre></div><p>UIViewController側を触らずとも、SwiftUI側でdismiss()することで、UIHostingControllerがdismiss()してくれます。</p>
+<h2 id=ケース2-1navigationだけswiftuiで作成する>ケース2: 1NavigationだけSwiftUIで作成する</h2>
+<p>1つのUINavigationControllerとその下で遷移するUIViewController群を、SwiftUIに置き換える方法です。</p>
+<p>例えばこのようにUITabBarControllerがビューのルートにあり、各タブにUINavigationControllerがセットされて、タブ内だけで遷移していくようなアプリがあるとします。</p>
+<pre><code class=language-mermaid data-lang=mermaid>graph LR
+    B[UITabBarController]
+    B --&gt; C[UINavigationController]
+    C --&gt; CC[UIViewController]
+    CC --&gt; CCC[UIViewController]
+    B --&gt; D[UINavigationController]
+    D --&gt; DD[UIViewController]
+    DD --&gt; DDD[UIViewController]
+    B --&gt; E[UINavigationController]
+    E --&gt; EE[UIViewController]
+    EE --&gt; EEE[UIViewController]
+</code></pre><p>この中で、UINavigationController1つと、その下のUIViewControllerをSwiftUIに置き換えるとします。</p>
+<pre><code class=language-mermaid data-lang=mermaid>graph LR
+    B[UITabBarController]
+    B --&gt; C[UIKit UIHostingViewController]
+    C --&gt; Cx[SwiftUI NavigationView]
+    Cx --&gt; CC[SwiftUI View]
+    CC --&gt; CCC[SwiftUI View]
+    B --&gt; D[UINavigationController]
+    D --&gt; DD[UIViewController]
+    DD --&gt; DDD[UIViewController]
+    B --&gt; E[UINavigationController]
+    E --&gt; EE[UIViewController]
+    EE --&gt; EEE[UIViewController]
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>PrivacyViewController</span>: UIHostingController&lt;PrivacyView&gt; {
+    <span style=color:#66d9ef>init</span>() {
+        <span style=color:#66d9ef>super</span>.<span style=color:#66d9ef>init</span>(rootView: PrivacyView())
+    }
+
+    <span style=color:#75715e>// PrivacyViewControllerがStoryboardからインスタンス化されるなら必要</span>
+    <span style=color:#66d9ef>required</span> <span style=color:#66d9ef>init</span>?(coder aDecoder: NSCoder) {
+        <span style=color:#66d9ef>super</span>.<span style=color:#66d9ef>init</span>(coder: aDecoder, rootView: PrivacyView())
+    }
+}
+</code></pre></div><p>この場合、UIKitのビューコントローラをUIViewControllerRepresentableを使ってSwiftUIと互換性のある形にラップします。ナビゲーションフローはSwiftUIを使いますが、具体的な画面の実装はUIKitを使い続けます。</p>
+<h2 id=ケース3-swiftuiでアプリを作り直す>ケース3: SwiftUIでアプリを作り直す</h2>
+<p>アプリの全体をSwiftUIで書き直す選択肢もあります。この場合、全てのビューコントローラやビューがSwiftUIのものに置き換わります。</p>
+<pre><code class=language-mermaid data-lang=mermaid>graph TB
+    A[SwiftUI App] --&gt; B{SwiftUI View}
+    B --&gt; C[SwiftUI SubView]
+</code></pre><p>ここでは、アプリ全体がSwiftUIで書かれています。これは一番きれいな方法ですが、全てを一度に書き換えるのは時間と労力がかかるため、大規模なアプリではこの方法を選ぶのは難しいかもしれません。</p>
+<h2 id=対応osバージョンについて>対応OSバージョンについて</h2>
+<p>SwiftUIは発展途上で、使えるメソッドが違ったり、同じメソッドでも仕様が大きく変わることがあります。
+iOS14~サポートのアプリで開発する機会があったので、iOS14以降でバージョンごとに大きく変わることを書いておきます。</p>
+<h3 id=ios15>iOS15</h3>
+<p>プルリフレッシュ <code>.refreshable</code> が使えます。</p>
+<p><a href=https://developer.apple.com/documentation/swiftui/view/refreshable(action:)>refreshable(action:) | Apple Developer Documentation</a></p>
+<p>プルリフレッシュ特有のインタラクションはUIKit+SwiftUIで再現するのが難しいので、これ以前ではプルリフレッシュできないと考えた方が良いです。</p>
+<h3 id=ios16>iOS16</h3>
+<p><code>NavigationStack</code> が使えます。</p>
+<p><a href=https://developer.apple.com/documentation/swiftui/migrating-to-new-navigation-types>Migrating to new navigation types | Apple Developer Documentation</a></p>
+<p><code>NavigationView</code> はiOS17までサポートのはずですが、画面遷移が起こるボタンを同時押しするとナビゲーションバーがおかしくなって、元の画面に戻れない状態になるなど致命的な問題があります。iOS15未満をサポートする場合以下のようなメソッドを利用することを推奨します。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift>@ViewBuilder
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>NavigationStackOrView</span>&lt;Content: View&gt;(@ViewBuilder content: () -&gt; Content) -&gt; some View {
+    <span style=color:#66d9ef>if</span> <span style=color:#75715e>#available</span>(<span style=color:#75715e>iOS</span> <span style=color:#ae81ff>16.0</span>, <span style=color:#f92672>*</span>) {
+        NavigationStack {
+            content()
+        }
+    } <span style=color:#66d9ef>else</span> {
+        NavigationView {
+            content()
+        }
+    }
+}
+</code></pre></div><h3 id=ios17>iOS17</h3>
+<p>Swift Macrosが扱えるようになり、コードをシンプルに書くうえで大きな進化があります。</p>
+<p><code>@Observable</code> が使えます。</p>
+<p><a href=https://developer.apple.com/documentation/swiftui/managing-model-data-in-your-app>Managing model data in your app | Apple Developer Documentation</a></p>
+<p><code>#Preview</code> が使えます。</p>
+<p><a href=https://developer.apple.com/documentation/swiftui/previews-in-xcode>Previews in Xcode | Apple Developer Documentation</a></p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swiftui/ rel=tag>SwiftUI</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/uikit/ rel=tag>UIKit</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/swiftui+uikit/>UIKitからSwiftUIに移行する際のアーキテクチャについて</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fundamentalsofnlp/>自然言語処理の基礎感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/appstorepreorder/>AppStoreの予約注文について</a></li>
+<li class=widget__item><a class=widget__link href=/posts/llmonm1mac/>M1MacでLLMを動かす</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fluttercalliosnative/>FlutterでiOSのネイティブ画面を表示する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebasemfaprosandcons/>Firebase多要素認証のメリットデメリット</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthhowtostartmfa/>Firebase多要素認証まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency/>Firebase Auth MFA x Swift Concurrency</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency2/>Firebase多要素認証におけるメールアドレス変更の仕様</a></li>
+<li class=widget__item><a class=widget__link href=/posts/readablecodeend/>リーダブルコード読了感想</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/appstore/>AppStore</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/firebase/>Firebase</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/flutter/>Flutter</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/llm/>LLM</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/applesilicon/ title=AppleSilicon>AppleSilicon</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/appstore/ title=AppStore>AppStore</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/cocoapods/ title=CocoaPods>CocoaPods</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/firebase/ title=Firebase>Firebase</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/flutter/ title=Flutter>Flutter</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ios/ title=iOS>iOS</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/llama/ title=LLaMA>LLaMA</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftpm/ title=SwiftPM>SwiftPM</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftui/ title=SwiftUI>SwiftUI</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ title=オブジェクト指向でなぜつくるのか>オブジェクト指向でなぜつくるのか</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%87%AA%E7%84%B6%E8%A8%80%E8%AA%9E%E5%87%A6%E7%90%86%E3%81%AE%E5%9F%BA%E7%A4%8E/ title=自然言語処理の基礎>自然言語処理の基礎</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2023 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
