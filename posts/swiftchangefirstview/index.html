@@ -1,0 +1,312 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>SwiftUIで起動時の画面の出しわけ - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="SwiftUIで起動時の画面の出しわけ">
+<meta name=twitter:description content="SwiftUIを使用してアプリ起動時にユーザーステータスに応じて画面を表示し分ける個人的ベストプラクティスを説明します。 前提として、Swif">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>SwiftUIで起動時の画面の出しわけ</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2024-04-24T00:00:00Z>April 24, 2024</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>SwiftUIを使用してアプリ起動時にユーザーステータスに応じて画面を表示し分ける個人的ベストプラクティスを説明します。</p>
+<p>前提として、SwiftUIで画面遷移に使われるNavigationViewは親Viewから任意に画面遷移を管理したりするのが困難です。(iOS16~で使えるNavigationStackではある程度解決していますが、Viewの外から画面を書き換えるような構造でないことは変わりません)
+そのため、ユーザーステータスなどに左右される画面遷移をコードで制御するのにNavigationViewを使うのはあまり適していません。</p>
+<p>この記事は、起動時の画面出し分けと、起動後ユーザーの操作によって画面遷移していく場合に同じロジックや状態管理を使うための実装です。
+NavigationViewは画面を単純に積み上げていく場合のみ使い、ユーザーステータスに応じて応じて画面を表示し分けるのは <code>@State</code> などによる表示内容の変更を使う、というのがメインの趣旨です。</p>
+<h2 id=最小実装>最小実装</h2>
+<p>ユーザーがログインしているかどうかに基づき、メイン画面またはログイン画面を切り替えるというアプリを例に説明します。</p>
+<h3 id=全体構造>全体構造</h3>
+<p><code>ContentView</code> では、<code>@AppStorage</code> を使用してユーザーのログイン状態を管理します。<code>@AppStorage</code> は UserDefaults に保存され、アプリを閉じても値が保持されます。これにより、アプリが起動するたびにユーザーのログイン状態に基づいて適切な画面が表示されます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>ContentView</span>: View {
+    <span style=color:#75715e>// @Stateと同じように変化するとViewの更新を発火する。</span>
+    <span style=color:#75715e>// 裏側はUserDefaultsに保存されているので、アプリを閉じても残る</span>
+    @AppStorage(<span style=color:#e6db74>&#34;isLoggedIn&#34;</span>) <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>var</span> isLoggedIn = <span style=color:#66d9ef>false</span>
+
+    <span style=color:#66d9ef>var</span> body: some View {
+        <span style=color:#66d9ef>if</span> isLoggedIn {
+            <span style=color:#75715e>// ログイン中ならMainView表示</span>
+            NavigationStackOrView {
+                MainView(isLoggedIn: <span style=color:#960050;background-color:#1e0010>$</span>isLoggedIn)
+            }
+        } <span style=color:#66d9ef>else</span> {
+            <span style=color:#75715e>// ログアウト中ならLoginView表示</span>
+            NavigationStackOrView {
+                LoginView(isLoggedIn: <span style=color:#960050;background-color:#1e0010>$</span>isLoggedIn)
+            }
+        }
+    }
+}
+</code></pre></div><p>注: <code>NavigationStackOrView</code> はiOS ~15では <code>NavigationView</code>、 iOS 16~では <code>NavigationStack</code> を使うようなラッパーです。</p>
+<h3 id=ログインログアウト処理>ログイン・ログアウト処理</h3>
+<p>ログイン画面とメイン画面では、<code>@Binding</code> を使用して <code>isLoggedIn</code> フラグをバインドし、ログインボタンとログアウトボタンのアクションでこのフラグを切り替えることができます。</p>
+<p><code>isLoggedIn</code> は <code>@AppStorage</code> がついているので、 <code>@State</code> と同じように値の変化によりViewの変更が発火します。
+ログインボタンやログアウトボタンで <code>isLoggedIn</code> を変更することで、起動時の画面出し分けと同じロジックで、メイン画面やログイン画面へ遷移することができます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>LoginView</span>: View {
+    @Binding <span style=color:#66d9ef>var</span> isLoggedIn: Bool
+
+    <span style=color:#66d9ef>var</span> body: some View {
+        <span style=color:#75715e>// ログインボタンを押すとMainViewに遷移</span>
+        Button(<span style=color:#e6db74>&#34;ログイン&#34;</span>) {
+            <span style=color:#75715e>// @Bindingで受け取っているので変更すると@AppStorageも変更される</span>
+            isLoggedIn = <span style=color:#66d9ef>true</span>
+        }
+    }
+}
+
+<span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>MainView</span>: View {
+    @Binding <span style=color:#66d9ef>var</span> isLoggedIn: Bool
+
+    <span style=color:#66d9ef>var</span> body: some View {
+        <span style=color:#75715e>// ログアウトボタンを押すとLoginViewに遷移</span>
+        Button(<span style=color:#e6db74>&#34;ログアウト&#34;</span>) {
+            <span style=color:#75715e>// @Bindingで受け取っているので変更すると@AppStorageも変更される</span>
+            isLoggedIn = <span style=color:#66d9ef>false</span>
+        }
+    }
+}
+</code></pre></div><h2 id=アニメーションの追加>アニメーションの追加</h2>
+<p><code>isLoggedIn</code> を変更することで、メイン画面やログイン画面へ遷移することができるのですが、この遷移は標準ではアニメーションがありません。
+アプリ内でプッシュ遷移を主に使っている場合は、メイン画面に遷移するときだけアニメーションがないのは違和感があるでしょう。
+<code>ContentView</code> に <code>.animation</code> と <code>.transition</code> を追加し、プッシュ遷移風のアニメーションを実現します。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>ContentView</span>: View {
+    @AppStorage(<span style=color:#e6db74>&#34;isLoggedIn&#34;</span>) <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>var</span> isLoggedIn = <span style=color:#66d9ef>false</span>
+
+    <span style=color:#66d9ef>var</span> body: some View {
+        ZStack {
+            <span style=color:#66d9ef>if</span> isLoggedIn {
+                NavigationStackOrView {
+                    MainView(isLoggedIn: <span style=color:#960050;background-color:#1e0010>$</span>isLoggedIn)
+                }
+                .transition(pushTransition())
+            } <span style=color:#66d9ef>else</span> {
+                NavigationStackOrView {
+                    LoginView(isLoggedIn: <span style=color:#960050;background-color:#1e0010>$</span>isLoggedIn)
+                }
+                .transition(pushTransition())
+            }
+        }
+        <span style=color:#75715e>// animationを行う必要があるプロパティを指定</span>
+        .animation(.<span style=color:#66d9ef>default</span>, value: isLoggedIn)
+    }
+    <span style=color:#75715e>/// プッシュ風のTransition</span>
+    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>pushTransition</span>() -&gt; AnyTransition {
+        <span style=color:#66d9ef>return</span> .asymmetric(
+            <span style=color:#75715e>// 挿入時は右から移動アニメーション</span>
+            insertion: .move(edge: .trailing),
+            <span style=color:#75715e>// 削除時は左に1/3だけ移動するアニメーション</span>
+            removal: .offset(CGSize(width: <span style=color:#f92672>-</span>UIScreen.main.bounds.width <span style=color:#f92672>/</span> <span style=color:#ae81ff>2</span>, height: <span style=color:#ae81ff>0</span>))
+        )
+    }
+}
+</code></pre></div><p><code>pushTransition()</code> は標準のプッシュ遷移のアニメーションを真似して作った自作の <code>AnyTransition</code> です。
+iOS16〜のサポートですが、<code>push(from:)</code> という <code>AnyTransition</code> も用意されているので、そちらを利用する方法もあります。
+(私が試した範囲では、自作の <code>pushTransition()</code> の方がプッシュ遷移のアニメーションに似ていたように思いますが)</p>
+<p><a href=https://developer.apple.com/documentation/SwiftUI/AnyTransition/push(from:)>push(from:) | Apple Developer Documentation</a></p>
+<h3 id=environmentobjectで値の受け渡しをシンプルに>EnvironmentObjectで値の受け渡しをシンプルに</h3>
+<p>紹介した方法では、各画面に <code>isLoggedIn</code> のバインドを渡す必要があり、出し分けをする画面の種類が増えたり、ログアウトボタンなど <code>isLoggedIn</code> を変更するViewの階層が深くなった際にバインドの受け渡しが面倒です。</p>
+<p><code>EnvironmentObject</code> を使うと、アプリケーション全体の状態を管理し、異なるビュー間でデータを共有するのが簡単になります。親ビューから子ビューへとデータを直接継承することなく、必要なビューで直接データにアクセスできるようになります。</p>
+<p>アプリのログイン状態を管理するために、例えば <code>AuthManager</code> というクラスを定義し、<code>isLoggedIn</code> をプロパティとして持たせることができます。これを <code>EnvironmentObject</code> として親View(今回は最も親であryContentView)に注入することで、その子Viewである全てのアプリのViewからアクセスできるようになります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>AuthManager</span>: ObservableObject {
+    @AppStorage(<span style=color:#e6db74>&#34;isLoggedIn&#34;</span>) <span style=color:#66d9ef>var</span> isLoggedIn = <span style=color:#66d9ef>false</span>
+    <span style=color:#75715e>// 永続化しない場合は</span>
+    <span style=color:#75715e>// @Published var isLoggedIn = false</span>
+}
+
+@main
+<span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>MyApp</span>: App {
+    @StateObject <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>var</span> authManager = AuthManager()
+
+    <span style=color:#66d9ef>var</span> body: some Scene {
+        WindowGroup {
+            ContentView()
+                .environmentObject(authManager)
+        }
+    }
+}
+
+<span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>ContentView</span>: View {
+    @EnvironmentObject <span style=color:#66d9ef>var</span> authManager: AuthManager
+
+    <span style=color:#66d9ef>var</span> body: some View {
+        <span style=color:#66d9ef>if</span> authManager.isLoggedIn {
+            NavigationStackOrView {
+                MainView()
+            }
+        } <span style=color:#66d9ef>else</span> {
+            NavigationStackOrView {
+                LoginView()
+            }
+        }
+    }
+}
+
+<span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>LoginView</span>: View {
+    @EnvironmentObject <span style=color:#66d9ef>var</span> authManager: AuthManager
+
+    <span style=color:#66d9ef>var</span> body: some View {
+        Button(<span style=color:#e6db74>&#34;ログイン&#34;</span>) {
+            authManager.isLoggedIn = <span style=color:#66d9ef>true</span>
+        }
+    }
+}
+
+<span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>MainView</span>: View {
+    @EnvironmentObject <span style=color:#66d9ef>var</span> authManager: AuthManager
+
+    <span style=color:#66d9ef>var</span> body: some View {
+        Button(<span style=color:#e6db74>&#34;ログアウト&#34;</span>) {
+            authManager.isLoggedIn = <span style=color:#66d9ef>false</span>
+        }
+    }
+}
+</code></pre></div><p>この例では、<code>LoginView</code> や <code>MainView</code> で <code>AuthManager</code> を利用していますが、LoginViewの子Viewや、NavigationLink等で遷移した先(これも子Viewとして扱われます)であっても <code>AuthManager</code> を受け渡しなしで利用できます。</p>
+<h3 id=まとめ>まとめ</h3>
+<p>NavigationViewは画面を単純に積み上げていく場合のみ使い、ユーザーステータスに応じて応じて画面を表示し分けるのは <code>@State</code> などによる表示内容の変更を行いましょう。</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swiftui/ rel=tag>SwiftUI</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/ios/ rel=tag>iOS</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/swiftchangefirstview/>SwiftUIで起動時の画面の出しわけ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/automaticallymanagesigning/>Automatically manage signingのススメ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/swiftui+uikit/>UIKitからSwiftUIに移行する際のアーキテクチャについて</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fundamentalsofnlp/>自然言語処理の基礎感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/appstorepreorder/>AppStoreの予約注文について</a></li>
+<li class=widget__item><a class=widget__link href=/posts/llmonm1mac/>M1MacでLLMを動かす</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fluttercalliosnative/>FlutterでiOSのネイティブ画面を表示する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebasemfaprosandcons/>Firebase多要素認証のメリットデメリット</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthhowtostartmfa/>Firebase多要素認証まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthconcurrency/>Firebase Auth MFA x Swift Concurrency</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/appstore/>AppStore</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/firebase/>Firebase</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/flutter/>Flutter</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios/>iOS</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/llm/>LLM</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/xcode/>Xcode</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/applesilicon/ title=AppleSilicon>AppleSilicon</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/appstore/ title=AppStore>AppStore</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/cocoapods/ title=CocoaPods>CocoaPods</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/firebase/ title=Firebase>Firebase</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/flutter/ title=Flutter>Flutter</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ios/ title=iOS>iOS</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/llama/ title=LLaMA>LLaMA</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftpm/ title=SwiftPM>SwiftPM</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftui/ title=SwiftUI>SwiftUI</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/xcode/ title=Xcode>Xcode</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ title=オブジェクト指向でなぜつくるのか>オブジェクト指向でなぜつくるのか</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%87%AA%E7%84%B6%E8%A8%80%E8%AA%9E%E5%87%A6%E7%90%86%E3%81%AE%E5%9F%BA%E7%A4%8E/ title=自然言語処理の基礎>自然言語処理の基礎</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2024 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
