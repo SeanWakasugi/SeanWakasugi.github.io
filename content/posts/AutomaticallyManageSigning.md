@@ -41,10 +41,13 @@ Xcode開発でSigning周りは本当に面倒ですが、Automatically manage si
 そこで、キャッシュを消します。
 
 > ・SigningのProvisioning profile Xcode Managed Profile の右にある i をクリックします
+>
 > ・Prov アイコンをデスクトップにドラッグ＆ドロップする等してファイル名を確認します
-> ・cd ~/Library/MobileDevice/Provisioning\ Profiles
-でプロビジョニングファイルがあるディレクトリに移動します
+>
+> ・cd ~/Library/MobileDevice/Provisioning\ Profilesでプロビジョニングファイルがあるディレクトリに移動します
+>
 > ・rm で先ほど調べたファイル名のファイルを削除します
+> 
 > ・Xcode Managed Profile の右にある i をクリックし、Provisioning profile の作成日が正しいことを確認します
 
 引用元(一部抜粋、修正)
