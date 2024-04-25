@@ -3,12 +3,12 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>オブジェクト指向でなぜつくるのか 9章感想 - しょ〜んの技術メモ😗</title>
+<title>ExtensionでCrashlyticsを利用 - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="オブジェクト指向でなぜつくるのか 9章感想">
-<meta name=twitter:description content="この記事では、SwiftでiOSアプリのプログラミングをする初学者として、 「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計">
+<meta name=twitter:title content="ExtensionでCrashlyticsを利用">
+<meta name=twitter:description content="Widget(ウィジェット)やShare(共有)などのApp Extensionや、VPNなどのNetwork Extensionなど、Exte">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
@@ -36,46 +36,66 @@
 <main class=main role=main>
 <article class=post>
 <header class=post__header>
-<h1 class=post__title>オブジェクト指向でなぜつくるのか 9章感想</h1>
+<h1 class=post__title>ExtensionでCrashlyticsを利用</h1>
 <div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2022-10-18T00:00:00Z>October 18, 2022</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/ rel=category>本まとめ</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2024-04-25T00:00:00Z>April 25, 2024</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
 </span>
 </div></div>
 </header><div class="content post__content clearfix">
-<p>この記事では、SwiftでiOSアプリのプログラミングをする初学者として、</p>
-<p>「オブジェクト指向でなぜつくるのか 第3版 知っておきたいOOP、設計、アジャイル開発の基礎知識」</p>
-<p><a href=https://www.amazon.co.jp/dp/4296000187>https://www.amazon.co.jp/dp/4296000187</a></p>
-<p>の感想、学びになった点を書いていきます。</p>
-<h2 id=9章-モデリング>9章: モデリング</h2>
-<p>現実世界とソフトウエアの間には大きなギャップがある、それを埋めるためのモデリング。</p>
-<ul>
-<li>このギャップを埋めるためには、現実世界の様子を整理する「業務分析」</li>
-<li>コンピュータにまかせる仕事の範囲を決める「要件定義」</li>
-<li>ソフトウエアの構造を定義する「設計」</li>
-</ul>
-<h2 id=ビジネスアプリケーションdxソフトの例>ビジネスアプリケーション（DXソフト）の例</h2>
-<p>現実の出来事を記録するアプリケーション</p>
-<ul>
-<li>「業務分析」現実の仕事をアクティビティ図を使って仕事の様子を理解する</li>
-<li>「要件定義」ユースケース図を使って誰（どのユーザー）にどんな機能を提供するか考える</li>
-<li>「要件定義」管理する情報の構造を表現する概念データモデルをクラス図を使って考える</li>
-</ul>
-<p>「設計」は次の章で解説されるようです。</p>
-<h2 id=感想>感想</h2>
-<p>私は、ソフトウェアを作る、となると、ユーザーの課題を解決しなければ！　とか最先端の技術を活かしたい！　とかを一番に思いついてしまいます。</p>
-<p>そのため、現実世界とソフトウエアの間の大きなギャップを埋める、という視点は私にとって新しいものでした。</p>
-<p>開発をしていると、現実世界ではないソフトウェアの世界を動かすのが上手くなりますが、ソフトウェアの世界と現実世界をどう関連づけるかが結局ソフトウェアの価値となるはずです。</p>
-<p>今後は、例えば新しい技術を習得したときに、これは現実世界で言うと何が起こるのか、考えるようにしたいです。</p>
+<p>Widget(ウィジェット)やShare(共有)などのApp Extensionや、VPNなどのNetwork Extensionなど、Extensionでもクラッシュやエラーの追跡は重要です。
+ExtensionでのCrashlyticsの設定方法をまとめました。</p>
+<p>なお、Firebase公式はApp Extension等でのFirebaseの動作をサポートしていません。</p>
+<p><a href=https://github.com/firebase/firebase-ios-sdk/issues/6605>Add Firebase to iOS app extension · Issue #6605 · firebase/firebase-ios-sdk · GitHub</a></p>
+<p>ただ、上記Issueの中で開発メンバーは</p>
+<blockquote>
+<p>Crashlytics should just work.</p>
+</blockquote>
+<p>と述べており、Crashlytics程度の利用であれば問題ないと考えられます。(実際私が導入したアプリでもクラッシュやエラーの送信は行えています)</p>
+<h2 id=firebaseコンソールのセットアップ>Firebaseコンソールのセットアップ</h2>
+<p>Extensionをアプリ本体とは別のアプリとして登録する必要があります。</p>
+<p>Firebaseコンソールで「プロジェクトの設定」→「アプリを追加」と進み、「AppleバンドルID」の欄にExtensionのバンドルIDを入れます。</p>
+<p>その後生成される <code>GoogleService-Info.plist</code> をExtensionのフォルダ下に置いてください。</p>
+<p>公式ドキュメント:
+<a href="https://firebase.google.com/docs/ios/setup?hl=ja">Firebase を Apple プロジェクトに追加する  |  Firebase for Apple platforms</a></p>
+<p>試してはいませんが、複数のExtensionでも同じように追加できそうです。</p>
+<h2 id=firebaseライブラリのインストール>Firebaseライブラリのインストール</h2>
+<p>Firebase CrashlyticsとAnalyticsをCocoaPodsや、Swift PMを利用してインストールしてください。</p>
+<p>通常、アプリ本体のターゲットのみに追加されるので、Extensionにも追加されるようにしてください。</p>
+<p>Swift PMの場合は、該当Extensionの「General」の「Frameworks and Libraries」からFirebase CrashlyticsとAnalyticsを追加します。</p>
+<h2 id=開発本番の動的なgoogleservice-infoplistの使い分け>開発/本番の動的なGoogleService-Info.plistの使い分け</h2>
+<p>開発と本番で別のFirebaseプロジェクトに向ける場合は、ビルドのConfigurationに応じてファイルを置き換える処理が必要です。</p>
+<p>Extensionのフォルダのルート下の <code>Config/</code> に <code>GoogleServiceProd.plist</code> と <code>GoogleServiceDev.plist</code> を置き、ExtensionのBuild Phasesから新たなRun Scriptを追加してください。入力ファイル、出力ファイルの設定は不要です。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>CONFIGURATION<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;Release&#34;</span> <span style=color:#f92672>]</span>; <span style=color:#66d9ef>then</span>
+  cp <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>PROJECT_DIR<span style=color:#e6db74>}</span><span style=color:#e6db74>/</span><span style=color:#e6db74>${</span>TARGET_NAME<span style=color:#e6db74>}</span><span style=color:#e6db74>/Config/GoogleServiceProd.plist&#34;</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>BUILT_PRODUCTS_DIR<span style=color:#e6db74>}</span><span style=color:#e6db74>/</span><span style=color:#e6db74>${</span>WRAPPER_NAME<span style=color:#e6db74>}</span><span style=color:#e6db74>/GoogleService-Info.plist&#34;</span>
+<span style=color:#66d9ef>else</span>
+  cp <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>PROJECT_DIR<span style=color:#e6db74>}</span><span style=color:#e6db74>/</span><span style=color:#e6db74>${</span>TARGET_NAME<span style=color:#e6db74>}</span><span style=color:#e6db74>/Config/GoogleServiceDev.plist&#34;</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>BUILT_PRODUCTS_DIR<span style=color:#e6db74>}</span><span style=color:#e6db74>/</span><span style=color:#e6db74>${</span>WRAPPER_NAME<span style=color:#e6db74>}</span><span style=color:#e6db74>/GoogleService-Info.plist&#34;</span>
+<span style=color:#66d9ef>fi</span>
+</code></pre></div><p>このスクリプトが行っている動作は、Extension動作時にFirebaseライブラリは、Extensionの直下の <code>GoogleService-Info.plist</code> というファイルを読みにいきます。</p>
+<p>このスクリプトは、ビルドされたプロダクトの位置 <code>${BUILT_PRODUCTS_DIR}</code> の TARGETとなるExtensionファイル <code>${WRAPPER_NAME}</code> の直下に <code>GoogleService-Info.plist</code> という名前でコピーしています。</p>
+<p><code>${WRAPPER_NAME}</code> は動作時に <code>{Extensionの名前}.appex</code> のような名前として解決されます。</p>
+<p>このコードはExtensionに限らず、アプリ本体でも同じコードが使えます。</p>
+<p>アプリ本体の場合は <code>${WRAPPER_NAME}</code> が <code>{Appの名前}.app</code> というような名前に置き換わるので、正常な位置にコピーが行われます。</p>
+<h2 id=crashlyticsサーバにdsymファイルを送信するスクリプト>CrashlyticsサーバにdSYMファイルを送信するスクリプト</h2>
+<p><a href="https://firebase.google.com/docs/crashlytics/get-started?hl=ja&platform=ios#set-up-dsym-uploading">Firebase Crashlytics を使ってみる</a></p>
+<p>チュートリアルと完全に同じScriptで大丈夫です。
+TARGETに応じてビルド時に解決されるようなコードになっているので、ExtensionのdSYMも正常に送信してくれます。</p>
+<h2 id=firebaseの初期化とエラーの送信>Firebaseの初期化とエラーの送信</h2>
+<p>Firebase Crashlyticsを有効化するには、どこかで <code>FirebaseApp.configure()</code> を呼ばなくてはなりません。Extensionで使うクラスの <code>init()</code> など、Extensionが実行される前に一度だけ必ず実行される場所に書いておくことが推奨されます。</p>
+<p>クラッシュ時は自動的にエラーが送信されますが、それ以外の非致命的なエラーを送りたい場合は、<code>Crashlytics.crashlytics().record(error: Error)</code> が便利です。</p>
+<p>アプリと合わせて動くタイプのExtensionの場合は、なんらかの識別できるIDをセットしておくと <code>Crashlytics.crashlytics().setUserID(String)</code> アプリのエラーとの紐付けを行いやすいかもしれません。</p>
 </div>
 <footer class=post__footer>
 <div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
 <ul class=tags__list>
 <li class=tags__item>
-<a class="tags__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ rel=tag>オブジェクト指向でなぜつくるのか</a>
+<a class="tags__link btn" href=/tags/crashlytics/ rel=tag>Crashlytics</a>
 </li>
 <li class=tags__item>
-<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/firebase/ rel=tag>Firebase</a>
 </li>
 </ul>
 </div>
