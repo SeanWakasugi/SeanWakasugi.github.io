@@ -1,0 +1,221 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>iOSのTOTP(ワンタイムパスワード)まとめ - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="iOSのTOTP(ワンタイムパスワード)まとめ">
+<meta name=twitter:description content="TOTP(Time-based One-Time Password algorithm)とは、時間ベースで生成されるワンタイム(= 一回きりの)パスワードです。 iOSでは、Google Authentica">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>iOSのTOTP(ワンタイムパスワード)まとめ</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2024-04-25T00:00:00Z>April 25, 2024</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>TOTP(Time-based One-Time Password algorithm)とは、時間ベースで生成されるワンタイム(= 一回きりの)パスワードです。
+iOSでは、Google AuthenticatorやMicrosoft Authenticatorなどのアプリがよく利用されています。
+この記事では、iOSアプリでTOTPを利用する際の主な連携方法について説明します。
+技術的な実装詳細は省略します。</p>
+<h2 id=結論>結論</h2>
+<p>URL Scheme <code>otpauth</code> は認証アプリを直接開ける便利な方法ですが、サポートOSバージョンと、iOS標準の「パスワード」に対応するハードルがあります。</p>
+<p>また、ユーザーが使いやすく利用するには、現状 <code>otpauth</code> 以外のQRコードやシークレットキーのコピペなどの方法を用意することが推奨されます。</p>
+<h2 id=url-scheme-otpauth>URL Scheme <code>otpauth</code></h2>
+<p>以下の形式のURL Schemeを開くことで、TOTP対応アプリを開くことができます。</p>
+<p><code>otpauth://totp/Example:foo?secret=JBSWY3DPEHPK3PXP&issuer=Example</code></p>
+<p>書式詳細:
+<a href=https://github.com/google/google-authenticator/wiki/Key-Uri-Format>Key Uri Format · google/google-authenticator Wiki · GitHub</a></p>
+<p>Apple公式ドキュメント:
+<a href=https://developer.apple.com/documentation/authenticationservices/securing_logins_with_icloud_keychain_verification_codes>Securing Logins with iCloud Keychain Verification Codes | Apple Developer Documentation</a></p>
+<p>具体的にSwiftでは、以下のコードで開けます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift>UIApplication.shared.open(URL(string: <span style=color:#e6db74>&#34;otpauth://totp/Example:foo?secret=JBSWY3DPEHPK3PXP&amp;issuer=Example&#34;</span>)<span style=color:#f92672>!</span>)
+</code></pre></div><p>ただし、動作はOSバージョンによって差があります。</p>
+<h2 id=otpauth-のosバージョン別動作><code>otpauth</code> のOSバージョン別動作</h2>
+<h3 id=ios15>iOS15</h3>
+<p>(iOS15未満は検証していませんが、iOS15とも16以降とも動作が異なるようです)</p>
+<p><code>otpauth</code> を叩くと、必ずiOS標準の「パスワード」が開きます。</p>
+<p><code>otpauth</code> を利用してGoogle AuthenticatorなどのTOTPアプリを開くことはできません。
+一般的なTOTPアプリをサポートするにはQRコードからの登録や、シークレットキーの入力による登録など、他の登録方法が必要です。</p>
+<h3 id=ios16>iOS16~</h3>
+<p>(検証時点での最新OSはiOS17)</p>
+<p><code>otpauth</code> を叩くと、設定アプリ→パスワード→パスワードオプション→「次を使用して検証コードを設定:」で選択されているアプリが開きます。デフォルトだとiOS標準の「パスワード」になっています。
+TOTPアプリを選択するUIを表示したり、この設定画面を開いたり、コードから選択したりすることはできません。ユーザーに自分で設定アプリから設定してもらう必要があります。</p>
+<h2 id=ios16以降での対応アプリ>iOS16以降での対応アプリ</h2>
+<p><code>otpauth</code> のリンクは対応していないアプリでは開けません。設定画面で「次を使用して検証コードを設定:」選択肢に出てくるアプリのみ利用できます。</p>
+<p><code>otpauth</code> 対応アプリ</p>
+<ul>
+<li>パスワード(iOS設定アプリ)</li>
+<li>Google Authenticator</li>
+<li>Microsoft Authenticator</li>
+<li>Twilio Authy</li>
+<li>1Password</li>
+</ul>
+<p><code>otpauth</code> 非対応アプリ</p>
+<ul>
+<li>Salesforce Authenticator(QRコードによる登録のみ)</li>
+<li>LastPass Authenticator(QRコード、シークレットキーによる登録が可能)</li>
+</ul>
+<p>非対応アプリは、QRコードからの登録や、シークレットキーの入力による登録など、他の登録方法が必要です。</p>
+<h3 id=特定アプリを開く>特定アプリを開く</h3>
+<p><code>otpauth</code> を <code>apple-otpauth</code> に変更することで、設定アプリで選択されているアプリを無視して、パスワード(iOS設定アプリ)を開くことができます。</p>
+<p>他のアプリの同様の方法は見つかりませんでした。</p>
+<h2 id=パスワードのtotp発行機能>「パスワード」のTOTP発行機能</h2>
+<p>すでに「パスワード」に登録されているドメイン・アカウント名・パスワードのセットに紐つける形で設定できます。
+他のTOTPアプリとは異なり、すでにあるアカウントに紐つけずにTOTP単体で設定することはできません。</p>
+<p>bitbankさんの2段階認証のサポートページが参考になります。</p>
+<p><a href=https://support.bitbank.cc/hc/ja/articles/4412605007257-iOS%E3%81%AE%E8%A8%AD%E5%AE%9A%E3%81%AB%E3%81%82%E3%82%8B%E3%83%91%E3%82%B9%E3%83%AF%E3%83%BC%E3%83%89%E6%A9%9F%E8%83%BD%E3%81%8C%E8%A1%A8%E7%A4%BA%E3%81%95%E3%82%8C-%E4%BA%8C%E6%AE%B5%E9%9A%8E%E8%AA%8D%E8%A8%BC%E3%81%8C%E8%A8%AD%E5%AE%9A%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84>iOSの設定にあるパスワード機能が表示され、二段階認証が設定できない - bitbank</a></p>
+<p><code>otpauth</code> を開くと、すでに「パスワード」に登録されているアカウントの一覧が表示され、どのアカウントに紐つけるかの選択を促されます。
+この時、<code>otpauth</code> リンクの <code>issuer</code> クエリに入っているドメインと同一のアカウントが優先的に表示されます。</p>
+<p>ただし、<code>otpauth</code> を開いた時、必ずしもここにアカウントが登録されている状態にあるとは限りません。
+保存されているのは、事前にユーザーがブラウザ等でログインなどを行い、ログイン時にパスワードを保存することを同意した場合のみです。
+登録されていない場合は、ユーザーが+ボタンからドメイン、アカウント、パスワードを手動で登録する必要があり、ユーザーに親切とは言えません。</p>
+<p>Webの場合は事前にログインをしたり、アプリの場合はAssociated Domainsを設定した上でログインフローを先に通すことで、ユーザーにアカウント情報を「パスワード」に登録することを促すことはできますが、登録するかどうかはユーザーの同意に委ねられるため、同様の問題が残ります。</p>
+<p><a href=https://developer.apple.com/documentation/security/password_autofill/about_the_password_autofill_workflow>About the Password AutoFill workflow | Apple Developer Documentation</a></p>
+<h2 id=結論-1>結論</h2>
+<p>URL Scheme <code>otpauth</code> は認証アプリを直接開ける便利な方法ですが、サポートOSバージョンと、iOS標準の「パスワード」に対応するハードルがあります。</p>
+<p>また、ユーザーが使いやすく利用するには、現状 <code>otpauth</code> 以外のQRコードやシークレットキーのコピペなどの方法を用意することが推奨されます。</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/%E3%83%AF%E3%83%B3%E3%82%BF%E3%82%A4%E3%83%A0%E3%83%91%E3%82%B9%E3%83%AF%E3%83%BC%E3%83%89/ rel=tag>ワンタイムパスワード</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>Swift</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/totp/ rel=tag>totp</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/otpauth/>iOSのTOTP(ワンタイムパスワード)まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/swiftchangefirstview/>SwiftUIで起動時の画面の出しわけ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/automaticallymanagesigning/>Automatically manage signingのススメ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/swiftui+uikit/>UIKitからSwiftUIに移行する際のアーキテクチャについて</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fundamentalsofnlp/>自然言語処理の基礎感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/appstorepreorder/>AppStoreの予約注文について</a></li>
+<li class=widget__item><a class=widget__link href=/posts/llmonm1mac/>M1MacでLLMを動かす</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fluttercalliosnative/>FlutterでiOSのネイティブ画面を表示する</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebasemfaprosandcons/>Firebase多要素認証のメリットデメリット</a></li>
+<li class=widget__item><a class=widget__link href=/posts/firebaseauthhowtostartmfa/>Firebase多要素認証まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/appstore/>AppStore</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/firebase/>Firebase</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/flutter/>Flutter</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios/>iOS</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/llm/>LLM</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/xcode/>Xcode</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/applesilicon/ title=AppleSilicon>AppleSilicon</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/appstore/ title=AppStore>AppStore</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/cocoapods/ title=CocoaPods>CocoaPods</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/firebase/ title=Firebase>Firebase</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/flutter/ title=Flutter>Flutter</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ios/ title=iOS>iOS</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/llama/ title=LLaMA>LLaMA</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftpm/ title=SwiftPM>SwiftPM</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftui/ title=SwiftUI>SwiftUI</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/totp/ title=totp>totp</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/xcode/ title=Xcode>Xcode</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ title=オブジェクト指向でなぜつくるのか>オブジェクト指向でなぜつくるのか</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AF%E3%83%B3%E3%82%BF%E3%82%A4%E3%83%A0%E3%83%91%E3%82%B9%E3%83%AF%E3%83%BC%E3%83%89/ title=ワンタイムパスワード>ワンタイムパスワード</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%87%AA%E7%84%B6%E8%A8%80%E8%AA%9E%E5%87%A6%E7%90%86%E3%81%AE%E5%9F%BA%E7%A4%8E/ title=自然言語処理の基礎>自然言語処理の基礎</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2024 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
