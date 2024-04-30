@@ -1,0 +1,212 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>CryptoZombiesをやっただけの初心者がまとめるDAppsの特徴 - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="CryptoZombiesをやっただけの初心者がまとめるDAppsの特徴">
+<meta name=twitter:description content="ブロックチェーン、特にEthereum関連の技術を学ぶため、CryptoZombiesのBeginnerコースを学習しました。 #1 Solidity Tutorial & Ethereum Blockchain Programming">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>CryptoZombiesをやっただけの初心者がまとめるDAppsの特徴</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2024-04-30T00:00:00Z>April 30, 2024</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3/ rel=category>ブロックチェーン</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>ブロックチェーン、特にEthereum関連の技術を学ぶため、CryptoZombiesのBeginnerコースを学習しました。</p>
+<p><a href=https://cryptozombies.io/jp/course>#1 Solidity Tutorial & Ethereum Blockchain Programming Course | CryptoZombies</a></p>
+<p>CryptoZombiesはゾンビゲームを実際にコードを書きながら作る体験をすることで、DApps(Decentralized Apps・分散型アプリ)の動作と仕組みを学ぶコースでした。1週間程度で完了することができ、何らかのプログラミングの経験があればSolidity言語について知らなくてもついていけるレベル感でした。</p>
+<p>ブロックチェーン全くの初学者がCryptoZombiesのBeginnerコースを終わっただけの段階で、DAppsとは何なのか、備忘録としてまとめておきます。間違っている部分があると思いますが、悪しからず。</p>
+<h2 id=dappsとは>DAppsとは</h2>
+<p>DApps = Decentralized(分散型) Appsは、Centralized(中央集権型) Appsの逆です。
+サーバーから情報を持ってきて、ユーザーのアクションに応じてサーバーに送信するスマホアプリは中央集権型アプリと言えるでしょう。
+対照的に、DAppsは単一のサーバーを持たず、ブロックチェーン上でノード(デバイス)同士が直接やり取りしながら動作するアプリケーションです。</p>
+<p>ブロックチェーン上で動作すると言うとイメージが難しいのですが、やっていることは単純です。</p>
+<p>ブロックチェーンを使って、各デバイスで"プログラムのコードを共有"しているのです。
+(注: 正確には、コンパイルされたバイトコードです。)</p>
+<p>コードはブロックチェーンのトランザクションとして公開・デプロイされ、ブロックチェーンの一つのブロックに記録されます。</p>
+<p>このコードのことをスマートコントラクトと呼び、EthereumではSolidityという言語で書きます。
+各ノードは、Ethereum Virtual Machine(EVM)と呼ばれるスマートコントラクトの実行環境を備えており、同一のスマートコントラクトコードを実行します。EVMはさまざまなデバイスで実行できるようになっており、web3.jsやWeb3.swiftなどのライブラリを使用することで、スマートコントラクトを利用したアプリを開発できます。</p>
+<p>Java(Type)Scriptライブラリ:</p>
+<p><a href=https://github.com/web3/web3.js>GitHub - web3/web3.js: Collection of comprehensive TypeScript libraries for Interaction with the Ethereum JSON RPC API and utility functions.</a></p>
+<p>iOSライブラリ:</p>
+<p><a href=https://github.com/Boilertalk/Web3.swift>GitHub - Boilertalk/Web3.swift: A pure swift Ethereum Web3 library</a></p>
+<p>これらを利用することで、スマートコントラクトをバックエンドとしたアプリを作ることができます。</p>
+<p>ブロックチェーン上にプログラム(スマートコントラクト)をデプロイし、各ノードのEVMでそのプログラムを実行するアプリがDAppsです。</p>
+<p>例として、CryptoZombiesではweb3.jsライブラリを利用し、スマートコントラクトをバックエンドとしたWebアプリとしてゾンビゲームを作っています。</p>
+<h2 id=特徴1-ethereum上にトークンおよび通貨を持っているため直接的にアプリからユーザー間でのやり取りが可能>特徴1: Ethereum上にトークンおよび通貨を持っているため、直接的にアプリからユーザー間でのやり取りが可能</h2>
+<p>DAppsは独自のトークンや暗号通貨を使用して、アプリ内でユーザー間の直接的な取引ができます。</p>
+<p>CryptoZombiesでは2種類の取引が実装されていました。</p>
+<ul>
+<li>暗号通貨を支払って、「ゾンビ」のレベルを上げる機能</li>
+<li>作成、育成した「ゾンビ」を交換する機能</li>
+</ul>
+<p>Ethereum暗号通貨を介したやり取りが可能なのはもちろん、「ゾンビ」のようなゲーム固有のトークンをコピーのできない唯一のものとして所持したり交換したりできるのはDAppsならではの特徴です。
+もちろんサーバー型のゲームでもそのような設計はできますが、直接取引であることや、唯一であることを保証できる(トランザクションを検証できる)のがDAppsでしかできないことです。</p>
+<h2 id=特徴2-中央集権的でないため単一の管理者の不正やサーバーエラーが起きにくい>特徴2: 中央集権的でないため、単一の管理者の不正やサーバーエラーが起きにくい</h2>
+<p>多くのDAppsは中央集権的な管理者を持たず、各ノード同士のやり取りを通じて運用されます。
+そのため管理者の特権による不正が起こりにくいです。サーバー費用や維持費が安くなるメリットもあると考えられます。
+複数のノードがネットワークを維持するため、ノードのダウンタイムやエラーが発生しても、他のノードが機能を継続するなどの設計も考えられます。</p>
+<p>ただし、スマートコントラクトの設計によっては特権的な管理者を設定することはできますし、それにより管理者がある種の不正を行ったりする可能性はあります。しかし、その問題は特徴3の透明性により解決されます。</p>
+<h2 id=特徴3-スマートコントラクトの透明性>特徴3: スマートコントラクトの透明性</h2>
+<p>スマートコントラクトのソースコードとバイトコードは、ブロックチェーン上に公開されるため、誰でも内容を確認できます。
+システムの透明性が保たれ、ユーザーがスマートコントラクトがどのように機能しているかを正確に理解できます。悪意のあるプログラムも検知しやすいでしょう。
+ユーザーがサービスを信頼しやすくなるだけでなく、不具合や潜在的なセキュリティリスクを多数のユーザーにより検証することができます。</p>
+<p>しかし、スマートコントラクトは一度デプロイされると更新が難しく、変更を加えるためには新しいコントラクトをデプロイする必要があります。</p>
+<h2 id=dapps雑感>DApps雑感</h2>
+<p>既存アプリをDAppsに変えると何か革新的なことができる！　というわけではなさそうと感じました。
+サーバー型のアプリでもデジタルコンテンツの取引はできますし、ユーザーのデジタルコンテンツを唯一とみなす(ユニークにする)ような仕組みを作ることはできます。
+分散性や透明性は、これにより何か新しい体験をもたらすことができるわけではありません。</p>
+<p>DAppsの特徴を活かしたアプリが輝くのは今までアプリにできなかった領域ではないでしょうか。
+改竄できてしまうことや不透明性が大きな課題になっていて、アプリだったりサービスとして成立しなかったような領域です。例えば、政治とか医療とかが考えられます。</p>
+<p>投票DAppsを考えてみます。一国民一ノード持っているとします(この前提がすでに難しいですが)。スマートコントラクトには投票のロジックが書かれていて、投票によって発生するトランザクションは検証されてブロックチェーンのブロックとなります。
+投票のロジックの透明性や、投票が改竄されていないことを証明できることがメリットとなるでしょう。
+反面、DAppsで解決しない問題点も多くあります。ユーザーの投票が全世界に公開されてしまうこと、重複投票を防ぐこと、あとは他人のアプリを使って投票してしまうような問題を防げない、などなど。</p>
+<p>パッと思いついただけのこの投票DAppsはあまりうまくいきそうではありませんが、方向性としては似たような分散性や透明性が決め手となるような領域で輝くのかな、と考えています。</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3/ rel=tag>ブロックチェーン</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/ethereum/ rel=tag>ethereum</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/cryptozombies/>CryptoZombiesをやっただけの初心者がまとめるDAppsの特徴</a></li>
+<li class=widget__item><a class=widget__link href=/posts/extensioncrashlytics/>ExtensionでCrashlyticsを利用</a></li>
+<li class=widget__item><a class=widget__link href=/posts/otpauth/>iOSのTOTP(ワンタイムパスワード)まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/swiftchangefirstview/>SwiftUIで起動時の画面の出しわけ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/automaticallymanagesigning/>Automatically manage signingのススメ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/swiftui+uikit/>UIKitからSwiftUIに移行する際のアーキテクチャについて</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fundamentalsofnlp/>自然言語処理の基礎感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/appstorepreorder/>AppStoreの予約注文について</a></li>
+<li class=widget__item><a class=widget__link href=/posts/llmonm1mac/>M1MacでLLMを動かす</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fluttercalliosnative/>FlutterでiOSのネイティブ画面を表示する</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/appstore/>AppStore</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/firebase/>Firebase</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/flutter/>Flutter</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios/>iOS</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/llm/>LLM</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/xcode/>Xcode</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3/>ブロックチェーン</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/applesilicon/ title=AppleSilicon>AppleSilicon</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/appstore/ title=AppStore>AppStore</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/cocoapods/ title=CocoaPods>CocoaPods</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/crashlytics/ title=Crashlytics>Crashlytics</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ethereum/ title=ethereum>ethereum</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/firebase/ title=Firebase>Firebase</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/flutter/ title=Flutter>Flutter</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ios/ title=iOS>iOS</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/llama/ title=LLaMA>LLaMA</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftpm/ title=SwiftPM>SwiftPM</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftui/ title=SwiftUI>SwiftUI</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/totp/ title=totp>totp</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/xcode/ title=Xcode>Xcode</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ title=オブジェクト指向でなぜつくるのか>オブジェクト指向でなぜつくるのか</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3/ title=ブロックチェーン>ブロックチェーン</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AF%E3%83%B3%E3%82%BF%E3%82%A4%E3%83%A0%E3%83%91%E3%82%B9%E3%83%AF%E3%83%BC%E3%83%89/ title=ワンタイムパスワード>ワンタイムパスワード</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%87%AA%E7%84%B6%E8%A8%80%E8%AA%9E%E5%87%A6%E7%90%86%E3%81%AE%E5%9F%BA%E7%A4%8E/ title=自然言語処理の基礎>自然言語処理の基礎</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2024 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
