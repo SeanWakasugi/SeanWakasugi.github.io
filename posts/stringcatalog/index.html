@@ -1,0 +1,289 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>ローカライズなんて全く考えずに作ったプロジェクトをローカライズする方法 - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="ローカライズなんて全く考えずに作ったプロジェクトをローカライズする方法">
+<meta name=twitter:description content="ローカライズを全く考慮せずに開発したiOSアプリを、後からローカライズ対応する方法について説明します。すべてのテキストがハードコードされてい">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>ローカライズなんて全く考えずに作ったプロジェクトをローカライズする方法</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2024-08-05T00:00:00Z>August 05, 2024</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>ローカライズを全く考慮せずに開発したiOSアプリを、後からローカライズ対応する方法について説明します。すべてのテキストがハードコードされている状態から、テキストをローカライズファイルに分離し、複数言語に対応させるまでの手順をまとめます。</p>
+<p>参考公式動画: <a href=https://developer.apple.com/jp/videos/play/wwdc2023/10155/>String Catalogsの紹介 - WWDC23</a></p>
+<h2 id=結論-対応手順まとめ>結論: 対応手順まとめ</h2>
+<h3 id=ステップ1-使用したい言語を追加する>ステップ1: 使用したい言語を追加する</h3>
+<ol>
+<li>プロジェクトファイルのInfoタブを選択。</li>
+<li>Localizationsセクションの+ボタンをクリックし、言語を追加。</li>
+<li>言語をクリックし、下部の「Set Default」ボタンを押してデフォルト言語を設定。</li>
+</ol>
+<h3 id=ステップ2-string-catalogファイルを追加する>ステップ2: String Catalogファイルを追加する</h3>
+<ol>
+<li>Xcodeで「File > New > File」を選択。</li>
+<li>「String Catalog」を選択。</li>
+<li><code>Localizable.xcstrings</code> をターゲットのルートに作成。</li>
+<li>Build Settingsで <code>Use Compiler to Extract Swift Strings</code> を有効にする。</li>
+</ol>
+<h3 id=ステップ3-string-catalogに抽出されるようコードを編集>ステップ3: String Catalogに抽出されるようコードを編集</h3>
+<ul>
+<li>String Catalogはビルド時にローカライズ可能と認識される文字列を自動で抽出してくれる。
+<ul>
+<li>SwiftUIは、UIテキストをローカライズのKeyとして使う文字列に置き換える。(ハードコードされたテキストをそのままKeyとして使う場合は対応不要)</li>
+<li>SwiftUI以外のUIテキストを <code>String(localized: )</code> に置き換える。iOS15未満をサポートする場合は <code>NSLocalizedString( , comment: )</code>。</li>
+<li>StoryboardやNIBファイルは右のファイル設定から <code>Localize...</code> をクリックしてファイル専用のString Catalogを生成する。</li>
+<li>Info.plistは <code>InfoPlist.xcstrings</code> をInfo.plistと同じディレクトリに置く。</li>
+</ul>
+</li>
+<li>数値や日付などを自動でローカライズされるよう変更する 参考: <a href=https://qiita.com/mono0926/items/c41c1ce18b90b765a8f2>iOSアプリの国際化対応の勘所とTips集</a></li>
+</ul>
+<h3 id=ステップ4-string-catalogに翻訳を追加>ステップ4: String Catalogに翻訳を追加</h3>
+<ul>
+<li>String CatalogファイルはGUIで簡単に編集できる。</li>
+<li>翻訳を外部の翻訳者やツールに任せる場合は、Product > Export Localizationから <code>.xcloc</code> のXcode独自形式で書き出す。
+<ul>
+<li><code>.xcloc</code> ファイル内には翻訳でよく使われる <code>XLIFF</code> 形式が存在するので、翻訳ツールによってはこれを使う。</li>
+<li>翻訳した <code>.xcloc</code> ファイルはProduct > Import Localizationから取り込める。</li>
+</ul>
+</li>
+</ul>
+<h2 id=string-catalogについて>String Catalogについて</h2>
+<p>String Catalogは、従来分割されていた各言語のstringsファイル、strings dictionaryに変わる包括的な仕組みです。</p>
+<p>iOSバージョンに依存せず使用でき、既存のローカライズファイルからの変換も容易なので、Xcode 15以降であればString Catalogを使うことが推奨されます。</p>
+<h3 id=string-catalogの特徴>String Catalogの特徴</h3>
+<ul>
+<li>複数言語の翻訳を1つのファイルで管理できる</li>
+<li>ビルド時に自動的にローカライズ可能な文字列を抽出してくれる
+<ul>
+<li>コード側をすべてローカライズ可能な文字列に対応させることで、String Catalogに管理を任せることができる</li>
+</ul>
+</li>
+<li>翻訳の進捗状況を視覚的に確認可能</li>
+<li>複数のString Catalogファイルを使い分けることができる</li>
+</ul>
+<h3 id=string-catalogの作成方法>String Catalogの作成方法</h3>
+<ol>
+<li>Xcodeで「File > New > File」を選択。</li>
+<li>String Catalogを選択。</li>
+<li>コードから自動抽出するString Catalogは、 <code>Localizable.xcstrings</code> という名前でターゲットのルートに作成。</li>
+<li>Build Settingsで <code>Use Compiler to Extract Swift Strings</code> を有効にする。</li>
+</ol>
+<h3 id=string-catalogの文字列管理>String Catalogの文字列管理</h3>
+<p>Build Settingsで <code>Use Compiler to Extract Swift Strings</code> を有効にすると、ビルド時にコード等からローカライズ可能な文字列の抽出が行われ、自動で新規作成、更新、削除されます。
+ローカライズが入力されているのにコード等から削除されると、STALE状態となり、削除を承認できます。</p>
+<p>抽出と別に任意のKeyで作成することもできますが、自動管理から外れるので推奨されません。</p>
+<p>すべてのUIテキストをコード側、Interface BuilderとInfo.plist側でローカライズ可能と設定し、String Catalogに文字列管理を任せるのが便利です。</p>
+<h2 id=swiftuiのローカライズ>SwiftUIのローカライズ</h2>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#75715e>// Text.init(_ key: LocalizedStringKey, tableName: String? = nil, bundle: Bundle? = nil, comment: StaticString? = nil)</span>
+Text(<span style=color:#e6db74>&#34;Hello, World!&#34;</span>)
+</code></pre></div><p><code>Text</code> など、SwiftUIの標準的なViewは自動的にString Catalogに抽出されます。</p>
+<p>これは、SwiftUIでは一般に引数に <code>String</code> ではなく <code>LocalizeStringKey</code> を受け取るようすることで、ローカライズ可能な文字列として認識されるためです。</p>
+<p>つまり、これらの引数はローカライズにおけるKeyおよびデフォルトの値として認識されます。
+Keyとデフォルトの値が同一の場合は問題ないですが、同じ文字列で別の翻訳をつけるケースなども多いと思われるので、Keyとデフォルトの値は別にすることが推奨されます。</p>
+<p>そのため、元々SwiftUIに文字列をハードコードしているケースでは、ハードコードした文字列をKeyとして使う文字列に置き換えていく作業が必要になります。</p>
+<p>なお、自分でカスタムViewを作成する際も <code>String</code> の代わりに <code>LocalizedStringKey</code> を使用することで、自動的にローカライズ対象となります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>CustomView</span>: View {
+    <span style=color:#66d9ef>let</span> title: LocalizedStringKey
+
+    <span style=color:#66d9ef>var</span> body: some View {
+        Text(title)
+    }
+}
+</code></pre></div><h2 id=uikitのローカライズ>UIKitのローカライズ</h2>
+<p>SwiftUIと違い、UIに使うテキストは明示的にローカライズ可能であるように書く必要があります。
+ローカライズ可能であるように書くことで、自動的にString Catalogに抽出されます。</p>
+<p>iOS15以降のみのサポートで良ければ、<code>String(localized: )</code> を使うのが良いです。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#75715e>// String(</span>
+<span style=color:#75715e>//     localized keyAndValue: String.LocalizationValue,</span>
+<span style=color:#75715e>//     table: String? = nil,</span>
+<span style=color:#75715e>//     bundle: Bundle? = nil,</span>
+<span style=color:#75715e>//     locale: Locale = .current,</span>
+<span style=color:#75715e>//     comment: StaticString? = nil</span>
+<span style=color:#75715e>// )</span>
+<span style=color:#66d9ef>let</span> message = String(localized: <span style=color:#e6db74>&#34;こんにちは&#34;</span>)
+</code></pre></div><p>iOS15未満をサポートする場合は <code>NSLocalizedString( , comment: )</code> を使う必要があります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#75715e>// NSLocalizedString(</span>
+<span style=color:#75715e>//     _ key: String,</span>
+<span style=color:#75715e>//     tableName: String? = nil,</span>
+<span style=color:#75715e>//     bundle: Bundle = Bundle.main,</span>
+<span style=color:#75715e>//     value: String = &#34;&#34;,</span>
+<span style=color:#75715e>//     comment: String</span>
+<span style=color:#75715e>// )</span>
+<span style=color:#66d9ef>let</span> message = NSLocalizedString(<span style=color:#e6db74>&#34;こんにちは&#34;</span>, comment: <span style=color:#e6db74>&#34;ユーザーへの昼の挨拶&#34;</span>)
+</code></pre></div><p><code>String(localized: )</code> が優れているのは、文字列中に変数が入る場合です。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#75715e>// 正しく抽出される: `エラー%@` (%がつくのは変数)</span>
+<span style=color:#66d9ef>let</span> errorMessage = String(localized: <span style=color:#e6db74>&#34;エラー: </span><span style=color:#e6db74>\(</span>error.localizedDescription<span style=color:#e6db74>)</span><span style=color:#e6db74>&#34;</span>)
+<span style=color:#75715e>// 変数部分が文字列として抽出されてしまう: `エラー(error.localizedDescription)`</span>
+<span style=color:#66d9ef>let</span> nsErrorMessage = NSLocalizedString(<span style=color:#e6db74>&#34;エラー</span><span style=color:#e6db74>\(</span>error.localizedDescription<span style=color:#e6db74>)</span><span style=color:#e6db74>&#34;</span>,comment: <span style=color:#e6db74>&#34;エラーとその内容&#34;</span>)
+<span style=color:#75715e>// 正しく抽出可能: Keyが `エラー` 翻訳先に `エラー%@` と入力できる。</span>
+<span style=color:#66d9ef>let</span> formattedErrorMessage = String(format: NSLocalizedString(<span style=color:#e6db74>&#34;エラー&#34;</span>, comment: <span style=color:#e6db74>&#34;エラーとその内容&#34;</span>), error.localizedDescription)
+</code></pre></div><p><code>String(localized: )</code> を使えば、大きく書き換えることなしに文字列中の変数を利用できます。</p>
+<p>参考: <a href=https://zenn.dev/samekard_dev/articles/e0149efe77e403>String Catalogで、%を使うやつまとめ</a></p>
+<p>なお、Objective-Cでは <code>NSLocalizableString</code> 、Cでも <code>CFCopyLocalizedString</code> を使用すればString Catalogが自動で抽出してくれます。
+これらはビルド設定の <code>Localized String Macro Names</code> で設定できます。</p>
+<h2 id=interface-builderとinfoplistのローカライズ>Interface BuilderとInfo.plistのローカライズ</h2>
+<p>Interface BuilderやInfo.plistはコードから抽出、管理される <code>Localizable.xcstrings</code> とは別管理になります。</p>
+<p>Interface Builder(StoryboardやNIBファイル)は、右ペインのファイル設定から <code>Localize...</code> でそのファイル専用のString Catalogを生成できます。</p>
+<p>つまり、Interface Builderのファイルごとに別々のString Catalogファイルが生成されます。大量のカスタムViewや、ViewControllerごとにInterface Builderを作成するようなコード方針だと大量にファイルができてしまい管理が少し不便です……。</p>
+<p>Info.plistは <code>InfoPlist.xcstrings</code> をInfo.plistと同じディレクトリに置くことで、ビルド時にInfo.plistの内容が反映されたString Catalogになります。</p>
+<p>Info.plistの中でも、ユーザーに表示されるテキストのみがローカライズが必要なテキストとして認識され、String Catalogの対象になります。</p>
+<p>例えば、ホーム画面等に表示されるアプリ名である <code>CFBundleDisplayName</code> や、ユーザーに権限の許可を求めるダイアログに表示される <code>NSPhotoLibraryUsageDescription</code> などです。</p>
+<h2 id=ローカライズのエクスポートとインポート>ローカライズのエクスポートとインポート</h2>
+<p>String CatalogファイルはGUIで簡単に編集できます。文章の少ないケースや、翻訳者がXcodeを使用できる場合は直接String Catalogに書き込んでいくのが簡単です。</p>
+<p>翻訳を外部の翻訳者やツールに任せる場合は、Product > Export Localizationから <code>.xcloc</code> のXcode独自形式で書き出すことができます。</p>
+<p>プロジェクト内もしくはターゲット内のすべてのString Catalogを認識して、まとめてくれます。</p>
+<p><code>.xcloc</code> は、Xcodeや一部対応ツールで開ける翻訳用のファイル形式です。言語ごとにファイルを分けたりすることもできます。</p>
+<p><code>.xcloc</code> ファイル内にはより汎用的で翻訳でよく使われる <code>XLIFF</code> 形式が存在するので、翻訳ツールによってはこれを使うこともできます。</p>
+<p>翻訳した <code>XLIFF</code> を <code>.xcloc</code> のファイル内に戻すことで翻訳した <code>.xcloc</code> ファイルとして扱えます。</p>
+<p>翻訳した <code>.xcloc</code> はProduct > Import Localizationから取り込めます。</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/xcode/ rel=tag>Xcode</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/stringcatalog/>ローカライズなんて全く考えずに作ったプロジェクトをローカライズする方法</a></li>
+<li class=widget__item><a class=widget__link href=/posts/cryptozombies/>CryptoZombiesをやっただけの初心者がまとめるDAppsの特徴</a></li>
+<li class=widget__item><a class=widget__link href=/posts/extensioncrashlytics/>ExtensionでCrashlyticsを利用</a></li>
+<li class=widget__item><a class=widget__link href=/posts/otpauth/>iOSのTOTP(ワンタイムパスワード)まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/swiftchangefirstview/>SwiftUIで起動時の画面の出しわけ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/automaticallymanagesigning/>Automatically manage signingのススメ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/swiftui+uikit/>UIKitからSwiftUIに移行する際のアーキテクチャについて</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fundamentalsofnlp/>自然言語処理の基礎感想</a></li>
+<li class=widget__item><a class=widget__link href=/posts/appstorepreorder/>AppStoreの予約注文について</a></li>
+<li class=widget__item><a class=widget__link href=/posts/llmonm1mac/>M1MacでLLMを動かす</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/appstore/>AppStore</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/firebase/>Firebase</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/flutter/>Flutter</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios/>iOS</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/llm/>LLM</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/xcode/>Xcode</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3/>ブロックチェーン</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/applesilicon/ title=AppleSilicon>AppleSilicon</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/appstore/ title=AppStore>AppStore</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/cocoapods/ title=CocoaPods>CocoaPods</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/crashlytics/ title=Crashlytics>Crashlytics</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ethereum/ title=ethereum>ethereum</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/firebase/ title=Firebase>Firebase</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/flutter/ title=Flutter>Flutter</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ios/ title=iOS>iOS</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/llama/ title=LLaMA>LLaMA</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftpm/ title=SwiftPM>SwiftPM</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftui/ title=SwiftUI>SwiftUI</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/totp/ title=totp>totp</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/xcode/ title=Xcode>Xcode</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ title=オブジェクト指向でなぜつくるのか>オブジェクト指向でなぜつくるのか</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3/ title=ブロックチェーン>ブロックチェーン</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AF%E3%83%B3%E3%82%BF%E3%82%A4%E3%83%A0%E3%83%91%E3%82%B9%E3%83%AF%E3%83%BC%E3%83%89/ title=ワンタイムパスワード>ワンタイムパスワード</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%87%AA%E7%84%B6%E8%A8%80%E8%AA%9E%E5%87%A6%E7%90%86%E3%81%AE%E5%9F%BA%E7%A4%8E/ title=自然言語処理の基礎>自然言語処理の基礎</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2024 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
