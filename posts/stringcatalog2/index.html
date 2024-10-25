@@ -1,0 +1,278 @@
+<!doctype html><html class=no-js lang=ja>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>iOSアプリをローカライズしてつまづいたところメモ - しょ〜んの技術メモ😗</title>
+<script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
+<meta name=description content>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="iOSアプリをローカライズしてつまづいたところメモ">
+<meta name=twitter:description content="以前書いた「ローカライズなんて全く考えずに作ったiOSアプリをローカライズする方法」に従って、実際にローカライズしていないアプリをローカライ">
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link rel=dns-prefetch href=//fonts.googleapis.com>
+<link rel=dns-prefetch href=//fonts.gstatic.com>
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+<link rel=stylesheet href=/css/style.css>
+<link rel=stylesheet href=/css/custom.css>
+<link rel="shortcut icon" href=/favicon.ico>
+</head>
+<body class=body>
+<div class="container container--outer">
+<header class=header>
+<div class="container header__container">
+<div class=logo>
+<a class=logo__link href=/ title=しょ〜んの技術メモ😗 rel=home>
+<div class="logo__item logo__text">
+<div class=logo__title>しょ〜んの技術メモ😗</div>
+</div>
+</a>
+</div>
+<div class=divider></div>
+</div>
+</header>
+<div class="wrapper flex">
+<div class=primary>
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>iOSアプリをローカライズしてつまづいたところメモ</h1>
+<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2024-10-25T00:00:00Z>October 25, 2024</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
+</span>
+</div></div>
+</header><div class="content post__content clearfix">
+<p>以前書いた「ローカライズなんて全く考えずに作ったiOSアプリをローカライズする方法」に従って、実際にローカライズしていないアプリをローカライズした時につまづいた点や検討が必要だった点についてメモ的に残していきます。</p>
+<h2 id=ローカライズテキストの抽出と適用>ローカライズテキストの抽出と適用</h2>
+<h3 id=storyboard>Storyboard</h3>
+<p>iOSでは、Storyboardを使用したUIは、ほとんどのテキスト要素が自動的にString Catalogに抽出されます。しかし、以下の項目に関しては、コードから設定する必要があります。</p>
+<h4 id=uitextviewのtext>UITextViewのtext</h4>
+<p>ローカライズ対象として抽出はされますが、ローカライズしたテキストを適用してくれません(バグ?)。コードからローカライズしたテキストを書き込む必要があります。</p>
+<p><a href=https://stackoverflow.com/questions/20038048/localization-for-uitextview-in-storyboard>ios - Localization for UITextView in storyboard - Stack Overflow</a></p>
+<h4 id=attributedstringを利用したuilabel等>AttributedStringを利用したUILabel等</h4>
+<p>AttributedStringは自動でローカライズに抽出されず、適用もされません。ある単語を赤くハイライトするなど、元の言語を前提にAttributedStringを作成しているケースも多いと思われるのでローカライズすることが難しいです。
+基本的にはAttributedStringをやめて普通のStringの組み合わせで設定できないか考えましょう。
+どうしてもAttributedStringを使う必要があるのであれば、ローカライズしたテキストを必要に応じてAttributedStringに変換して、コード側から適用する必要があります。</p>
+<h3 id=テキストの長さ>テキストの長さ</h3>
+<p>日本語は他の言語より短い文字列で表現できる傾向があります。日本語だと数文字のところが英語にするとかなりの長さになることが多々あります。
+固定長のラベルや一行指定のラベルを可変で2行以上を許容するように修正する必要があります。Storyboard上では確認し切れないので、実機で見切れがないか探す作業が必要です。</p>
+<h2 id=string-catalogをexportしたファイルの取り扱い>String Catalogをexportしたファイルの取り扱い</h2>
+<p>iOSのString Catalogをexportした <code>ja.xliff</code> ファイルからCSVファイルを作って、翻訳後にそれぞれのファイルに書き戻すようにスクリプトを組みました。
+xliffファイルは比較的新しいこともあり、取り扱うライブラリなども見当たらなかったので、xmlファイルとしてpythonで処理するスクリプトを組みました。</p>
+<h3 id=iosのxliffファイルの読み出し>iOSのxliffファイルの読み出し</h3>
+<p>iOSの <code>ja.xliff</code> ファイルからデータを抜き出すコードです。
+正確には、keyはアプリ全体でユニークとはかぎらないので重複するkeyがある場合はxml tree構造を読み取って別で管理するなどが必要ですが、省略しています。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#f92672>import</span> xml.etree.ElementTree <span style=color:#66d9ef>as</span> ET
+
+localizations_folder_path <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;path/to/localizations_folder&#34;</span>
+
+ja_xliff_path <span style=color:#f92672>=</span> localizations_folder_path <span style=color:#f92672>/</span> <span style=color:#e6db74>&#34;ja.xcloc/Localized Contents/ja.xliff&#34;</span>
+tree <span style=color:#f92672>=</span> ET<span style=color:#f92672>.</span>parse(ja_xliff_path)
+root <span style=color:#f92672>=</span> tree<span style=color:#f92672>.</span>getroot()
+
+<span style=color:#75715e># 空のリストを準備</span>
+data <span style=color:#f92672>=</span> []
+
+<span style=color:#75715e># 各trans-unitを処理してデータをリストに格納</span>
+<span style=color:#66d9ef>for</span> trans_unit <span style=color:#f92672>in</span> root<span style=color:#f92672>.</span>findall(<span style=color:#e6db74>&#34;.//ns:trans-unit&#34;</span>, {<span style=color:#e6db74>&#34;ns&#34;</span>: <span style=color:#e6db74>&#34;urn:oasis:names:tc:xliff:document:1.2&#34;</span>}):
+    unit_id <span style=color:#f92672>=</span> trans_unit<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;id&#34;</span>)
+    source_text <span style=color:#f92672>=</span> trans_unit<span style=color:#f92672>.</span>find(<span style=color:#e6db74>&#34;ns:source&#34;</span>, {<span style=color:#e6db74>&#34;ns&#34;</span>: <span style=color:#e6db74>&#34;urn:oasis:names:tc:xliff:document:1.2&#34;</span>})<span style=color:#f92672>.</span>text
+    <span style=color:#66d9ef>if</span> unit_id <span style=color:#f92672>in</span> (<span style=color:#e6db74>&#34;CFBundleName&#34;</span>, <span style=color:#e6db74>&#34;CFBundleDisplayName&#34;</span>):
+        <span style=color:#75715e># 今回は翻訳不要だったためスキップ</span>
+        <span style=color:#66d9ef>continue</span>
+    <span style=color:#75715e># リストに辞書としてデータを追加</span>
+    data<span style=color:#f92672>.</span>append({<span style=color:#e6db74>&#34;key&#34;</span>: unit_id, <span style=color:#e6db74>&#34;ja&#34;</span>: source_text})
+</code></pre></div><h3 id=iosのxliffファイルへの書き込み>iOSのxliffファイルへの書き込み</h3>
+<p>翻訳後に各言語のxliffファイルに書き込むコードです。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#75715e># 名前空間のプレフィックスを制御(設定しないと書き込み後のタグに不要なprefixがつく)</span>
+ET<span style=color:#f92672>.</span>register_namespace(<span style=color:#e6db74>&#34;&#34;</span>, <span style=color:#e6db74>&#34;urn:oasis:names:tc:xliff:document:1.2&#34;</span>)
+
+<span style=color:#75715e># 今回は3言語。必要に応じて変更。</span>
+target_languages <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;ja&#34;</span>, <span style=color:#e6db74>&#34;en&#34;</span>, <span style=color:#e6db74>&#34;ko&#34;</span>]
+<span style=color:#75715e># dict[言語名, dict[key, 翻訳後テキスト]]の形で読み込んでいる。</span>
+translations: dict[str, dict[str, str]] <span style=color:#f92672>=</span> self<span style=color:#f92672>.</span>_load_translations_from_csv(csv_file_path)
+
+<span style=color:#66d9ef>for</span> lang <span style=color:#f92672>in</span> target_languages:
+    xliff_path <span style=color:#f92672>=</span> localizations_folder_path <span style=color:#f92672>/</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>{</span>lang<span style=color:#e6db74>}</span><span style=color:#e6db74>.xcloc/Localized Contents/</span><span style=color:#e6db74>{</span>lang<span style=color:#e6db74>}</span><span style=color:#e6db74>.xliff&#34;</span>
+    tree <span style=color:#f92672>=</span> ET<span style=color:#f92672>.</span>parse(xliff_path)
+    root <span style=color:#f92672>=</span> tree<span style=color:#f92672>.</span>getroot()
+
+    <span style=color:#66d9ef>for</span> trans_unit <span style=color:#f92672>in</span> root<span style=color:#f92672>.</span>findall(<span style=color:#e6db74>&#34;.//ns:trans-unit&#34;</span>, self<span style=color:#f92672>.</span>namespace):
+        unit_id <span style=color:#f92672>=</span> trans_unit<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;id&#34;</span>)
+        <span style=color:#66d9ef>if</span> unit_id <span style=color:#f92672>in</span> translations:
+            target_elem <span style=color:#f92672>=</span> trans_unit<span style=color:#f92672>.</span>find(<span style=color:#e6db74>&#34;ns:target&#34;</span>, self<span style=color:#f92672>.</span>namespace)
+            <span style=color:#66d9ef>if</span> target_elem <span style=color:#f92672>is</span> <span style=color:#66d9ef>None</span>:
+                <span style=color:#75715e># 一度も翻訳したことない場合はtargetタグがないので作る</span>
+                target_elem <span style=color:#f92672>=</span> ET<span style=color:#f92672>.</span>SubElement(trans_unit, <span style=color:#e6db74>&#34;target&#34;</span>)
+            <span style=color:#66d9ef>if</span> <span style=color:#e6db74>&#34;state&#34;</span> <span style=color:#f92672>in</span> target_elem<span style=color:#f92672>.</span>attrib:
+                <span style=color:#75715e># 元のxliffファイルにはstateにnewとか入っていて、翻訳状態を管理している。書き込むときは消す必要がある。。</span>
+                <span style=color:#66d9ef>del</span> target_elem<span style=color:#f92672>.</span>attrib[<span style=color:#e6db74>&#34;state&#34;</span>]
+
+            <span style=color:#75715e># 翻訳を書き込む</span>
+            target_elem<span style=color:#f92672>.</span>text <span style=color:#f92672>=</span> translations[unit_id]<span style=color:#f92672>.</span>get(lang, <span style=color:#e6db74>&#34;&#34;</span>)
+
+    <span style=color:#75715e># 更新されたXLIFFファイルを保存</span>
+    tree<span style=color:#f92672>.</span>write(xliff_path, encoding<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;utf-8&#34;</span>, xml_declaration<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>)
+</code></pre></div><h2 id=android翻訳ファイルとの統合時の注意>Android翻訳ファイルとの統合時の注意</h2>
+<p>同じアプリのiOSバージョンとAndroidバージョンがある場合に翻訳を統一したいことがあると思います。
+Anroidの <code>strings.xml</code> ファイルとiOSのString Catalogをexportした <code>ja.xliff</code> ファイルからCSVファイルを作って、翻訳後にそれぞれのファイルに書き戻すようにスクリプトを組んでいました。
+CSVファイルで統合する際に困ったことを書いておきます。</p>
+<h3 id=改行>改行</h3>
+<p>Androidでは改行コード<code>"\n"</code>を用いて改行を表しますが、iOSでは改行コード<code>"\n"</code>は改行と認識されません。実際の改行に変換してからxliffファイルに書き戻す必要があります。</p>
+<h3 id=ワイルドカードの指定方法>ワイルドカードの指定方法</h3>
+<p>AndroidとiOSでは、文字列の変数置き換えに使われるワイルドカードの形式が異なります。</p>
+<ul>
+<li>Android: 文字列<code>%s</code>, 数値<code>%d</code></li>
+<li>iOS: 文字列<code>%@</code>, 数値<code>%d</code></li>
+</ul>
+<p>他にも文字列が複数ある場合などありますが、必要に応じて変換か、iOSとAndroidで文字列を分けてしまう必要があります。</p>
+<h3 id=htmlタグ>HTMLタグ</h3>
+<p>Androidでは簡単なHTMLタグをテキストに挿入してスタイリングすることができますが、iOSではこの機能は利用できません。
+HTMLタグを頻繁に使う運用ではなかったので、一部HTMLタグの含まれるテキストのみiOSとAndroidで文字列を分けました。</p>
+<h2 id=iosにおけるアプリの言語設定>iOSにおけるアプリの言語設定</h2>
+<p>iOSでは、端末の言語設定に基づいてアプリの表示言語が自動的に切り替わる仕組みがあります。</p>
+<h3 id=端末の言語設定の反映>端末の言語設定の反映</h3>
+<p>端末の言語設定で、自動的にアプリの言語設定が決定されます。
+言語設定は複数設定できるので、その場合も少し挙動が変わります。</p>
+<ul>
+<li>端末: 英語　→　アプリ: 英語</li>
+<li>端末: ニュージーランド英語　→　アプリ: 英語(亜種的な言語でも、その言語の設定になる)</li>
+<li>端末: イタリア語(アプリが対応していない言語)　→　アプリ: 日本語(アプリのデフォルト言語)</li>
+<li>端末: イタリア語, 英語　→　アプリ: 英語(1番上の言語設定でなくても、対応言語が言語設定に入っていればその言語になる)</li>
+</ul>
+<h3 id=アプリ内の言語変更について>アプリ内の言語変更について</h3>
+<p>端末の言語設定と別に、アプリの言語設定を変えることもできます。ただし、iOSではアプリ内から直接言語設定を変更することはできません。</p>
+<p>言語設定を変更したい場合は、設定アプリの各アプリの設定から <code>Preferred Language</code> を切り替える必要があります。
+アプリ内から以下リンクで、設定アプリの各アプリ設定に飛ばすのが良いです。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift>UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)<span style=color:#f92672>!</span>)
+</code></pre></div><h3 id=アプリ内の言語変更が表示されないケース>アプリ内の言語変更が表示されないケース</h3>
+<p>端末の言語設定が1つの場合、なぜか設定にアプリの言語設定が表示されません。</p>
+<p>iOS17以降であれば、端末の言語設定が1つの場合でも、info.plistで<code>UIPrefersShowingLanguageSettings</code>を<code>YES</code>に設定すると、アプリの言語設定が表示されます。</p>
+<p><a href=https://forums.developer.apple.com/forums/thread/721302>Localization settings hidden if on… | Apple Developer Forums</a></p>
+<p><code>UIPrefersShowingLanguageSettings</code>については、なぜかドキュメントがなくWWDC2024の動画で一言触れられたのみです。</p>
+<p><a href=https://developer.apple.com/jp/videos/play/wwdc2024/10185/>多言語対応アプリの構築 - WWDC24 - ビデオ - Apple Developer</a></p>
+<p>iOS17未満の端末で端末の言語設定が1つの場合は、アプリ内の言語変更を行う方法はありません……。</p>
+<p>以上</p>
+</div>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/xcode/ rel=tag>Xcode</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
+</li>
+</ul>
+</div>
+</footer>
+</article>
+</main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
+</div>
+<aside class=sidebar><div class="widget-search widget">
+<form class=widget-search__form role=search method=get action=https://google.com/search>
+<label>
+<input class=widget-search__field type=search placeholder=検索… name=q aria-label=検索…>
+</label>
+<input class=widget-search__submit type=submit value=Search>
+<input type=hidden name=sitesearch value=https://SeanWakasugi.github.io>
+</form>
+</div>
+<div class="widget-recent widget">
+<h4 class=widget__title>最近の投稿</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item><a class=widget__link href=/posts/stringcatalog2/>iOSアプリをローカライズしてつまづいたところメモ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/lambdalayer/>AWS Lambda Layerでつまづいたところメモ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/stringcatalog/>ローカライズなんて全く考えずに作ったiOSアプリをローカライズする方法</a></li>
+<li class=widget__item><a class=widget__link href=/posts/cryptozombies/>CryptoZombiesをやっただけの初心者がまとめるDAppsの特徴</a></li>
+<li class=widget__item><a class=widget__link href=/posts/extensioncrashlytics/>ExtensionでCrashlyticsを利用</a></li>
+<li class=widget__item><a class=widget__link href=/posts/otpauth/>iOSのTOTP(ワンタイムパスワード)まとめ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/swiftchangefirstview/>SwiftUIで起動時の画面の出しわけ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/automaticallymanagesigning/>Automatically manage signingのススメ</a></li>
+<li class=widget__item><a class=widget__link href=/posts/swiftui+uikit/>UIKitからSwiftUIに移行する際のアーキテクチャについて</a></li>
+<li class=widget__item><a class=widget__link href=/posts/fundamentalsofnlp/>自然言語処理の基礎感想</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-categories widget">
+<h4 class=widget__title>カテゴリー</h4>
+<div class=widget__content>
+<ul class=widget__list>
+<li class=widget__item>
+<a class=widget__link href=/categories/appstore/>AppStore</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/aws/>AWS</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/firebase/>Firebase</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/flutter/>Flutter</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios/>iOS</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/ios%E3%82%A2%E3%83%97%E3%83%AA/>iOSアプリ</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/llm/>LLM</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/swift/>Swift</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/xcode/>Xcode</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3/>ブロックチェーン</a></li>
+<li class=widget__item>
+<a class=widget__link href=/categories/%E6%9C%AC%E3%81%BE%E3%81%A8%E3%82%81/>本まとめ</a></li>
+</ul>
+</div>
+</div>
+<div class="widget-taglist widget">
+<h4 class=widget__title>タグ</h4>
+<div class=widget__content>
+<a class="widget-taglist__link widget__link btn" href=/tags/alamofire/ title=Alamofire>Alamofire</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/applesilicon/ title=AppleSilicon>AppleSilicon</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/appstore/ title=AppStore>AppStore</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/aws/ title=AWS>AWS</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/cocoapods/ title=CocoaPods>CocoaPods</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/crashlytics/ title=Crashlytics>Crashlytics</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ethereum/ title=ethereum>ethereum</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/firebase/ title=Firebase>Firebase</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/flutter/ title=Flutter>Flutter</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ios/ title=iOS>iOS</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/lambda/ title=Lambda>Lambda</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/llama/ title=LLaMA>LLaMA</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/python/ title=python>python</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/storyboard/ title=Storyboard>Storyboard</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swift/ title=Swift>Swift</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftpm/ title=SwiftPM>SwiftPM</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/swiftui/ title=SwiftUI>SwiftUI</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/totp/ title=totp>totp</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uikit/ title=UIKit>UIKit</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/uipageviewcontroller/ title=UIPageViewController>UIPageViewController</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/usernotifications/ title=UserNotifications>UserNotifications</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/xcode/ title=Xcode>Xcode</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%81%A7%E3%81%AA%E3%81%9C%E3%81%A4%E3%81%8F%E3%82%8B%E3%81%AE%E3%81%8B/ title=オブジェクト指向でなぜつくるのか>オブジェクト指向でなぜつくるのか</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3/ title=ブロックチェーン>ブロックチェーン</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AA%E3%83%BC%E3%83%80%E3%83%96%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89/ title=リーダブルコード>リーダブルコード</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E3%83%AF%E3%83%B3%E3%82%BF%E3%82%A4%E3%83%A0%E3%83%91%E3%82%B9%E3%83%AF%E3%83%BC%E3%83%89/ title=ワンタイムパスワード>ワンタイムパスワード</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%87%AA%E7%84%B6%E8%A8%80%E8%AA%9E%E5%87%A6%E7%90%86%E3%81%AE%E5%9F%BA%E7%A4%8E/ title=自然言語処理の基礎>自然言語処理の基礎</a>
+</div>
+</div>
+</aside>
+</div>
+<footer class=footer>
+<div class="container footer__container flex">
+<div class=footer__copyright>
+&copy; 2024 Author.
+<span class=footer__copyright-credits>このサイトは <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> と <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> テーマで生成されています。</span>
+</div>
+</div>
+</footer>
+</div>
+<script async defer src=/js/menu.js></script>
+</body>
+</html>
