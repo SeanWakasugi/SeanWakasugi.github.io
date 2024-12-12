@@ -3,19 +3,18 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=x-ua-compatible content="IE=edge">
-<title>AWS - しょ〜んの技術メモ😗</title>
+<title>iOSアプリのローカライズリリースを先送りにする時のチェックリスト - しょ〜んの技術メモ😗</title>
 <script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script>
 <meta name=description content>
 <meta name=twitter:card content="summary">
-<meta name=twitter:title content="AWS">
-<meta name=twitter:description content>
+<meta name=twitter:title content="iOSアプリのローカライズリリースを先送りにする時のチェックリスト">
+<meta name=twitter:description content="iOSアプリのローカライズ対応を進めたものの、翻訳確認などに時間がかかり、リリースを先送りにすることがあります。このとき、変更を長期間ブラン">
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link rel=dns-prefetch href=//fonts.googleapis.com>
 <link rel=dns-prefetch href=//fonts.gstatic.com>
 <link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
 <link rel=stylesheet href=/css/style.css>
 <link rel=stylesheet href=/css/custom.css>
-<link rel=alternate type=application/rss+xml href=/tags/aws/index.xml title=しょ〜んの技術メモ😗>
 <link rel="shortcut icon" href=/favicon.ico>
 </head>
 <body class=body>
@@ -34,30 +33,85 @@
 </header>
 <div class="wrapper flex">
 <div class=primary>
-<main class="main list" role=main>
-<header class=main__header>
-<h1 class=main__title>AWS</h1>
-</header><article class="list__item post">
-<header class=list__header>
-<h2 class="list__title post__title">
-<a href=/posts/lambdalayer/ rel=bookmark>
-AWS Lambda Layerでつまづいたところメモ
-</a>
-</h2>
-<div class="list__meta meta">
+<main class=main role=main>
+<article class=post>
+<header class=post__header>
+<h1 class=post__title>iOSアプリのローカライズリリースを先送りにする時のチェックリスト</h1>
+<div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
-<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2024-08-09T00:00:00Z>August 09, 2024</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/aws/ rel=category>AWS</a>
+<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2024-12-12T00:00:00Z>December 12, 2024</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/swift/ rel=category>Swift</a>
 </span>
 </div></div>
-</header>
-<div class="content list__excerpt post__content clearfix">
-AWS Lambdaを使用してPythonスクリプトを実行する際、必要なPythonライブラリをインストールするのに pip などのライブラリ管理は利用で
+</header><div class="content post__content clearfix">
+<p>iOSアプリのローカライズ対応を進めたものの、翻訳確認などに時間がかかり、リリースを先送りにすることがあります。このとき、変更を長期間ブランチで塩漬けにすると、いざリリース直前になってからconflictが発生し、面倒なことになりがちです。</p>
+<p>そこで、コードのマージだけでも先行して行う方法について、いくつか情報をまとめました。</p>
+<p>ローカライズ対応のためにStringを別ファイルに切り出したり、言語・地域を考慮した実装を行うことは、今後のローカライズ対応においても有益な修正です。実際、現段階で多言語対応版をリリースしない場合でも、早めにmergeしておくことをお勧めします。</p>
+<h2 id=string-catalog>String Catalog</h2>
+<p>ローカライズ対応を始める際、以下の手順で対応予定の言語を設定したと思います。</p>
+<ol>
+<li>プロジェクトファイルのInfoタブを選択</li>
+<li>Localizationsセクションの「+」ボタンで言語を追加</li>
+<li>言語をクリックし、下部の「Set Default」ボタンでデフォルト言語を設定</li>
+</ol>
+<p>もし、今回はまだリリースしない言語があるなら、Localizationsセクションで「-」ボタンをクリックして削除しても問題ありません。String Catalogにはローカライズ情報が残るので、後で「+」ボタンから言語を追加すれば戻せます。ただし、デフォルト言語を変更するときは注意が必要です。</p>
+<h3 id=デフォルト言語変更時の注意点>デフォルト言語変更時の注意点</h3>
+<p>デフォルト言語を変えると、String Catalogファイル内の <code>"sourceLanguage"</code> が書き換わります。これはXcodeに任せて問題ありませんが、<code>"sourceLanguage"</code> の変更によってローカライズ値が消えることがあります。</p>
+<p><code>"state" : "new"</code> と <code>"extractionState" : "extracted_with_value"</code> 2つのフラグが付いているローカライズ値は、<code>sourceLanguage</code> 変更時に値が消えてしまうことがあります。</p>
+<p>例えば、Storyboard上に「決定する」というUIButtonがあり、そのまま日本語が抽出されていた場合、デフォルト言語を英語にすると日本語の「決定する」は消失します。</p>
+<p>これを避けるには、<code>"state" : "new"</code> をすべて <code>"state" : "translated"</code> に文字列置換し、1度ビルドすると <code>"extractionState" : "extracted_with_value"</code> も自動的に消えます。
+その後はデフォルト言語を変更しても値が保持されます。</p>
+<h2 id=現在のローカライズ言語によって処理を変えるコード>現在のローカライズ言語によって処理を変えるコード</h2>
+<p>String Catalogでまかなえない部分をコードで処理している場合、それらもローカライズに合わせた対応が必要です。結論としては、<code>Locale.current</code> に依存して処理を分けるようにすることをお勧めします。</p>
+<p><code>Locale.current</code> は、現在アプリで使用されているローカライズ言語の <code>Locale</code> を返します。ユーザーのiPhone言語が英語でもフランス語でも、アプリ表示が日本語なら <code>Locale</code> (の言語部分)は <code>ja</code> を返します。これにより、アプリ表示言語と処理が自然と同期するため、プロジェクトのLocalizations設定に依存してローカライズを管理できます。</p>
+<p>例えば、以下のような <code>Language</code> enumを <code>Locale.current</code> で初期化すれば、enumごとに言語別の処理を書けます。
+たとえプロジェクトが英語のみ対応でも、<code>Locale.current</code> が英語を返してくれるため、何も特別な対応なしで処理を振り分けられます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Language</span>: CaseIterable {
+    <span style=color:#66d9ef>case</span> japanese
+    <span style=color:#66d9ef>case</span> english
+    <span style=color:#66d9ef>case</span> simplifiedChinese
+    <span style=color:#66d9ef>case</span> traditionalChinese
+    <span style=color:#66d9ef>case</span> korean
+
+    <span style=color:#66d9ef>init</span>(locale: Locale) {
+        <span style=color:#66d9ef>self</span> = <span style=color:#66d9ef>Self</span>.allCases.first { locale.identifier.hasPrefix($0.localePrefix) } ?? .english
+    }
+
+    <span style=color:#66d9ef>var</span> localePrefix: String {
+        <span style=color:#66d9ef>switch</span> <span style=color:#66d9ef>self</span> {
+        <span style=color:#66d9ef>case</span> .japanese:
+            <span style=color:#e6db74>&#34;ja&#34;</span>
+        <span style=color:#66d9ef>case</span> .english:
+            <span style=color:#e6db74>&#34;en&#34;</span>
+        <span style=color:#66d9ef>case</span> .simplifiedChinese:
+            <span style=color:#e6db74>&#34;zh-Hans&#34;</span>
+        <span style=color:#66d9ef>case</span> .traditionalChinese:
+            <span style=color:#e6db74>&#34;zh-Hant&#34;</span>
+        <span style=color:#66d9ef>case</span> .korean:
+            <span style=color:#e6db74>&#34;ko&#34;</span>
+        }
+    }
+}
+</code></pre></div><p>以上</p>
 </div>
-<div class="list__footer clearfix">
-<a class="list__footer-readmore btn" href=/posts/lambdalayer/>続きを読む…</a>
+<footer class=post__footer>
+<div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
+<ul class=tags__list>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/xcode/ rel=tag>Xcode</a>
+</li>
+<li class=tags__item>
+<a class="tags__link btn" href=/tags/swift/ rel=tag>swift</a>
+</li>
+</ul>
 </div>
+</footer>
 </article>
 </main>
+<div class="authorbox clearfix">
+<figure class=authorbox__avatar>
+<img alt=" avatar" src=/img/avatar.jpg class=avatar height=90 width=90>
+</figure>
+</div>
 </div>
 <aside class=sidebar><div class="widget-search widget">
 <form class=widget-search__form role=search method=get action=https://google.com/search>
